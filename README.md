@@ -307,6 +307,18 @@ Compose 会启动 PostgreSQL、Redis 和 EvoAgent。未配置这两项时，项�
 | `GET` | `/api/queue/dead-letters` | 查询死信任务 |
 | `POST` | `/v1/queue/dead-letters/replay` | 重放死信任务 |
 | `GET/POST` | `/api/deployments/llm-review`、`/v1/deployments/llm-review` | 查询或配置灰度/影子发布 |
+| `GET` | `/v1/runtime-policies` | 查询持久化的风险感知运行时策略 |
+| `GET` | `/v1/runtime-policies/{id}` | 查询单个运行时策略 |
+| `POST` | `/v1/policy-evolution/propose` | 基于基线生成并保存策略候选 |
+| `GET` | `/v1/policy-deployments` | 查询策略部署清单 |
+| `GET` | `/v1/policy-deployments/{id}` | 查询单个策略部署 |
+| `POST` | `/v1/policy-deployments` | 依据候选策略创建 DRAFT 部署 |
+| `POST` | `/v1/policy-deployments/{id}/replay-pass` | 推进到 REPLAY_PASSED |
+| `POST` | `/v1/policy-deployments/{id}/shadow` | 推进到 SHADOW |
+| `POST` | `/v1/policy-deployments/{id}/canary` | 开启 Canary 分流 |
+| `POST` | `/v1/policy-deployments/{id}/advance` | 人工推进 stage（或触发自动回滚） |
+| `POST` | `/v1/policy-deployments/{id}/promote` | 全量接管 Candidate Policy |
+| `POST` | `/v1/policy-deployments/{id}/rollback` | 回滚到 previous-good policy |
 
 `POST /v1/reviews` 的 `diff` 最大默认 1 MiB；单任务默认最多 8 步、120 秒。可通过环境变量调整，详见 `.env.example`。
 
@@ -342,3 +354,29 @@ HTTP / GitHub Webhook
 ```
 
 Harness 由项目内 `AgentRuntime` 控制状态流转：`PENDING → PLANNING → EXECUTING → REVIEWING → SUCCESS`。LLM Specialist 在有界 Agent Loop 中依据 Tool Registry 暴露的参数 Schema 选择 Diff 搜索、变更行读取、文件列表和记忆检索工具；Runtime 在调用前校验参数，并把结果或错误写成结构化 Observation。ContextManager 每轮重新组合任务、工具 Schema、Critic 反馈、历史记忆、最新 Observation 与风险排序后的 Diff，共享统一 Token 预算。MemoryManager 按租户与仓库检索历史经验，任务结束后把裁决摘要归档为 Episodic Memory、释放 Working Memory，并在 Recall 前清理过期记录。步骤和时间预算耗尽后，Agent 进入既有重试/交接流程。协作协议仍为 `规划 → 初审 → 质疑 → 反思/补证 → 验证 → 裁决`，消息、工具观察、重试、任务交接和最终裁决均随任务持久化。
+
+### Runtime Policy 部署闭环（持久化控制面）
+
+真实 `/v1/reviews` 的策略选择已统一改为由 `PolicyDeploymentManager` 接管，链路为：
+
+```text
+RiskProfiler → 解析 Baseline Policy → PolicyDeploymentManager.route()
+            → baseline / candidate 稳定 lane（hash(task_id + deployment_id)）
+            → Safety Floor 最终门禁 → ReviewExecutionContext
+```
+
+生产闭环以**持久化控制面**为底座（SQLite JSON 控制存储或 PostgreSQL，重启后状态不丢）：
+
+```text
+Review(真实流量) → RiskProfile / Policy / DecisionTrace / ReplaySnapshot / Outcome
+  → confirmed false negative → Experience → Hypothesis
+  → Runtime Policy Candidate
+  → Replay（baseline vs candidate）→ Hard Safety Gate
+  → DRAFT → REPLAY_PASSED → SHADOW → CANARY（按流量百分比稳定分流）
+  → 新 Review 进入 candidate lane → Production Outcome
+  → Promote → 100% Candidate → 重启仍保留
+  → 坏 Candidate 触发 hard safety failure → 自动 Rollback → previous-good
+  → 全流程写入 Evolution Lineage（可从 DB 重新读取）
+```
+
+Risk 等级与候选策略、部署、曝光（exposure）、决策 Trace、Replay 快照、生产 Outcome 与 Lineage 均持久化；服务重启时自动恢复激活的 Canary/Promote/Rollback 状态。据此，项目可描述为：**以 Code Review 为业务载体的自研持久化控制面 Policy-driven Agent Harness，具备风险感知 Runtime Policy、Tool Governance、Recovery/Replay 管控，以及 Runtime Policy Candidate 的 Replay / Hard Gate / Canary / Promote / Rollback 生产闭环，生产 Outcome 持续回流进化流，控制面支持服务重启恢复。**

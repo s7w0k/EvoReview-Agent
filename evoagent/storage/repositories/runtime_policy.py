@@ -30,6 +30,22 @@ class PersistedRuntimePolicyRepository(PersistentRepository):
     def latest(self, policy_id: str) -> Optional[Dict[str, Any]]:
         return self.record(policy_id)
 
+    def active_baseline_policy(self, risk_level: str):
+        """Return the persisted ``baseline-{risk_level}`` policy if present.
+
+        Baselines are bootstrapped once under a stable id so a service restart
+        restores the same baseline object instead of creating a newer version.
+        """
+        from ...policy.codec import policy_from_dict
+
+        row = self.record(f"baseline-{risk_level}")
+        if row is None or not row.get("content"):
+            return None
+        try:
+            return policy_from_dict(row["content"])
+        except Exception:
+            return None
+
     def version(self, policy_id: str, version: int) -> Optional[Dict[str, Any]]:
         record = self.record(policy_id)
         if record and int(record.get("version", 0)) == version:

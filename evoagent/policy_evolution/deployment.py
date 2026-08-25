@@ -121,6 +121,37 @@ class ExposureRecord:
         }
 
 
+@dataclass
+class RoutingDecision:
+    """The outcome of routing one task: the policy to use plus attribution.
+
+    This is what a real service writes into the task context so the exact
+    policy / lane a review ran under is always recoverable (section 4.4).
+    """
+
+    policy: ExecutionPolicy
+    lane: str                       # "baseline" | "candidate"
+    deployment_id: Optional[str] = None
+    baseline_policy_id: Optional[str] = None
+    baseline_version: Optional[int] = None
+    candidate_policy_id: Optional[str] = None
+    candidate_version: Optional[int] = None
+    traffic_share: Optional[float] = None
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "policy_id": self.policy.policy_id,
+            "policy_version": self.policy.policy_version,
+            "lane": self.lane,
+            "deployment_id": self.deployment_id,
+            "baseline_policy_id": self.baseline_policy_id,
+            "baseline_version": self.baseline_version,
+            "candidate_policy_id": self.candidate_policy_id,
+            "candidate_version": self.candidate_version,
+            "traffic_share": self.traffic_share,
+        }
+
+
 class DeploymentNotFound(Exception):
     pass
 
@@ -370,7 +401,134 @@ class PolicyDeploymentManager:
     def exposure(self) -> List[ExposureRecord]:
         return list(self._exposure)
 
+    def route(
+        self,
+        tenant_id: str,
+        repository: str,
+        risk_level: str,
+        task_id: str,
+    ) -> RoutingDecision:
+        """Resolve a task's lane and return the policy *with* attribution.
+
+        Unlike ``resolve_policy`` (which returns only the policy), this returns
+        everything a service needs to stamp the task context and replay results
+        (section 4.4 / 4.5).
+        """
+        deployment = self._active_deployment(tenant_id, repository, risk_level)
+
+        if deployment is None:
+            baseline = self._policies.get(self._default_baseline_id(
+                tenant_id, repository, risk_level))
+            if baseline is None:
+                raise DeploymentNotFound(
+                    f"no policy available for {tenant_id}/{repository}/{risk_level}")
+            return RoutingDecision(policy=baseline, lane="baseline",
+                                   baseline_policy_id=baseline.policy_id,
+                                   baseline_version=baseline.policy_version)
+
+        baseline = self._policies.get(deployment.baseline_policy_id)
+        candidate = self._policies.get(deployment.policy_id)
+
+        if deployment.state is DeploymentState.PROMOTED:
+            return RoutingDecision(
+                policy=candidate, lane="candidate",
+                deployment_id=deployment.deployment_id,
+                baseline_policy_id=deployment.baseline_policy_id,
+                baseline_version=baseline.policy_version if baseline else None,
+                candidate_policy_id=deployment.policy_id,
+                candidate_version=candidate.policy_version if candidate else None,
+                traffic_share=1.0,
+            )
+
+        if deployment.state is not DeploymentState.CANARY:
+            return RoutingDecision(
+                policy=baseline, lane="baseline",
+                deployment_id=deployment.deployment_id,
+                baseline_policy_id=deployment.baseline_policy_id,
+                baseline_version=baseline.policy_version if baseline else None,
+                candidate_policy_id=deployment.policy_id,
+                candidate_version=candidate.policy_version if candidate else None,
+                traffic_share=0.0,
+            )
+
+        lane = self._lane(task_id, deployment.deployment_id,
+                          deployment.traffic_share)
+        if baseline is None or candidate is None:
+            raise DeploymentNotFound("canary policies not registered")
+        self._record_exposure(
+            task_id, deployment, lane,
+            baseline_version=baseline.policy_version,
+            candidate_version=candidate.policy_version,
+        )
+        chosen = candidate if lane == "candidate" else baseline
+        return RoutingDecision(
+            policy=chosen, lane=lane,
+            deployment_id=deployment.deployment_id,
+            baseline_policy_id=deployment.baseline_policy_id,
+            baseline_version=baseline.policy_version,
+            candidate_policy_id=deployment.policy_id,
+            candidate_version=candidate.policy_version,
+            traffic_share=deployment.traffic_share,
+        )
+
+    def restore_active_deployments(self, policy_loader=None) -> int:
+        """Rehydrate deployments / exposures from the persisted repo (section 6.1).
+
+        Invoked on service startup so a canary or promoted policy survives a
+        restart.  ``policy_loader(policy_id)`` is used to reload the baseline /
+        candidate ExecutionPolicy objects from the persisted policy store.
+        """
+        if self._repo is None:
+            return 0
+        rows = getattr(self._repo, "all_deployments", lambda: self._repo.all())()
+        restored = 0
+        active: Dict[Tuple[str, str, str], PolicyDeployment] = {}
+        for row in rows:
+            deployment = PolicyDeployment.from_dict(row)
+            self._deployments[deployment.deployment_id] = deployment
+            if policy_loader is not None:
+                for pid in (deployment.policy_id, deployment.baseline_policy_id):
+                    policy = policy_loader(pid)
+                    if policy is not None:
+                        self._policies[policy.policy_id] = policy
+            # Latest non-terminal deployment wins the scope pointer.
+            if deployment.state not in (
+                    DeploymentState.ROLLED_BACK, DeploymentState.PAUSED):
+                existing = active.get(
+                    (deployment.tenant_id, deployment.repository,
+                     deployment.risk_level))
+                if existing is None or deployment.created_at >= existing.created_at:
+                    active[(deployment.tenant_id, deployment.repository,
+                            deployment.risk_level)] = deployment
+            restored += 1
+        self._active = {
+            key: deployment.deployment_id
+            for key, deployment in active.items()
+        }
+        self._load_persisted_exposure()
+        return restored
+
+    def restart_recover_exposure(self) -> None:
+        """Reload the exposure log from the persisted exposure repo."""
+        self._load_persisted_exposure()
+
     # -- internals ----------------------------------------------------------
+
+    def _load_persisted_exposure(self) -> None:
+        if self._exposure_repo is None:
+            return
+        rows = getattr(self._exposure_repo, "all_exposures",
+                       lambda: self._exposure_repo.all())()
+        self._exposure = []
+        for row in rows:
+            self._exposure.append(ExposureRecord(
+                task_id=row["task_id"],
+                deployment_id=row["deployment_id"],
+                lane=row["lane"],
+                baseline_version=row["baseline_version"],
+                candidate_version=row["candidate_version"],
+                traffic_share=row.get("traffic_share", 0.0),
+            ))
 
     def _active_deployment(self, tenant_id, repository, risk_level) -> Optional[PolicyDeployment]:
         deployment_id = self._active.get((tenant_id, repository, risk_level))

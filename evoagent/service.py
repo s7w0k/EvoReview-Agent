@@ -4,6 +4,7 @@ import logging
 import threading
 import time
 import uuid
+from dataclasses import replace
 from typing import Any, Dict, Optional
 
 from .agents import MultiAgentCoordinator
@@ -36,12 +37,27 @@ from .skill_curator import SkillCurator
 from .semantic_reviewer import build_semantic_reviewer
 from .confidence import parse_buckets
 from .policy import PolicyResolver, RiskProfiler
-from .policy.repository import RuntimePolicyRepository
+from .policy.codec import policy_from_dict, policy_to_dict
+from .policy.defaults import default_policy
+from .policy_evolution.candidate import CandidateOperation, PolicyCandidateGenerator
+from .policy_evolution.deployment import PolicyDeploymentManager
 from .recovery import RecoveryBudget, RecoveryManager
 from .decision_trace import DecisionTrace
-from .decision_trace.repository import DecisionTraceRepository
-from .replay import ReplayRepository
 from .execution import ReviewExecutionContext
+from .outcome_evolution import OutcomeStore
+from .outcome_evolution.outcome import (
+    Outcome,
+    OutcomeAttribution,
+    OutcomeKind,
+    RuntimeMetrics,
+)
+from .storage.json_store import JSONFileStore
+from .storage.repositories.decision_trace import PersistedDecisionTraceRepository
+from .storage.repositories.deployment import DeploymentRepository
+from .storage.repositories.outcome import OutcomeRepository
+from .storage.repositories.policy_exposure import PolicyExposureRepository
+from .storage.repositories.replay import ReplayRepository as PersistedReplayRepository
+from .storage.repositories.runtime_policy import PersistedRuntimePolicyRepository
 from .verifier import RepairVerifier
 from .chat import (
     CHAT_INSIGHT_CATEGORIES,
@@ -103,7 +119,24 @@ class ReviewService:
         # Closed-loop runtime-policy plumbing (plan section 5.2).
         self.risk_profiler = RiskProfiler()
         self.policy_resolver = PolicyResolver()
-        self.policy_repository = RuntimePolicyRepository()
+        # Durable control-plane store + repositories (convergence plan 2/3/4/5).
+        control_store = JSONFileStore(f"{settings.db_path}.control.json")
+        self.control_store = control_store
+        self.policy_repository = PersistedRuntimePolicyRepository(control_store)
+        self.policy_deployment_repository = DeploymentRepository(control_store)
+        self.policy_exposure_repository = PolicyExposureRepository(control_store)
+        self.policy_deployment_manager = PolicyDeploymentManager(
+            repo=self.policy_deployment_repository,
+            exposure_repo=self.policy_exposure_repository,
+        )
+        # Bootstrapped baseline policies survive restarts and are registered so a
+        # brand-new scope resolves to the right baseline (plan section 4.2).
+        self._bootstrap_baselines()
+        self.policy_deployment_manager.restore_active_deployments(
+            policy_loader=self._load_control_policy)
+        # Production-outcome mirror: in-memory store + durable log (section 8.3).
+        self.outcome_store = OutcomeStore()
+        self.outcome_repository = OutcomeRepository(control_store)
         self.recovery_manager = RecoveryManager(
             budget=RecoveryBudget(
                 max_recovery_attempts=settings.recovery_max_attempts,
@@ -111,8 +144,8 @@ class ReviewService:
                 max_model_switches=settings.recovery_max_model_switches,
             ),
         )
-        self.trace_repository = DecisionTraceRepository()
-        self.replay_repository = ReplayRepository()
+        self.trace_repository = PersistedDecisionTraceRepository(control_store)
+        self.replay_repository = PersistedReplayRepository(control_store)
         self.runtime_policy_version: Optional[int] = None
         self.registry = SkillRegistry(
             settings.skills_dir, settings.skill_sandbox, settings.skill_timeout_seconds,
@@ -254,29 +287,210 @@ class ReviewService:
         self, task_id: str, repository: str, pull_request: Optional[int],
         diff: str, tenant_id: str,
     ) -> ReviewExecutionContext:
-        """Profile risk, resolve the active policy and freeze it in a context."""
+        """Profile risk, route through the deployment manager, freeze the result.
+
+        The real production path is ``RiskProfiler -> PolicyDeploymentManager
+        (baseline / candidate stable lane) -> Safety Floor -> Context`` (plan
+        section 4.3).  A task with no live deployment resolves to the registered
+        baseline; a live canary routes the task to the candidate lane by a stable
+        hash, and a promoted/rolled-back deployment picks the correct policy.
+        """
         parsed = parse_unified_diff(diff)
         risk = self.risk_profiler.profile(parsed)
         task_hint = {"task_id": task_id, "tenant_id": tenant_id}
-        # An overridden policy (e.g. from a deployment) wins; otherwise resolve.
-        policy = self.policy_resolver.resolve(task_hint, risk_profile=risk)
-        runtime_version = self.policy_repository.policy_version(policy.policy_id)
-        if runtime_version is None:
-            runtime_version = self.policy_repository.register(
-                policy, status="active", tenant_id=tenant_id,
-                risk_level=risk.level, metadata={"source": "review-service"},
-            )
-            self.runtime_policy_version = runtime_version
+
+        # Guarantee a baseline exists for this risk level (read for restart
+        # restore, otherwise bootstrap and persist once).
+        baseline = self.policy_repository.active_baseline_policy(risk.level)
+        if baseline is None:
+            base = self.policy_resolver.resolve(task_hint, risk_profile=risk)
+            baseline = replace(
+                base, policy_id=f"baseline-{risk.level}", policy_version=1)
+            self.policy_repository.save_policy(
+                baseline.policy_id, baseline.policy_version,
+                policy_to_dict(baseline), risk_level=risk.level,
+                status="ACTIVE", tenant_id=tenant_id)
+        self.policy_deployment_manager.register_policy(baseline)
+
+        # Route through the deployment manager (plan 4.3 step 3).
+        decision = self.policy_deployment_manager.route(
+            tenant_id, repository, risk.level, task_id)
+        policy = decision.policy
+        # Safety floor final enforcement (plan 4.3 step 4).
+        policy = self.policy_resolver.enforce_safety_floor(policy, risk)
+
         context = ReviewExecutionContext(
             task_id=task_id, tenant_id=tenant_id, repository=repository,
             pull_request=pull_request, parsed_diff=parsed, risk_profile=risk,
             execution_policy=policy,
             prompt_version=None,
             skill_versions={},
-            runtime_policy_version=runtime_version,
+            runtime_policy_version=policy.policy_version,
             model_name=str(self.llm_config.get("model")) if self.llm_config else None,
+            deployment_id=decision.deployment_id,
+            deployment_lane=decision.lane,
+            baseline_policy_id=decision.baseline_policy_id,
+            baseline_policy_version=decision.baseline_version,
+            candidate_policy_id=decision.candidate_policy_id,
+            candidate_policy_version=decision.candidate_version,
+            traffic_share=decision.traffic_share,
         )
+        # Plan 4.5: persist the per-task routing exposure (idempotent by
+        # ``task_id:deployment_id``, so a retried task never double-counts).
+        self._persist_task_policy(task_id, decision)
         return context
+
+    def _persist_task_policy(self, task_id: str, decision) -> None:
+        try:
+            self.policy_exposure_repository.add({
+                "task_id": task_id,
+                "deployment_id": decision.deployment_id,
+                "lane": decision.lane,
+                "baseline_version": decision.baseline_version or 0,
+                "candidate_version": decision.candidate_version or 0,
+                "traffic_share": decision.traffic_share or 0.0,
+                "policy_id": decision.policy.policy_id,
+                "policy_version": decision.policy.policy_version,
+            })
+        except Exception:  # noqa: BLE001 - routing attribution must not break reviews
+            pass
+
+    def _bootstrap_baselines(self) -> None:
+        """Ensure the four ``baseline-{level}`` policies exist and are registered."""
+        for level in ("low", "medium", "high", "critical"):
+            self.policy_deployment_manager.register_policy(
+                self._bootstrapped_baseline(level))
+
+    def _bootstrapped_baseline(self, level: str):
+        baseline = None
+        row = self.policy_repository.record(f"baseline-{level}")
+        if row is not None and row.get("content"):
+            try:
+                baseline = policy_from_dict(row["content"])
+            except Exception:  # noqa: BLE001 - corrupt row falls back to default
+                baseline = None
+        if baseline is None:
+            baseline = replace(
+                default_policy(level),
+                policy_id=f"baseline-{level}", policy_version=1)
+            self.policy_repository.save_policy(
+                baseline.policy_id, baseline.policy_version,
+                policy_to_dict(baseline), risk_level=level,
+                status="ACTIVE", tenant_id="default")
+        return baseline
+
+    def _load_control_policy(self, policy_id: str):
+        """Reload an ``ExecutionPolicy`` from the durable control plane (restart)."""
+        row = self.policy_repository.record(policy_id)
+        if row is None or not row.get("content"):
+            return None
+        try:
+            return policy_from_dict(row["content"])
+        except Exception:  # noqa: BLE001
+            return None
+
+    # ------------------------------------------------------------------
+    # Service-level deployment / runtime-policy control plane (plan 6).
+    # ------------------------------------------------------------------
+
+    def list_runtime_policies(self, tenant_id: str = "default") -> list:
+        rows = self.policy_repository.all()
+        return [r for r in rows if r.get("tenant_id", "default") == tenant_id]
+
+    def get_runtime_policy(self, policy_id: str) -> dict:
+        row = self.policy_repository.record(policy_id)
+        if not row:
+            raise ValueError("runtime policy not found")
+        return row
+
+    def list_policy_deployments(self, tenant_id: str = "default") -> list:
+        rows = self.policy_deployment_repository.all()
+        return [r for r in rows if r.get("tenant_id", "default") == tenant_id]
+
+    def get_policy_deployment(self, deployment_id: str) -> dict:
+        row = self.policy_deployment_repository.record(deployment_id)
+        if not row:
+            raise ValueError("policy deployment not found")
+        return row
+
+    def propose_policy_candidate(
+        self,
+        *,
+        tenant_id: str = "default",
+        repository: str = "",
+        risk_level: str = "high",
+        hypothesis_id: Optional[str] = None,
+        operations: Optional[list] = None,
+    ) -> dict:
+        """Generate + persist a runtime policy candidate for an operator to review."""
+        baseline = self.policy_repository.active_baseline_policy(risk_level)
+        if baseline is None:
+            baseline = self._bootstrapped_baseline(risk_level)
+        generator = PolicyCandidateGenerator()
+        candidates = generator.generate(
+            baseline,
+            operations=operations or [CandidateOperation.RAISE_MAX_STEPS],
+            hypothesis_id=hypothesis_id)
+        candidate = candidates[0]
+        self.policy_repository.save_policy(
+            candidate.policy.policy_id, candidate.policy.policy_version,
+            policy_to_dict(candidate.policy), risk_level=risk_level,
+            status="CANDIDATE", tenant_id=tenant_id)
+        return {
+            "candidate_id": candidate.candidate_id,
+            "hypothesis_id": hypothesis_id,
+            "policy": candidate.policy.to_dict(),
+        }
+
+    def create_policy_deployment(
+        self,
+        candidate,
+        *,
+        tenant_id: str = "default",
+        repository: str = "",
+        risk_level: str = "high",
+        hypothesis_id: Optional[str] = None,
+    ):
+        """Persist the candidate policy and open a DRAFT deployment (plan 6)."""
+        self.policy_repository.save_policy(
+            candidate.policy_id, candidate.policy_version,
+            policy_to_dict(candidate), risk_level=risk_level,
+            status="CANDIDATE", tenant_id=tenant_id)
+        return self.policy_deployment_manager.create(
+            candidate, self.policy_deployment_manager._policies[
+                f"baseline-{risk_level}"],
+            tenant_id=tenant_id, repository=repository,
+            risk_level=risk_level, hypothesis_id=hypothesis_id)
+
+    def deployment_replay_pass(self, deployment_id: str):
+        return self.policy_deployment_manager.replay_pass(deployment_id)
+
+    def deployment_shadow(self, deployment_id: str):
+        return self.policy_deployment_manager.shadow(deployment_id)
+
+    def deployment_canary(self, deployment_id: str):
+        return self.policy_deployment_manager.start_canary(deployment_id)
+
+    def deployment_advance(
+        self,
+        deployment_id: str,
+        *,
+        min_sample_ok: bool = True,
+        min_duration_ok: bool = True,
+        hard_safety_pass: bool = True,
+    ):
+        return self.policy_deployment_manager.advance_stage(
+            deployment_id, min_sample_ok=min_sample_ok,
+            min_duration_ok=min_duration_ok,
+            hard_safety_pass=hard_safety_pass)
+
+    def deployment_promote(self, deployment_id: str):
+        return self.policy_deployment_manager.promote(deployment_id)
+
+    def deployment_rollback(
+        self, deployment_id: str, reason: str = "automatic rollback"
+    ):
+        return self.policy_deployment_manager.rollback(deployment_id, reason)
 
     def candidate_reviewers(self, tenant_id: str, deployment=None) -> list:
         """Return every shadow/canary candidate reviewer (prompt + rule skill).
@@ -360,7 +574,36 @@ class ReviewService:
             report = harness.run(task_id, repository, pull_request, diff, tenant_id)
         self._record_skill_usage(tenant_id, evolved, report)
         self._record_finding_distribution(tenant_id, repository, report)
+        self._record_production_outcome(context, report)
         return report
+
+    def _record_production_outcome(self, context, report) -> None:
+        """Persist an attributed production outcome after a review (plan 8.3).
+
+        Uses the deployment attribution stamped into the execution context so the
+        outcome is attributable to the exact policy / lane that produced it.
+        Best-effort: a failed outcome write never breaks the review path.
+        """
+        try:
+            trace = getattr(report, "trace", None) or []
+            outcome = Outcome(
+                task_id=context.task_id,
+                kind=OutcomeKind.TASK_SUCCESS,
+                tenant_id=context.tenant_id,
+                repository=context.repository,
+                risk_level=context.risk_level,
+                attribution=OutcomeAttribution(
+                    runtime_policy_version=str(context.runtime_policy_version),
+                    deployment_lane=context.deployment_lane or "baseline",
+                    candidate_id=context.candidate_policy_id or "",
+                ),
+                metrics=RuntimeMetrics(tool_calls=len(trace)),
+            )
+            self.outcome_store.record(outcome)
+            self.outcome_repository.save_outcome(
+                outcome.outcome_id, outcome.to_dict())
+        except Exception:  # noqa: BLE001 - outcomes must never fail a review
+            logger.warning("production outcome recording failed", exc_info=True)
 
     def _record_finding_distribution(
         self, tenant_id: str, repository: str, report,

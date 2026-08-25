@@ -15,6 +15,7 @@ from .metrics import metrics
 from .report import to_markdown
 from .service import ReviewService
 from .chat import ChatBusyError, ChatModelError
+from .policy.codec import policy_from_dict
 
 
 TASK = re.compile(r"^/v1/tasks/([0-9a-f-]+)$")
@@ -43,6 +44,12 @@ SKILL_ARTIFACT_ACTIVATE = re.compile(
 SKILL_ARTIFACT_ARCHIVE = re.compile(
     r"^/v1/skill-evolution/([a-z0-9_-]+)/versions/(\d+)/archive$"
 )
+RUNTIME_POLICY = re.compile(r"^/v1/runtime-policies/([A-Za-z0-9_.-]+)$")
+POLICY_DEPLOYMENT = re.compile(r"^/v1/policy-deployments/([A-Za-z0-9_.-]+)$")
+POLICY_DEPLOYMENT_ACTION = re.compile(
+    r"^/v1/policy-deployments/([A-Za-z0-9_.-]+)/(replay-pass|shadow|canary|advance|promote|rollback)$"
+)
+POLICY_EVOLUTION_PROPOSE = re.compile(r"^/v1/policy-evolution/propose$")
 WEB_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "web"))
 
 
@@ -392,6 +399,35 @@ class ApiHandler(BaseHTTPRequestHandler):
                 self._send_json(404, {"error": "task not found"})
                 return
             self._send_json(200, task)
+            return
+        # Phase 6: runtime policy / policy deployment inspection.
+        if path == "/v1/runtime-policies":
+            self._send_json(200, {
+                "policies": self.service.list_runtime_policies(principal.tenant_id),
+            })
+            return
+        if path == "/v1/policy-deployments":
+            self._send_json(200, {
+                "deployments": self.service.list_policy_deployments(principal.tenant_id),
+            })
+            return
+        runtime_policy_match = RUNTIME_POLICY.match(path)
+        if runtime_policy_match:
+            try:
+                row = self.service.get_runtime_policy(runtime_policy_match.group(1))
+            except ValueError as exc:
+                self._send_json(404, {"error": str(exc)})
+                return
+            self._send_json(200, row)
+            return
+        deployment_match = POLICY_DEPLOYMENT.match(path)
+        if deployment_match:
+            try:
+                row = self.service.get_policy_deployment(deployment_match.group(1))
+            except ValueError as exc:
+                self._send_json(404, {"error": str(exc)})
+                return
+            self._send_json(200, row)
             return
         self._send_json(404, {"error": "not found"})
 
@@ -787,6 +823,70 @@ class ApiHandler(BaseHTTPRequestHandler):
                 if ok:
                     self.service.reload_skills()
                 self._send_json(200 if ok else 404, {"activated": ok})
+                return
+            # Phase 6: policy evolution proposal + deployment lifecycle.
+            if POLICY_EVOLUTION_PROPOSE.match(path):
+                principal = self._principal("manage")
+                payload = self._read_json(body)
+                result = self.service.propose_policy_candidate(
+                    tenant_id=principal.tenant_id,
+                    repository=str(payload.get("repository", "")),
+                    risk_level=str(payload.get("risk_level", "high")),
+                    hypothesis_id=payload.get("hypothesis_id"),
+                    operations=payload.get("operations"),
+                )
+                self.service.store.audit(
+                    principal.tenant_id, principal.username,
+                    "policy.evolution.propose", result["candidate_id"],
+                    {"risk_level": payload.get("risk_level", "high")})
+                self._send_json(201, result)
+                return
+            if path == "/v1/policy-deployments":
+                principal = self._principal("manage")
+                payload = self._read_json(body)
+                policy = policy_from_dict(payload.get("policy", {}))
+                dep = self.service.create_policy_deployment(
+                    policy, tenant_id=principal.tenant_id,
+                    repository=str(payload.get("repository", "")),
+                    risk_level=str(payload.get("risk_level", "high")),
+                    hypothesis_id=payload.get("hypothesis_id"))
+                self.service.store.audit(
+                    principal.tenant_id, principal.username,
+                    "policy.deployment.create", dep.deployment_id,
+                    {"state": dep.state.value})
+                self._send_json(201, {
+                    "deployment_id": dep.deployment_id,
+                    "state": dep.state.value,
+                })
+                return
+            deployment_action_match = POLICY_DEPLOYMENT_ACTION.match(path)
+            if deployment_action_match:
+                principal = self._principal("manage")
+                deployment_id = deployment_action_match.group(1)
+                action = deployment_action_match.group(2)
+                payload = self._read_json(body) if body else {}
+                if action == "replay-pass":
+                    self.service.deployment_replay_pass(deployment_id)
+                elif action == "shadow":
+                    self.service.deployment_shadow(deployment_id)
+                elif action == "canary":
+                    self.service.deployment_canary(deployment_id)
+                elif action == "promote":
+                    self.service.deployment_promote(deployment_id)
+                elif action == "rollback":
+                    self.service.deployment_rollback(deployment_id)
+                else:  # advance
+                    self.service.deployment_advance(
+                        deployment_id,
+                        min_sample_ok=bool(payload.get("min_sample_ok", True)),
+                        min_duration_ok=bool(payload.get("min_duration_ok", True)),
+                        hard_safety_pass=bool(payload.get("hard_safety_pass", True)))
+                state = self.service.get_policy_deployment(deployment_id).get("state")
+                self.service.store.audit(
+                    principal.tenant_id, principal.username,
+                    "policy.deployment." + action, deployment_id,
+                    {"state": state})
+                self._send_json(200, {"deployment_id": deployment_id, "state": state})
                 return
             self._send_json(404, {"error": "not found"})
         except ValueError as exc:

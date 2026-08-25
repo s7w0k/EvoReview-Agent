@@ -75,6 +75,19 @@ jobs:
           python-version: "3.11"
       - run: python -m pytest tests/e2e -q
 
+  # 15.1 + plan Phase 8: the foundational service-level production closed loop,
+  # run on its own so a regression here is immediately diagnosable.
+  closed-loop-e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pytest tests/e2e/test_service_policy_deployment.py -q
+      - run: python -m pytest tests/e2e/test_service_self_evolution_production_loop.py -q
+      - run: python -m pytest tests/e2e/test_service_deployment_api.py -q
+
   # 15.1 + 15.6 evolution-regression: the Known-Good / Known-Bad fixtures.
   evolution-regression:
     runs-on: ubuntu-latest

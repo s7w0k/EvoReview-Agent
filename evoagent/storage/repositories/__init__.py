@@ -10,6 +10,8 @@ from .deployment import DeploymentRepository
 from .evolution_budget import EvolutionBudgetRepository
 from .failure import FailureRepository
 from .lineage import LineageRepository
+from .outcome import OutcomeRepository
+from .policy_exposure import PolicyExposureRepository
 from .procedure import ProcedureRepository
 from .recovery import RecoveryRepository
 from .replay import ReplayRepository
@@ -21,9 +23,11 @@ __all__ = [
     "EvolutionBudgetRepository",
     "FailureRepository",
     "LineageRepository",
+    "OutcomeRepository",
     "PersistedDecisionTraceRepository",
     "PersistedRuntimePolicyRepository",
     "PersistentRepository",
+    "PolicyExposureRepository",
     "ProcedureRepository",
     "RecoveryRepository",
     "ReplayRepository",

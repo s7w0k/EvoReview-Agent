@@ -101,6 +101,30 @@ class PolicyResolver:
             metadata=dict(merged.metadata, override_source=source, **explicit, **(metadata or {})),
         )
 
+    def enforce_safety_floor(
+        self,
+        policy: ExecutionPolicy,
+        risk_profile: Optional[RiskProfile] = None,
+    ) -> ExecutionPolicy:
+        """Guarantee a policy never drops below the immutable safety floor.
+
+        A thin, explicit entry point used after deployment routing (section 4.3)
+        so the *routed* policy (baseline or candidate) is still tightened if the
+        system safety floor or the task's risk level demands it.
+        """
+        if self.safety_floor is not None:
+            policy = apply_safety_floor(policy, self.safety_floor)
+        if risk_profile is not None:
+            floor = default_policy(risk_profile.level)
+            if RISK_RANK[floor.risk_level] > RISK_RANK[policy.risk_level]:
+                policy = replace(
+                    policy, risk_level=floor.risk_level,
+                    budget=floor.budget, retry=floor.retry,
+                    verification=floor.verification, agents=floor.agents,
+                    tool_permissions=list(floor.tool_permissions),
+                    metadata=dict(policy.metadata, risk_enforced_after_routing=True))
+        return policy
+
     @staticmethod
     def validate(policy: ExecutionPolicy) -> None:
         """Fail fast when a resolved policy is internally inconsistent."""

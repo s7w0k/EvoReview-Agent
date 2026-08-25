@@ -16,10 +16,22 @@ class ReplayRepository(PersistentRepository):
     table = "replay_snapshots"
 
     def save_snapshot(self, snapshot: ReplaySnapshot) -> ReplaySnapshot:
-        self.save(snapshot.snapshot_id, snapshot.to_dict())
+        self.store.save(self.table, snapshot.snapshot_id, snapshot.to_dict())
         self.store.save("replay_tool_observations", snapshot.snapshot_id,
                         snapshot.tool_observations)
         return snapshot
+
+    def save(self, snapshot: ReplaySnapshot) -> ReplaySnapshot:
+        """Alias matching the in-memory ``ReplayRepository`` facade.
+
+        The runtime harness calls ``replay_repository.save(snapshot)``; both the
+        in-memory and persisted backends expose the same method name so the
+        service can swap between them without touching the harness.
+        """
+        return self.save_snapshot(snapshot)
+
+    def list_snapshots(self) -> List[Dict[str, Any]]:
+        return self.all()
 
     def snapshot(self, snapshot_id: str) -> Optional[Dict[str, Any]]:
         return self.record(snapshot_id)

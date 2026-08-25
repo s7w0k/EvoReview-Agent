@@ -31,6 +31,15 @@ class ReviewExecutionContext:
     skill_versions: Dict[str, str] = field(default_factory=dict)
     runtime_policy_version: Optional[int] = None
 
+    # Deployment routing attribution (plan section 4.4).
+    deployment_id: Optional[str] = None
+    deployment_lane: Optional[str] = None
+    baseline_policy_id: Optional[str] = None
+    baseline_policy_version: Optional[int] = None
+    candidate_policy_id: Optional[str] = None
+    candidate_policy_version: Optional[int] = None
+    traffic_share: Optional[float] = None
+
     model_name: Optional[str] = None
 
     @property
@@ -56,5 +65,12 @@ class ReviewExecutionContext:
             "prompt_version": self.prompt_version,
             "skill_versions": dict(self.skill_versions),
             "runtime_policy_version": self.runtime_policy_version,
+            "deployment_id": self.deployment_id,
+            "deployment_lane": self.deployment_lane,
+            "baseline_policy_id": self.baseline_policy_id,
+            "baseline_policy_version": self.baseline_policy_version,
+            "candidate_policy_id": self.candidate_policy_id,
+            "candidate_policy_version": self.candidate_policy_version,
+            "traffic_share": self.traffic_share,
             "model_name": self.model_name,
         }
