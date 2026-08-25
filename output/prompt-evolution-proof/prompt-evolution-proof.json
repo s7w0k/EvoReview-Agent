@@ -1,0 +1,4930 @@
+{
+  "all_cases": {
+    "baseline": {
+      "case_results": [
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 1,
+          "name": "proof-prompt-evolution-0001",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 2,
+          "name": "proof-prompt-evolution-0002",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 3,
+          "name": "proof-prompt-evolution-0003",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 4,
+          "name": "proof-prompt-evolution-0004",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 5,
+          "name": "proof-prompt-evolution-0005",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 6,
+          "name": "proof-prompt-evolution-0006",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 7,
+          "name": "proof-prompt-evolution-0007",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 8,
+          "name": "proof-prompt-evolution-0008",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 9,
+          "name": "proof-prompt-evolution-0009",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 10,
+          "name": "proof-prompt-evolution-0010",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 11,
+          "name": "proof-prompt-evolution-0011",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 12,
+          "name": "proof-prompt-evolution-0012",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 13,
+          "name": "proof-prompt-evolution-0013",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 14,
+          "name": "proof-prompt-evolution-0014",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 15,
+          "name": "proof-prompt-evolution-0015",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 16,
+          "name": "proof-prompt-evolution-0016",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 17,
+          "name": "proof-prompt-evolution-0017",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 18,
+          "name": "proof-prompt-evolution-0018",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 19,
+          "name": "proof-prompt-evolution-0019",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 20,
+          "name": "proof-prompt-evolution-0020",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 21,
+          "name": "proof-prompt-evolution-0021",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 22,
+          "name": "proof-prompt-evolution-0022",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 23,
+          "name": "proof-prompt-evolution-0023",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 24,
+          "name": "proof-prompt-evolution-0024",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 25,
+          "name": "proof-prompt-evolution-0025",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 26,
+          "name": "proof-prompt-evolution-0026",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 27,
+          "name": "proof-prompt-evolution-0027",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 28,
+          "name": "proof-prompt-evolution-0028",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 29,
+          "name": "proof-prompt-evolution-0029",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 30,
+          "name": "proof-prompt-evolution-0030",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 31,
+          "name": "proof-prompt-evolution-0031",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 32,
+          "name": "proof-prompt-evolution-0032",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 33,
+          "name": "proof-prompt-evolution-0033",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 34,
+          "name": "proof-prompt-evolution-0034",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 35,
+          "name": "proof-prompt-evolution-0035",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 36,
+          "name": "proof-prompt-evolution-0036",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 37,
+          "name": "proof-prompt-evolution-0037",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 38,
+          "name": "proof-prompt-evolution-0038",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 39,
+          "name": "proof-prompt-evolution-0039",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 40,
+          "name": "proof-prompt-evolution-0040",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 41,
+          "name": "proof-prompt-evolution-0041",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 42,
+          "name": "proof-prompt-evolution-0042",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 43,
+          "name": "proof-prompt-evolution-0043",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 44,
+          "name": "proof-prompt-evolution-0044",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 45,
+          "name": "proof-prompt-evolution-0045",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 46,
+          "name": "proof-prompt-evolution-0046",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 47,
+          "name": "proof-prompt-evolution-0047",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 48,
+          "name": "proof-prompt-evolution-0048",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 49,
+          "name": "proof-prompt-evolution-0049",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 50,
+          "name": "proof-prompt-evolution-0050",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 51,
+          "name": "proof-prompt-evolution-0051",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 52,
+          "name": "proof-prompt-evolution-0052",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 53,
+          "name": "proof-prompt-evolution-0053",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 54,
+          "name": "proof-prompt-evolution-0054",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 55,
+          "name": "proof-prompt-evolution-0055",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 56,
+          "name": "proof-prompt-evolution-0056",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 57,
+          "name": "proof-prompt-evolution-0057",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 58,
+          "name": "proof-prompt-evolution-0058",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 59,
+          "name": "proof-prompt-evolution-0059",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 60,
+          "name": "proof-prompt-evolution-0060",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 61,
+          "name": "proof-prompt-evolution-0061",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 62,
+          "name": "proof-prompt-evolution-0062",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 63,
+          "name": "proof-prompt-evolution-0063",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 64,
+          "name": "proof-prompt-evolution-0064",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 65,
+          "name": "proof-prompt-evolution-0065",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 66,
+          "name": "proof-prompt-evolution-0066",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 67,
+          "name": "proof-prompt-evolution-0067",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 68,
+          "name": "proof-prompt-evolution-0068",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 69,
+          "name": "proof-prompt-evolution-0069",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 70,
+          "name": "proof-prompt-evolution-0070",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 71,
+          "name": "proof-prompt-evolution-0071",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 72,
+          "name": "proof-prompt-evolution-0072",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 73,
+          "name": "proof-prompt-evolution-0073",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 74,
+          "name": "proof-prompt-evolution-0074",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 75,
+          "name": "proof-prompt-evolution-0075",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 76,
+          "name": "proof-prompt-evolution-0076",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 77,
+          "name": "proof-prompt-evolution-0077",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 78,
+          "name": "proof-prompt-evolution-0078",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 79,
+          "name": "proof-prompt-evolution-0079",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 80,
+          "name": "proof-prompt-evolution-0080",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 81,
+          "name": "proof-prompt-evolution-0081",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 82,
+          "name": "proof-prompt-evolution-0082",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 83,
+          "name": "proof-prompt-evolution-0083",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 84,
+          "name": "proof-prompt-evolution-0084",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 85,
+          "name": "proof-prompt-evolution-0085",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 86,
+          "name": "proof-prompt-evolution-0086",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 87,
+          "name": "proof-prompt-evolution-0087",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 88,
+          "name": "proof-prompt-evolution-0088",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 89,
+          "name": "proof-prompt-evolution-0089",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 90,
+          "name": "proof-prompt-evolution-0090",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 91,
+          "name": "proof-prompt-evolution-0091",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 92,
+          "name": "proof-prompt-evolution-0092",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 93,
+          "name": "proof-prompt-evolution-0093",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 94,
+          "name": "proof-prompt-evolution-0094",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 95,
+          "name": "proof-prompt-evolution-0095",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 96,
+          "name": "proof-prompt-evolution-0096",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 97,
+          "name": "proof-prompt-evolution-0097",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 98,
+          "name": "proof-prompt-evolution-0098",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 99,
+          "name": "proof-prompt-evolution-0099",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 100,
+          "name": "proof-prompt-evolution-0100",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 101,
+          "name": "proof-prompt-evolution-0101",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 102,
+          "name": "proof-prompt-evolution-0102",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 103,
+          "name": "proof-prompt-evolution-0103",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 104,
+          "name": "proof-prompt-evolution-0104",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 105,
+          "name": "proof-prompt-evolution-0105",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 106,
+          "name": "proof-prompt-evolution-0106",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 107,
+          "name": "proof-prompt-evolution-0107",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 108,
+          "name": "proof-prompt-evolution-0108",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 109,
+          "name": "proof-prompt-evolution-0109",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 110,
+          "name": "proof-prompt-evolution-0110",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 111,
+          "name": "proof-prompt-evolution-0111",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 112,
+          "name": "proof-prompt-evolution-0112",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 113,
+          "name": "proof-prompt-evolution-0113",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 114,
+          "name": "proof-prompt-evolution-0114",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 115,
+          "name": "proof-prompt-evolution-0115",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 116,
+          "name": "proof-prompt-evolution-0116",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 117,
+          "name": "proof-prompt-evolution-0117",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 118,
+          "name": "proof-prompt-evolution-0118",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 119,
+          "name": "proof-prompt-evolution-0119",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 120,
+          "name": "proof-prompt-evolution-0120",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 121,
+          "name": "proof-prompt-evolution-0121",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 122,
+          "name": "proof-prompt-evolution-0122",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 123,
+          "name": "proof-prompt-evolution-0123",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 124,
+          "name": "proof-prompt-evolution-0124",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 125,
+          "name": "proof-prompt-evolution-0125",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 126,
+          "name": "proof-prompt-evolution-0126",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 127,
+          "name": "proof-prompt-evolution-0127",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 128,
+          "name": "proof-prompt-evolution-0128",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 129,
+          "name": "proof-prompt-evolution-0129",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 130,
+          "name": "proof-prompt-evolution-0130",
+          "severity_hits": 0,
+          "tp": 0
+        }
+      ],
+      "cases": 130,
+      "clean_accuracy": 1.0,
+      "clean_cases": 50,
+      "errors": [],
+      "expected_findings": 80,
+      "f1": 0.6667,
+      "false_positive_rate": 0.0,
+      "fix_correctness": null,
+      "high_severity_recall": 0.75,
+      "latency_ms": 2.0,
+      "per_finding_cost_estimate": null,
+      "positive_cases": 80,
+      "precision": 1.0,
+      "predicted_findings": 40,
+      "recall": 0.5,
+      "reviewer": "prompt-policy-reviewer",
+      "schema_version": 2,
+      "score": 0.7833,
+      "severity_accuracy": 1.0,
+      "success_rate": 1.0,
+      "successful_cases": 130
+    },
+    "candidate": {
+      "case_results": [
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 1,
+          "name": "proof-prompt-evolution-0001",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 2,
+          "name": "proof-prompt-evolution-0002",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 3,
+          "name": "proof-prompt-evolution-0003",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 4,
+          "name": "proof-prompt-evolution-0004",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 5,
+          "name": "proof-prompt-evolution-0005",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 6,
+          "name": "proof-prompt-evolution-0006",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 7,
+          "name": "proof-prompt-evolution-0007",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 8,
+          "name": "proof-prompt-evolution-0008",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 9,
+          "name": "proof-prompt-evolution-0009",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 10,
+          "name": "proof-prompt-evolution-0010",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 11,
+          "name": "proof-prompt-evolution-0011",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 12,
+          "name": "proof-prompt-evolution-0012",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 13,
+          "name": "proof-prompt-evolution-0013",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 14,
+          "name": "proof-prompt-evolution-0014",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 15,
+          "name": "proof-prompt-evolution-0015",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 16,
+          "name": "proof-prompt-evolution-0016",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 17,
+          "name": "proof-prompt-evolution-0017",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 18,
+          "name": "proof-prompt-evolution-0018",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 19,
+          "name": "proof-prompt-evolution-0019",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 20,
+          "name": "proof-prompt-evolution-0020",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 21,
+          "name": "proof-prompt-evolution-0021",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 22,
+          "name": "proof-prompt-evolution-0022",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 23,
+          "name": "proof-prompt-evolution-0023",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 24,
+          "name": "proof-prompt-evolution-0024",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 25,
+          "name": "proof-prompt-evolution-0025",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 26,
+          "name": "proof-prompt-evolution-0026",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 27,
+          "name": "proof-prompt-evolution-0027",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 28,
+          "name": "proof-prompt-evolution-0028",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 29,
+          "name": "proof-prompt-evolution-0029",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 30,
+          "name": "proof-prompt-evolution-0030",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 31,
+          "name": "proof-prompt-evolution-0031",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 32,
+          "name": "proof-prompt-evolution-0032",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 33,
+          "name": "proof-prompt-evolution-0033",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 34,
+          "name": "proof-prompt-evolution-0034",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 35,
+          "name": "proof-prompt-evolution-0035",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 36,
+          "name": "proof-prompt-evolution-0036",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 37,
+          "name": "proof-prompt-evolution-0037",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 38,
+          "name": "proof-prompt-evolution-0038",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 39,
+          "name": "proof-prompt-evolution-0039",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 40,
+          "name": "proof-prompt-evolution-0040",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 41,
+          "name": "proof-prompt-evolution-0041",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 42,
+          "name": "proof-prompt-evolution-0042",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 43,
+          "name": "proof-prompt-evolution-0043",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 44,
+          "name": "proof-prompt-evolution-0044",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 45,
+          "name": "proof-prompt-evolution-0045",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 46,
+          "name": "proof-prompt-evolution-0046",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 47,
+          "name": "proof-prompt-evolution-0047",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 48,
+          "name": "proof-prompt-evolution-0048",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 49,
+          "name": "proof-prompt-evolution-0049",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 50,
+          "name": "proof-prompt-evolution-0050",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 51,
+          "name": "proof-prompt-evolution-0051",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 52,
+          "name": "proof-prompt-evolution-0052",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 53,
+          "name": "proof-prompt-evolution-0053",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 54,
+          "name": "proof-prompt-evolution-0054",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 55,
+          "name": "proof-prompt-evolution-0055",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 56,
+          "name": "proof-prompt-evolution-0056",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 57,
+          "name": "proof-prompt-evolution-0057",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 58,
+          "name": "proof-prompt-evolution-0058",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 59,
+          "name": "proof-prompt-evolution-0059",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 60,
+          "name": "proof-prompt-evolution-0060",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 61,
+          "name": "proof-prompt-evolution-0061",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 62,
+          "name": "proof-prompt-evolution-0062",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 63,
+          "name": "proof-prompt-evolution-0063",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 64,
+          "name": "proof-prompt-evolution-0064",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 65,
+          "name": "proof-prompt-evolution-0065",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 66,
+          "name": "proof-prompt-evolution-0066",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 67,
+          "name": "proof-prompt-evolution-0067",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 68,
+          "name": "proof-prompt-evolution-0068",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 69,
+          "name": "proof-prompt-evolution-0069",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 70,
+          "name": "proof-prompt-evolution-0070",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 71,
+          "name": "proof-prompt-evolution-0071",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 72,
+          "name": "proof-prompt-evolution-0072",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 73,
+          "name": "proof-prompt-evolution-0073",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 74,
+          "name": "proof-prompt-evolution-0074",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 75,
+          "name": "proof-prompt-evolution-0075",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 76,
+          "name": "proof-prompt-evolution-0076",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 77,
+          "name": "proof-prompt-evolution-0077",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 78,
+          "name": "proof-prompt-evolution-0078",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 79,
+          "name": "proof-prompt-evolution-0079",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 80,
+          "name": "proof-prompt-evolution-0080",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 81,
+          "name": "proof-prompt-evolution-0081",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 82,
+          "name": "proof-prompt-evolution-0082",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 83,
+          "name": "proof-prompt-evolution-0083",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 84,
+          "name": "proof-prompt-evolution-0084",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 85,
+          "name": "proof-prompt-evolution-0085",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 86,
+          "name": "proof-prompt-evolution-0086",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 87,
+          "name": "proof-prompt-evolution-0087",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 88,
+          "name": "proof-prompt-evolution-0088",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 89,
+          "name": "proof-prompt-evolution-0089",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 90,
+          "name": "proof-prompt-evolution-0090",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 91,
+          "name": "proof-prompt-evolution-0091",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 92,
+          "name": "proof-prompt-evolution-0092",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 93,
+          "name": "proof-prompt-evolution-0093",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 94,
+          "name": "proof-prompt-evolution-0094",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 95,
+          "name": "proof-prompt-evolution-0095",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 96,
+          "name": "proof-prompt-evolution-0096",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 97,
+          "name": "proof-prompt-evolution-0097",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 98,
+          "name": "proof-prompt-evolution-0098",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 99,
+          "name": "proof-prompt-evolution-0099",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 100,
+          "name": "proof-prompt-evolution-0100",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 101,
+          "name": "proof-prompt-evolution-0101",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 102,
+          "name": "proof-prompt-evolution-0102",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 103,
+          "name": "proof-prompt-evolution-0103",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 104,
+          "name": "proof-prompt-evolution-0104",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 105,
+          "name": "proof-prompt-evolution-0105",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 106,
+          "name": "proof-prompt-evolution-0106",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 107,
+          "name": "proof-prompt-evolution-0107",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 108,
+          "name": "proof-prompt-evolution-0108",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 109,
+          "name": "proof-prompt-evolution-0109",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 110,
+          "name": "proof-prompt-evolution-0110",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 111,
+          "name": "proof-prompt-evolution-0111",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 112,
+          "name": "proof-prompt-evolution-0112",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 113,
+          "name": "proof-prompt-evolution-0113",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 114,
+          "name": "proof-prompt-evolution-0114",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 115,
+          "name": "proof-prompt-evolution-0115",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 116,
+          "name": "proof-prompt-evolution-0116",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 117,
+          "name": "proof-prompt-evolution-0117",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 118,
+          "name": "proof-prompt-evolution-0118",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 119,
+          "name": "proof-prompt-evolution-0119",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 120,
+          "name": "proof-prompt-evolution-0120",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 121,
+          "name": "proof-prompt-evolution-0121",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 122,
+          "name": "proof-prompt-evolution-0122",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 123,
+          "name": "proof-prompt-evolution-0123",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 124,
+          "name": "proof-prompt-evolution-0124",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 125,
+          "name": "proof-prompt-evolution-0125",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 126,
+          "name": "proof-prompt-evolution-0126",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 127,
+          "name": "proof-prompt-evolution-0127",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 128,
+          "name": "proof-prompt-evolution-0128",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 129,
+          "name": "proof-prompt-evolution-0129",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 130,
+          "name": "proof-prompt-evolution-0130",
+          "severity_hits": 0,
+          "tp": 0
+        }
+      ],
+      "cases": 130,
+      "clean_accuracy": 1.0,
+      "clean_cases": 50,
+      "errors": [],
+      "expected_findings": 80,
+      "f1": 1.0,
+      "false_positive_rate": 0.0,
+      "fix_correctness": null,
+      "high_severity_recall": 1.0,
+      "latency_ms": 1.6,
+      "per_finding_cost_estimate": null,
+      "positive_cases": 80,
+      "precision": 1.0,
+      "predicted_findings": 80,
+      "recall": 1.0,
+      "reviewer": "prompt-policy-reviewer",
+      "schema_version": 2,
+      "score": 1.0,
+      "severity_accuracy": 1.0,
+      "success_rate": 1.0,
+      "successful_cases": 130
+    },
+    "delta": {
+      "clean_accuracy": 0.0,
+      "f1": 0.3333,
+      "high_severity_recall": 0.25,
+      "precision": 0.0,
+      "recall": 0.5,
+      "score": 0.2167,
+      "severity_accuracy": 0.0,
+      "success_rate": 0.0
+    }
+  },
+  "claim_scope": {
+    "does_not_prove": "External LLM weight improvement or production performance on real GitHub PRs.",
+    "level": "controlled-offline-behavioral-evolution",
+    "proves": "Feedback automatically produced a new prompt version; the same reviewer changed behavior and passed validation improvement plus holdout non-regression."
+  },
+  "dataset": {
+    "cases": 130,
+    "holdout_cases": 26,
+    "holdout_sha256": "35bddc209122646e7f30aa5d0c168042cc853c42407e66ba3aa7b77a9f1b245b",
+    "path": "D:\\研究生\\1\\project\\EvoAgent\\output\\prompt-evolution-proof\\prompt-evolution-cases.jsonl",
+    "repositories": 10,
+    "sha256": "a2de581efb840652547a67927a3fcb411fd77561b3818ab672c760fe503c3b07",
+    "source_kinds": [
+      "synthetic-controlled"
+    ],
+    "validation_cases": 104,
+    "validation_sha256": "aa646c1e0d7498124016bd8443b3bbbe0d35054d3687f2a6e47ecb6514af6de9"
+  },
+  "evolution_run": {
+    "decision": "activated",
+    "failure_cases_used": 32,
+    "gates": {
+      "evaluation_success": true,
+      "holdout_dataset_ready": true,
+      "holdout_non_regression": true,
+      "safety": true,
+      "validation_dataset_ready": true,
+      "validation_improvement": true,
+      "validation_non_regression": true
+    },
+    "reason": "candidate improved on validation and passed the non-regression holdout gate",
+    "run_id": "3b2442d9-c1de-4601-8123-8ac4d110f4e1"
+  },
+  "feedback": {
+    "learned_rule_ids": [
+      "REL-UNBOUNDED-RETRY",
+      "SEC-INSECURE-COOKIE",
+      "SEC-PATH-TRAVERSAL",
+      "SEC-WEAK-HASH"
+    ],
+    "missed_findings": 32,
+    "resolved_after_activation": 32
+  },
+  "generated_at": "2026-08-13T03:28:08.859622+00:00",
+  "holdout": {
+    "baseline": {
+      "cases": 26,
+      "clean_accuracy": 1.0,
+      "clean_cases": 10,
+      "error_count": 0,
+      "expected_findings": 16,
+      "f1": 0.6667,
+      "false_positive_rate": 0.0,
+      "fix_correctness": null,
+      "high_severity_recall": 0.75,
+      "latency_ms": 0.4,
+      "per_finding_cost_estimate": null,
+      "positive_cases": 16,
+      "precision": 1.0,
+      "predicted_findings": 8,
+      "recall": 0.5,
+      "reviewer": "prompt-policy-reviewer",
+      "schema_version": 2,
+      "score": 0.7833,
+      "severity_accuracy": 1.0,
+      "success_rate": 1.0,
+      "successful_cases": 26
+    },
+    "candidate": {
+      "cases": 26,
+      "clean_accuracy": 1.0,
+      "clean_cases": 10,
+      "error_count": 0,
+      "expected_findings": 16,
+      "f1": 1.0,
+      "false_positive_rate": 0.0,
+      "fix_correctness": null,
+      "high_severity_recall": 1.0,
+      "latency_ms": 0.4,
+      "per_finding_cost_estimate": null,
+      "positive_cases": 16,
+      "precision": 1.0,
+      "predicted_findings": 16,
+      "recall": 1.0,
+      "reviewer": "prompt-policy-reviewer",
+      "schema_version": 2,
+      "score": 1.0,
+      "severity_accuracy": 1.0,
+      "success_rate": 1.0,
+      "successful_cases": 26
+    },
+    "delta": {
+      "clean_accuracy": 0.0,
+      "f1": 0.3333,
+      "high_severity_recall": 0.25,
+      "precision": 0.0,
+      "recall": 0.5,
+      "score": 0.2167,
+      "severity_accuracy": 0.0,
+      "success_rate": 0.0
+    }
+  },
+  "release_gate": {
+    "production_activation_allowed": false,
+    "production_data_provenance_passed": false,
+    "quantitative_passed": true
+  },
+  "schema_version": 1,
+  "validation": {
+    "baseline": {
+      "case_results": [
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 1,
+          "name": "proof-prompt-evolution-0001",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 2,
+          "name": "proof-prompt-evolution-0002",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 3,
+          "name": "proof-prompt-evolution-0003",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 4,
+          "name": "proof-prompt-evolution-0004",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 5,
+          "name": "proof-prompt-evolution-0005",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 6,
+          "name": "proof-prompt-evolution-0006",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 7,
+          "name": "proof-prompt-evolution-0007",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 8,
+          "name": "proof-prompt-evolution-0008",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 9,
+          "name": "proof-prompt-evolution-0009",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 10,
+          "name": "proof-prompt-evolution-0010",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 11,
+          "name": "proof-prompt-evolution-0011",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 12,
+          "name": "proof-prompt-evolution-0012",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 13,
+          "name": "proof-prompt-evolution-0013",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 14,
+          "name": "proof-prompt-evolution-0014",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 15,
+          "name": "proof-prompt-evolution-0015",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 16,
+          "name": "proof-prompt-evolution-0016",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 17,
+          "name": "proof-prompt-evolution-0017",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 18,
+          "name": "proof-prompt-evolution-0018",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 19,
+          "name": "proof-prompt-evolution-0019",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 20,
+          "name": "proof-prompt-evolution-0020",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 21,
+          "name": "proof-prompt-evolution-0021",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 22,
+          "name": "proof-prompt-evolution-0022",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 23,
+          "name": "proof-prompt-evolution-0023",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 24,
+          "name": "proof-prompt-evolution-0024",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 25,
+          "name": "proof-prompt-evolution-0025",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 26,
+          "name": "proof-prompt-evolution-0026",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 27,
+          "name": "proof-prompt-evolution-0027",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 28,
+          "name": "proof-prompt-evolution-0028",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 29,
+          "name": "proof-prompt-evolution-0029",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 30,
+          "name": "proof-prompt-evolution-0030",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 31,
+          "name": "proof-prompt-evolution-0031",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 32,
+          "name": "proof-prompt-evolution-0032",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 33,
+          "name": "proof-prompt-evolution-0033",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 34,
+          "name": "proof-prompt-evolution-0034",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 35,
+          "name": "proof-prompt-evolution-0035",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 36,
+          "name": "proof-prompt-evolution-0036",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 37,
+          "name": "proof-prompt-evolution-0037",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 38,
+          "name": "proof-prompt-evolution-0038",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 39,
+          "name": "proof-prompt-evolution-0039",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 40,
+          "name": "proof-prompt-evolution-0040",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 41,
+          "name": "proof-prompt-evolution-0041",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 42,
+          "name": "proof-prompt-evolution-0042",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 43,
+          "name": "proof-prompt-evolution-0043",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 44,
+          "name": "proof-prompt-evolution-0044",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 45,
+          "name": "proof-prompt-evolution-0045",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 46,
+          "name": "proof-prompt-evolution-0046",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 47,
+          "name": "proof-prompt-evolution-0047",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 48,
+          "name": "proof-prompt-evolution-0048",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 49,
+          "name": "proof-prompt-evolution-0049",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 50,
+          "name": "proof-prompt-evolution-0050",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 51,
+          "name": "proof-prompt-evolution-0051",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 52,
+          "name": "proof-prompt-evolution-0052",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 53,
+          "name": "proof-prompt-evolution-0053",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 54,
+          "name": "proof-prompt-evolution-0054",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 55,
+          "name": "proof-prompt-evolution-0055",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 56,
+          "name": "proof-prompt-evolution-0056",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 57,
+          "name": "proof-prompt-evolution-0057",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 58,
+          "name": "proof-prompt-evolution-0058",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 59,
+          "name": "proof-prompt-evolution-0059",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 60,
+          "name": "proof-prompt-evolution-0060",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 61,
+          "name": "proof-prompt-evolution-0061",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 62,
+          "name": "proof-prompt-evolution-0062",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 63,
+          "name": "proof-prompt-evolution-0063",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 64,
+          "name": "proof-prompt-evolution-0064",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 65,
+          "name": "proof-prompt-evolution-0065",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 66,
+          "name": "proof-prompt-evolution-0066",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 67,
+          "name": "proof-prompt-evolution-0067",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 68,
+          "name": "proof-prompt-evolution-0068",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 69,
+          "name": "proof-prompt-evolution-0069",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 70,
+          "name": "proof-prompt-evolution-0070",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 71,
+          "name": "proof-prompt-evolution-0071",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 72,
+          "name": "proof-prompt-evolution-0072",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 73,
+          "name": "proof-prompt-evolution-0073",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 74,
+          "name": "proof-prompt-evolution-0074",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 75,
+          "name": "proof-prompt-evolution-0075",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 76,
+          "name": "proof-prompt-evolution-0076",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 77,
+          "name": "proof-prompt-evolution-0077",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 78,
+          "name": "proof-prompt-evolution-0078",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 79,
+          "name": "proof-prompt-evolution-0079",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 80,
+          "name": "proof-prompt-evolution-0080",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 81,
+          "name": "proof-prompt-evolution-0081",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 82,
+          "name": "proof-prompt-evolution-0082",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 83,
+          "name": "proof-prompt-evolution-0083",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 84,
+          "name": "proof-prompt-evolution-0084",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 85,
+          "name": "proof-prompt-evolution-0085",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 86,
+          "name": "proof-prompt-evolution-0086",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 87,
+          "name": "proof-prompt-evolution-0087",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 88,
+          "name": "proof-prompt-evolution-0088",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 89,
+          "name": "proof-prompt-evolution-0089",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 90,
+          "name": "proof-prompt-evolution-0090",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 91,
+          "name": "proof-prompt-evolution-0091",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 92,
+          "name": "proof-prompt-evolution-0092",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 93,
+          "name": "proof-prompt-evolution-0093",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 94,
+          "name": "proof-prompt-evolution-0094",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 95,
+          "name": "proof-prompt-evolution-0095",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 96,
+          "name": "proof-prompt-evolution-0096",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 97,
+          "name": "proof-prompt-evolution-0097",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 98,
+          "name": "proof-prompt-evolution-0098",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 1,
+          "fp": 0,
+          "id": 99,
+          "name": "proof-prompt-evolution-0099",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 100,
+          "name": "proof-prompt-evolution-0100",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 101,
+          "name": "proof-prompt-evolution-0101",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 102,
+          "name": "proof-prompt-evolution-0102",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 103,
+          "name": "proof-prompt-evolution-0103",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 104,
+          "name": "proof-prompt-evolution-0104",
+          "severity_hits": 0,
+          "tp": 0
+        }
+      ],
+      "cases": 104,
+      "clean_accuracy": 1.0,
+      "clean_cases": 40,
+      "errors": [],
+      "expected_findings": 64,
+      "f1": 0.6667,
+      "false_positive_rate": 0.0,
+      "fix_correctness": null,
+      "high_severity_recall": 0.75,
+      "latency_ms": 1.7,
+      "per_finding_cost_estimate": null,
+      "positive_cases": 64,
+      "precision": 1.0,
+      "predicted_findings": 32,
+      "recall": 0.5,
+      "reviewer": "prompt-policy-reviewer",
+      "schema_version": 2,
+      "score": 0.7833,
+      "severity_accuracy": 1.0,
+      "success_rate": 1.0,
+      "successful_cases": 104
+    },
+    "candidate": {
+      "case_results": [
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 1,
+          "name": "proof-prompt-evolution-0001",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 2,
+          "name": "proof-prompt-evolution-0002",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 3,
+          "name": "proof-prompt-evolution-0003",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 4,
+          "name": "proof-prompt-evolution-0004",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 5,
+          "name": "proof-prompt-evolution-0005",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 6,
+          "name": "proof-prompt-evolution-0006",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 7,
+          "name": "proof-prompt-evolution-0007",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 8,
+          "name": "proof-prompt-evolution-0008",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 9,
+          "name": "proof-prompt-evolution-0009",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 10,
+          "name": "proof-prompt-evolution-0010",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 11,
+          "name": "proof-prompt-evolution-0011",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 12,
+          "name": "proof-prompt-evolution-0012",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 13,
+          "name": "proof-prompt-evolution-0013",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 14,
+          "name": "proof-prompt-evolution-0014",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 15,
+          "name": "proof-prompt-evolution-0015",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 16,
+          "name": "proof-prompt-evolution-0016",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 17,
+          "name": "proof-prompt-evolution-0017",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 18,
+          "name": "proof-prompt-evolution-0018",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 19,
+          "name": "proof-prompt-evolution-0019",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 20,
+          "name": "proof-prompt-evolution-0020",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 21,
+          "name": "proof-prompt-evolution-0021",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 22,
+          "name": "proof-prompt-evolution-0022",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 23,
+          "name": "proof-prompt-evolution-0023",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 24,
+          "name": "proof-prompt-evolution-0024",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 25,
+          "name": "proof-prompt-evolution-0025",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 26,
+          "name": "proof-prompt-evolution-0026",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 27,
+          "name": "proof-prompt-evolution-0027",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 28,
+          "name": "proof-prompt-evolution-0028",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 29,
+          "name": "proof-prompt-evolution-0029",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 30,
+          "name": "proof-prompt-evolution-0030",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 31,
+          "name": "proof-prompt-evolution-0031",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 32,
+          "name": "proof-prompt-evolution-0032",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 33,
+          "name": "proof-prompt-evolution-0033",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 34,
+          "name": "proof-prompt-evolution-0034",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 35,
+          "name": "proof-prompt-evolution-0035",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 36,
+          "name": "proof-prompt-evolution-0036",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 37,
+          "name": "proof-prompt-evolution-0037",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 38,
+          "name": "proof-prompt-evolution-0038",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 39,
+          "name": "proof-prompt-evolution-0039",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 40,
+          "name": "proof-prompt-evolution-0040",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 41,
+          "name": "proof-prompt-evolution-0041",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 42,
+          "name": "proof-prompt-evolution-0042",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 43,
+          "name": "proof-prompt-evolution-0043",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 44,
+          "name": "proof-prompt-evolution-0044",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 45,
+          "name": "proof-prompt-evolution-0045",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 46,
+          "name": "proof-prompt-evolution-0046",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 47,
+          "name": "proof-prompt-evolution-0047",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 48,
+          "name": "proof-prompt-evolution-0048",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 49,
+          "name": "proof-prompt-evolution-0049",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 50,
+          "name": "proof-prompt-evolution-0050",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 51,
+          "name": "proof-prompt-evolution-0051",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 52,
+          "name": "proof-prompt-evolution-0052",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 53,
+          "name": "proof-prompt-evolution-0053",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 54,
+          "name": "proof-prompt-evolution-0054",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 55,
+          "name": "proof-prompt-evolution-0055",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 56,
+          "name": "proof-prompt-evolution-0056",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 57,
+          "name": "proof-prompt-evolution-0057",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 58,
+          "name": "proof-prompt-evolution-0058",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 59,
+          "name": "proof-prompt-evolution-0059",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 60,
+          "name": "proof-prompt-evolution-0060",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 61,
+          "name": "proof-prompt-evolution-0061",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 62,
+          "name": "proof-prompt-evolution-0062",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 63,
+          "name": "proof-prompt-evolution-0063",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 64,
+          "name": "proof-prompt-evolution-0064",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 65,
+          "name": "proof-prompt-evolution-0065",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 66,
+          "name": "proof-prompt-evolution-0066",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 67,
+          "name": "proof-prompt-evolution-0067",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 68,
+          "name": "proof-prompt-evolution-0068",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 69,
+          "name": "proof-prompt-evolution-0069",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 70,
+          "name": "proof-prompt-evolution-0070",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 71,
+          "name": "proof-prompt-evolution-0071",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 72,
+          "name": "proof-prompt-evolution-0072",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 73,
+          "name": "proof-prompt-evolution-0073",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 74,
+          "name": "proof-prompt-evolution-0074",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 75,
+          "name": "proof-prompt-evolution-0075",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 76,
+          "name": "proof-prompt-evolution-0076",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 77,
+          "name": "proof-prompt-evolution-0077",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 78,
+          "name": "proof-prompt-evolution-0078",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 79,
+          "name": "proof-prompt-evolution-0079",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 80,
+          "name": "proof-prompt-evolution-0080",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 81,
+          "name": "proof-prompt-evolution-0081",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 82,
+          "name": "proof-prompt-evolution-0082",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 83,
+          "name": "proof-prompt-evolution-0083",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 84,
+          "name": "proof-prompt-evolution-0084",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 85,
+          "name": "proof-prompt-evolution-0085",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 86,
+          "name": "proof-prompt-evolution-0086",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 87,
+          "name": "proof-prompt-evolution-0087",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 88,
+          "name": "proof-prompt-evolution-0088",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 89,
+          "name": "proof-prompt-evolution-0089",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 90,
+          "name": "proof-prompt-evolution-0090",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 91,
+          "name": "proof-prompt-evolution-0091",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 92,
+          "name": "proof-prompt-evolution-0092",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 93,
+          "name": "proof-prompt-evolution-0093",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 94,
+          "name": "proof-prompt-evolution-0094",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 95,
+          "name": "proof-prompt-evolution-0095",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 96,
+          "name": "proof-prompt-evolution-0096",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 97,
+          "name": "proof-prompt-evolution-0097",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 98,
+          "name": "proof-prompt-evolution-0098",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 1,
+          "fn": 0,
+          "fp": 0,
+          "id": 99,
+          "name": "proof-prompt-evolution-0099",
+          "severity_hits": 1,
+          "tp": 1
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 100,
+          "name": "proof-prompt-evolution-0100",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 101,
+          "name": "proof-prompt-evolution-0101",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 102,
+          "name": "proof-prompt-evolution-0102",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 103,
+          "name": "proof-prompt-evolution-0103",
+          "severity_hits": 0,
+          "tp": 0
+        },
+        {
+          "error": null,
+          "findings": 0,
+          "fn": 0,
+          "fp": 0,
+          "id": 104,
+          "name": "proof-prompt-evolution-0104",
+          "severity_hits": 0,
+          "tp": 0
+        }
+      ],
+      "cases": 104,
+      "clean_accuracy": 1.0,
+      "clean_cases": 40,
+      "errors": [],
+      "expected_findings": 64,
+      "f1": 1.0,
+      "false_positive_rate": 0.0,
+      "fix_correctness": null,
+      "high_severity_recall": 1.0,
+      "latency_ms": 1.5,
+      "per_finding_cost_estimate": null,
+      "positive_cases": 64,
+      "precision": 1.0,
+      "predicted_findings": 64,
+      "recall": 1.0,
+      "reviewer": "prompt-policy-reviewer",
+      "schema_version": 2,
+      "score": 1.0,
+      "severity_accuracy": 1.0,
+      "success_rate": 1.0,
+      "successful_cases": 104
+    },
+    "delta": {
+      "clean_accuracy": 0.0,
+      "f1": 0.3333,
+      "high_severity_recall": 0.25,
+      "precision": 0.0,
+      "recall": 0.5,
+      "score": 0.2167,
+      "severity_accuracy": 0.0,
+      "success_rate": 0.0
+    }
+  },
+  "versions": [
+    {
+      "active": false,
+      "parent_version": null,
+      "prompt_sha256": "7744079c9edf276b4855958d232aff16e93c6623d8d3812a49b8ddcfb209eceb",
+      "score": 0.7833,
+      "version": 1
+    },
+    {
+      "active": true,
+      "parent_version": 1,
+      "prompt_sha256": "7196ddb52155720265071ea96f91d934cbc3a5388b52726fd368680a86c3dc66",
+      "score": 1.0,
+      "version": 2
+    }
+  ]
+}
