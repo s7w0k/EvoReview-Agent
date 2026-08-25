@@ -5,24 +5,21 @@ budget -> circuit breaker -> sandbox/approval -> timeout guard -> execution ->
 observation sanitize -> audit.  This makes it easy to prove every tool call was
 governed.
 """
-import json
 import threading
 from typing import Any, Callable, Dict, List, Optional
 
 from ..metrics import metrics
 from ..policy.models import ExecutionPolicy
 from ..policy.tool_policy import (
-    ToolDecision,
-    ToolMetadata,
     ToolPermissionDenied,
     ToolPolicyEngine,
 )
-from ..runtime import AgentLoopProtocolError, AgentTool, ToolRegistry
+from ..runtime import AgentLoopProtocolError, ToolRegistry
 from .audit import hash_args, ToolAuditLogger
 from .circuit_breaker import CircuitBreaker, CircuitOpenError
 from .executor import ToolExecutionResult, ToolExecutor, ToolTimeoutError
-from .invocation import InvocationState, ToolInvocationGuard, UnknownInvocationError
-from .sandbox import SandboxContext, SandboxEnforcer
+from .invocation import ToolInvocationGuard, UnknownInvocationError
+from .sandbox import SandboxContext
 
 
 class GovernedToolRegistry(ToolRegistry):
@@ -45,7 +42,7 @@ class GovernedToolRegistry(ToolRegistry):
         self.audit = audit or ToolAuditLogger()
         self.guard = guard or ToolInvocationGuard()
         self.timeout_extension = timeout_extension
-        self.approval_provider: Optional[Callable[[Dict[str, Any]], bool]] = None
+        self.approval_provider: Optional[Callable[[Any], bool]] = None
         self._tool_call_counts: Dict[str, int] = {}
         self._lock = threading.RLock()
         self.sandbox_context = sandbox_context
@@ -64,7 +61,7 @@ class GovernedToolRegistry(ToolRegistry):
             raise AgentLoopProtocolError("unknown agent tool: %s" % name)
         self._validate(tool.parameters, arguments)
         meta = self.policy_engine.metadata.get(name)
-        side_effect = bool(meta) and meta.side_effect
+        side_effect = meta is not None and meta.side_effect
 
         runtime_state = {"tool_call_counts": dict(self._tool_call_counts)}
         decision = self.policy_engine.authorize(
@@ -84,7 +81,7 @@ class GovernedToolRegistry(ToolRegistry):
             raise
 
         idempotency_key = self._idempotency_key(name, arguments)
-        reuse_guard = bool(meta) and meta.side_effect and not meta.idempotent
+        reuse_guard = meta is not None and meta.side_effect and not meta.idempotent
         if reuse_guard:
             self.guard.begin(idempotency_key)
             self.guard.authorize(idempotency_key)

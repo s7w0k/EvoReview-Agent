@@ -16,7 +16,7 @@ class GateDecision:
     """Outcome of evaluating a candidate against the hard safety gate."""
 
     approved: bool
-    reasons: List[str] = None
+    reasons: Optional[List[str]] = None
 
     def __post_init__(self):
         if self.reasons is None:

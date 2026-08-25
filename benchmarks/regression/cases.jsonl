@@ -1,0 +1,3 @@
+{"case_id": "REG-001", "repository": "fixture/regression", "diff": "--- a/clean.py\n+++ b/clean.py\n@@ -1 +1,4 @@\n+def clean(title):\n+    return title.strip().replace(\"  \", \" \")\n", "expected_findings": [], "risk_level": "low"}
+{"case_id": "REG-002", "repository": "fixture/regression", "diff": "--- a/price.py\n+++ b/price.py\n@@ -1 +1,5 @@\n+def total(items):\n+    return sum(item.price for item in items)\n", "expected_findings": [], "risk_level": "low"}
+{"case_id": "REG-003", "repository": "fixture/regression", "diff": "--- a/log.py\n+++ b/log.py\n@@ -1 +1,5 @@\n+def info(msg):\n+    print(\"[INFO] \" + msg)\n", "expected_findings": [], "risk_level": "low"}

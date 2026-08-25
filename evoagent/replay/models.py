@@ -4,7 +4,7 @@ import time
 import uuid
 from collections import deque
 from dataclasses import dataclass, field
-from typing import Any, Deque, Dict, List, Optional
+from typing import Any, Deque, Dict, List, Optional, Tuple
 
 
 class ReplayLevel(str, enum.Enum):
@@ -76,12 +76,13 @@ class ReplayObservationIndex:
     """
 
     def __init__(self, observations: List[Dict[str, Any]]):
-        self._queues: Dict[str, Deque[Dict[str, Any]]] = {}
+        self._queues: Dict[str, Deque[Tuple[Any, Dict[str, Any]]]] = {}
         for item in observations or []:
             key = str(item.get("fingerprint", ""))
             if not key:
                 continue
-            self._queues.setdefault(key, deque()).append((item.get("observation"), item))
+            self._queues.setdefault(key, deque()).append(
+                (item.get("observation"), item))
 
     def take(self, tool_name: str, arguments: Dict[str, Any]) -> Optional[Any]:
         """Pop the next observation for ``tool_name`` + ``arguments`` or return None."""

@@ -4,7 +4,6 @@ Classification is deterministic and based on the exception class, message tokens
 and optional caller-provided context (e.g. the tool name and whether a
 non-idempotent side-effect tool was in flight).
 """
-import re
 from typing import Any, Dict, Optional
 
 from ..errors import (
@@ -58,7 +57,9 @@ class FailureClassifier:
         if exc_type in {"timeouterror", "timeoutexpired"} or "timed out" in lowered or \
                 "timeout" in lowered:
             node = str(context.get("node", ""))
-            return FailureType.MODEL_TIMEOUT if node.startswith("model") else FailureType.TOOL_TIMEOUT
+            if node.startswith("model"):
+                return FailureType.MODEL_TIMEOUT
+            return FailureType.TOOL_TIMEOUT
 
         if "rate limit" in lowered or "429" in lowered:
             return FailureType.MODEL_RATE_LIMIT

@@ -2,7 +2,6 @@
 from typing import Any, Dict, List, Optional
 
 from ...replay.models import ReplayRun, ReplaySnapshot
-from ...storage.json_store import JSONFileStore
 from .base import PersistentRepository
 
 
@@ -21,7 +20,7 @@ class ReplayRepository(PersistentRepository):
                         snapshot.tool_observations)
         return snapshot
 
-    def save(self, snapshot: ReplaySnapshot) -> ReplaySnapshot:
+    def save(self, snapshot: ReplaySnapshot) -> ReplaySnapshot:  # type: ignore[override]
         """Alias matching the in-memory ``ReplayRepository`` facade.
 
         The runtime harness calls ``replay_repository.save(snapshot)``; both the

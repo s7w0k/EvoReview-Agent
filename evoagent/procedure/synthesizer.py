@@ -13,7 +13,7 @@ ever returned, so nothing unsafe can leak into a candidate from here.
 from dataclasses import dataclass
 from typing import Any, Dict, Iterable, List, Optional, Sequence
 
-from .miner import CandidateSource, ProcedurePattern
+from .miner import ProcedurePattern
 from .schema import ProceduralStep, ProcedureBudget, ProcedureSkill, ProcedureTrigger
 from .validator import ProcedureValidator
 

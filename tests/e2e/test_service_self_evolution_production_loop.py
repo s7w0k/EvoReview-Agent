@@ -18,7 +18,6 @@ from evoagent.evolution_gov.lineage import LineageStage, LineageTracker
 from evoagent.experience import MISSED_ISSUE, OBSERVED, build_experience
 from evoagent.hypothesis import new_hypothesis
 from evoagent.outcome_evolution.outcome import Outcome, OutcomeKind
-from evoagent.policy.codec import policy_from_dict
 from evoagent.policy_evolution.candidate import (
     CandidateOperation,
     PolicyCandidateGenerator,

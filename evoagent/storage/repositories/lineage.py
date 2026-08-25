@@ -1,7 +1,6 @@
 """Persistent evolution lineage repository (plan section 9.5)."""
 from typing import Any, Dict, List, Optional
 
-from ...storage.json_store import JSONFileStore
 from .base import PersistentRepository
 
 

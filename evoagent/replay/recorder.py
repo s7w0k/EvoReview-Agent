@@ -2,7 +2,7 @@
 import threading
 from typing import Any, Dict, List, Optional
 
-from ..runtime import AgentLoopProtocolError, AgentTool, ToolRegistry
+from ..runtime import AgentLoopProtocolError, ToolRegistry
 from .models import ReplayLevel, ReplayObservationIndex, ReplaySnapshot, fingerprint
 
 
@@ -80,18 +80,21 @@ class ReplayToolRegistry(ToolRegistry):
             if recorded is not None:
                 return recorded
             raise AgentLoopProtocolError(
-                "no recorded observation for deterministic replay: %s" % fingerprint(name, arguments)
+                "no recorded observation for deterministic replay: %s"
+                % fingerprint(name, arguments)
             )
         # Live mode re-invokes read-only tools only, via a governed live
         # registry so a side-effect tool is denied by policy (fail-closed).
-        if getattr(self.live_registry, "invoke_as", None) is not None:
-            return self.live_registry.invoke_as(
+        registry = self.live_registry
+        if registry is None:
+            raise AgentLoopProtocolError("no live registry for %s" % name)
+        invoke_as = getattr(registry, "invoke_as", None)
+        if invoke_as is not None:
+            return invoke_as(
                 "replay-agent", name, arguments, task_id=self.snapshot.task_id,
             )
         if name not in self.read_only_tools:
             raise AgentLoopProtocolError(
                 "side-effect tool %s not allowed in live replay" % name
             )
-        if self.live_registry is None:
-            raise AgentLoopProtocolError("no live registry for %s" % name)
-        return self.live_registry.invoke(name, arguments)
+        return registry.invoke(name, arguments)

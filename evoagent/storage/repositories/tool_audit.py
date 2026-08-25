@@ -1,7 +1,6 @@
 """Persistent tool-invocation audit repository (plan section 9.6)."""
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
-from ...storage.json_store import JSONFileStore
 from ...tools.audit import AuditEntry
 from .base import PersistentRepository
 

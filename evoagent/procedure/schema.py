@@ -5,7 +5,7 @@ only invoke tools registered in the tool registry and evaluate named checks.  No
 arbitrary Python / shell / network / dynamic import is allowed.
 """
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 
 @dataclass
@@ -18,7 +18,7 @@ class ProceduralStep:
     on_failure: str = "continue"  # "abort" | "continue" (plan section 10.6)
 
     def to_dict(self) -> Dict[str, Any]:
-        value = {"kind": self.kind}
+        value: Dict[str, Any] = {"kind": self.kind}
         if self.tool:
             value["tool"] = self.tool
         if self.args:

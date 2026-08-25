@@ -5,7 +5,6 @@ historical task.  Counterfactual replay substitutes one variable (prompt / skill
 / policy / model / topology / context strategy) while keeping everything else
 fixed.
 """
-import datetime
 from typing import Any, Dict, Optional
 
 from .models import ReplaySnapshot
@@ -72,8 +71,12 @@ class Counterfactual:
             repository=base.repository,
             commit_sha=base.commit_sha,
             diff_hash=base.diff_hash,
-            prompt_version=prompt_version if prompt_version is not None else base.prompt_version,
-            skill_versions=dict(skill_versions if skill_versions is not None else base.skill_versions),
+            prompt_version=(
+                prompt_version if prompt_version is not None else base.prompt_version
+            ),
+            skill_versions=(
+                dict(skill_versions if skill_versions is not None else base.skill_versions)
+            ),
             policy_version=policy_version if policy_version is not None else base.policy_version,
             model_name=model_name if model_name is not None else base.model_name,
             model_parameters=dict(base.model_parameters),

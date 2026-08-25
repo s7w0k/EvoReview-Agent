@@ -10,7 +10,7 @@ from dataclasses import replace
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-from evoagent.policy.models import AgentPolicy, ExecutionPolicy
+from evoagent.policy.models import ExecutionPolicy
 
 from .evolution_scope import assert_evolvable
 
@@ -222,11 +222,11 @@ def _collect_changes(
 ) -> Dict[str, tuple]:
     """Return ``{field: (before, after)}`` for the fields an op may touch."""
     changes: Dict[str, tuple] = {}
-    for field in _OPERATION_FIELDS.get(operation, ()):
-        before = _snapshot_field(parent, field)
-        after = _snapshot_field(policy, field)
+    for field_name in _OPERATION_FIELDS.get(operation, ()):
+        before = _snapshot_field(parent, field_name)
+        after = _snapshot_field(policy, field_name)
         if before != after:
-            changes[field] = (before, after)
+            changes[field_name] = (before, after)
     return changes
 
 

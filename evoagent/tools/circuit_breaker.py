@@ -6,6 +6,7 @@ times opens the breaker for the cooldown window.
 """
 import threading
 import time
+from typing import Callable, Optional
 
 
 class CircuitOpenError(RuntimeError):
@@ -19,7 +20,7 @@ class CircuitBreaker:
         self,
         failure_threshold: int = 5,
         cooldown_seconds: float = 60.0,
-        now: float = None,
+        now: Optional[Callable[[], float]] = None,
     ):
         self.failure_threshold = max(1, failure_threshold)
         self.cooldown_seconds = max(1.0, cooldown_seconds)

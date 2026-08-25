@@ -17,7 +17,6 @@ from evoagent.policy.models import ExecutionPolicy
 from .candidate import PolicyCandidate, PolicyCandidateGenerator, CandidateOperation
 from .canary import CanaryDecision, CanaryVerdict
 from .gate import EvolutionGate, GateDecision
-from .objective import EvolutionMetrics
 from .replay_eval import PolicyReplayEvaluator, ReplayComparison, PolicyRunner
 from .rollback import AutoRollback, RollbackDecision
 
@@ -95,7 +94,7 @@ class PolicyEvolutionPipeline:
 
         if gate.rejected or replay.utility <= 0:
             if gate.rejected:
-                trace.notes = list(gate.reasons)
+                trace.notes = list(gate.reasons or [])
             else:
                 trace.notes = ["replay utility did not improve over baseline"]
             trace.status = RunnableStatus.REJECTED

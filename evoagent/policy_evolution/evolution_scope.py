@@ -5,7 +5,7 @@ Anything touching tenant isolation, auth, repo isolation, side-effect approval,
 the critical-risk safety floor, secrets or the sandbox network boundary is
 *forbidden* regardless of the measured utility gain.
 """
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, Iterable, List
 
 # Runtime-tuning fields that evolution may touch.
 EVOLVABLE_FIELDS: set = {

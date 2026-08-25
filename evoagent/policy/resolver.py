@@ -92,8 +92,8 @@ class PolicyResolver:
         if "tool_permissions" in override:
             base_perms = [ToolPermission(**p) for p in current["tool_permissions"]]
             override_perms = [ToolPermission(**p) for p in override["tool_permissions"]]
-            merged = merge_tool_permissions(base_perms, override_perms)
-            current["tool_permissions"] = [asdict(p) for p in merged]
+            merged_perms = merge_tool_permissions(base_perms, override_perms)
+            current["tool_permissions"] = [asdict(p) for p in merged_perms]
         merged = ExecutionPolicy.from_dict(current)
         explicit = override.get("metadata") or {}
         return replace(

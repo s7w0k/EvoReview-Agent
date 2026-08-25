@@ -1,5 +1,7 @@
 """Compare baseline and candidate replay metrics and decide."""
 
+from typing import Any, Dict
+
 METRIC_SIGN = {
     "finding_precision": +1, "finding_recall": +1, "finding_f1": +1,
     "high_risk_recall": +1, "verification_pass_rate": +1,
@@ -20,8 +22,8 @@ class ReplayComparator:
 
     def compare(self, baseline: dict, candidate: dict) -> dict:
         keys = sorted(set(baseline) | set(candidate))
-        deltas = {}
-        passes = {}
+        deltas: Dict[str, Any] = {}
+        passes: Dict[str, bool] = {}
         for key in keys:
             b = baseline.get(key, 0.0)
             c = candidate.get(key, 0.0)

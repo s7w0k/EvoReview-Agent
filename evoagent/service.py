@@ -51,9 +51,10 @@ from .outcome_evolution.outcome import (
     OutcomeKind,
     RuntimeMetrics,
 )
-from .storage.json_store import JSONFileStore
+from .storage.control_plane import create_control_plane_store
 from .storage.repositories.decision_trace import PersistedDecisionTraceRepository
 from .storage.repositories.deployment import DeploymentRepository
+from .storage.repositories.lineage import LineageRepository
 from .storage.repositories.outcome import OutcomeRepository
 from .storage.repositories.policy_exposure import PolicyExposureRepository
 from .storage.repositories.replay import ReplayRepository as PersistedReplayRepository
@@ -119,8 +120,9 @@ class ReviewService:
         # Closed-loop runtime-policy plumbing (plan section 5.2).
         self.risk_profiler = RiskProfiler()
         self.policy_resolver = PolicyResolver()
-        # Durable control-plane store + repositories (convergence plan 2/3/4/5).
-        control_store = JSONFileStore(f"{settings.db_path}.control.json")
+        # Durable control-plane store + repositories (convergence plan 2/3/4/5,
+        # hardening plan Phase 4-7: backend selected by CONTROL_PLANE_BACKEND).
+        control_store = create_control_plane_store(settings)
         self.control_store = control_store
         self.policy_repository = PersistedRuntimePolicyRepository(control_store)
         self.policy_deployment_repository = DeploymentRepository(control_store)
@@ -146,6 +148,7 @@ class ReviewService:
         )
         self.trace_repository = PersistedDecisionTraceRepository(control_store)
         self.replay_repository = PersistedReplayRepository(control_store)
+        self.lineage_repository = LineageRepository(control_store)
         self.runtime_policy_version: Optional[int] = None
         self.registry = SkillRegistry(
             settings.skills_dir, settings.skill_sandbox, settings.skill_timeout_seconds,
@@ -456,11 +459,27 @@ class ReviewService:
             candidate.policy_id, candidate.policy_version,
             policy_to_dict(candidate), risk_level=risk_level,
             status="CANDIDATE", tenant_id=tenant_id)
-        return self.policy_deployment_manager.create(
+        deployment = self.policy_deployment_manager.create(
             candidate, self.policy_deployment_manager._policies[
                 f"baseline-{risk_level}"],
             tenant_id=tenant_id, repository=repository,
             risk_level=risk_level, hypothesis_id=hypothesis_id)
+        # Record the durable lineage chain (plan section 9.5) so the
+        # ``/v1/evolution/{candidate_id}/lineage`` endpoint has evidence even
+        # across restarts.
+        candidate_id = getattr(candidate, "candidate_id",
+                               getattr(candidate, "policy_id", "unknown"))
+        self.lineage_repository.save_lineage(
+            candidate_id, {
+                "candidate_id": candidate_id,
+                "hypothesis_id": hypothesis_id,
+                "baseline": f"baseline-{risk_level}",
+                "deployment_id": deployment.get("deployment_id") if isinstance(
+                    deployment, dict) else getattr(deployment, "deployment_id", ""),
+                "stages": ["EXPERIENCE", "HYPOTHESIS", "CANDIDATE",
+                           "EVALUATION", "DEPLOYMENT"],
+            })
+        return deployment
 
     def deployment_replay_pass(self, deployment_id: str):
         return self.policy_deployment_manager.replay_pass(deployment_id)
@@ -469,7 +488,13 @@ class ReviewService:
         return self.policy_deployment_manager.shadow(deployment_id)
 
     def deployment_canary(self, deployment_id: str):
-        return self.policy_deployment_manager.start_canary(deployment_id)
+        deployment = self.policy_deployment_manager.start_canary(deployment_id)
+        self.lineage_repository.add_node(
+            "canary:" + deployment_id,
+            {"deployment_id": deployment_id, "stage": "DEPLOYMENT",
+             "lane": "canary", "candidate_id":
+                 self._deployment_candidate_id(deployment_id)})
+        return deployment
 
     def deployment_advance(
         self,
@@ -485,12 +510,83 @@ class ReviewService:
             hard_safety_pass=hard_safety_pass)
 
     def deployment_promote(self, deployment_id: str):
-        return self.policy_deployment_manager.promote(deployment_id)
+        deployment = self.policy_deployment_manager.promote(deployment_id)
+        self.lineage_repository.add_node(
+            "promote:" + deployment_id,
+            {"deployment_id": deployment_id, "stage": "DEPLOYMENT",
+             "lane": "promoted", "candidate_id":
+                 self._deployment_candidate_id(deployment_id)})
+        return deployment
 
     def deployment_rollback(
         self, deployment_id: str, reason: str = "automatic rollback"
     ):
-        return self.policy_deployment_manager.rollback(deployment_id, reason)
+        deployment = self.policy_deployment_manager.rollback(deployment_id, reason)
+        self.lineage_repository.add_node(
+            "rollback:" + deployment_id,
+            {"deployment_id": deployment_id, "stage": "OUTCOME",
+             "lane": "rolled-back", "candidate_id":
+                 self._deployment_candidate_id(deployment_id), "reason": reason})
+        return deployment
+
+    def _deployment_candidate_id(self, deployment_id: str) -> str:
+        row = self.policy_deployment_repository.record(deployment_id) or {}
+        return str(row.get("policy_id", "unknown"))
+
+    # ------------------------------------------------------------------
+    # Observability / evidence export (plan section 14).
+    # ------------------------------------------------------------------
+
+    def task_decision_trace(self, task_id: str) -> dict:
+        """Return the durable ordered decision trace for one task."""
+        trace = self.trace_repository.trace(task_id)
+        if trace is None:
+            raise ValueError("no decision trace recorded for task")
+        return trace.to_dict()
+
+    def task_replay(self, task_id: str) -> dict:
+        """Return durable replay snapshots (+ observations and runs) for a task."""
+        snapshots = self.replay_repository.snapshots_for_task(task_id)
+        if not snapshots:
+            raise ValueError("no replay snapshots recorded for task")
+        grouped = []
+        for snapshot in snapshots:
+            snap_id = snapshot.get("snapshot_id")
+            observations = self.replay_repository.store.get(
+                "replay_tool_observations", snap_id) or []
+            runs = self.replay_repository.runs_for_snapshot(snap_id)
+            grouped.append({
+                "snapshot": snapshot, "observations": observations, "runs": runs,
+            })
+        return {"task_id": task_id, "snapshots": grouped}
+
+    def deployment_metrics(self, deployment_id: str) -> dict:
+        """Aggregate durable metrics for one policy deployment."""
+        row = self.policy_deployment_repository.record(deployment_id)
+        if not row:
+            raise ValueError("policy deployment not found")
+        exposures = self.policy_exposure_repository.for_deployment(deployment_id)
+        return {
+            "deployment_id": deployment_id,
+            "deployment": row,
+            "exposure_count": len(exposures),
+            "exposures": exposures,
+        }
+
+    def evolution_lineage(self, candidate_id: str) -> dict:
+        """Return the durable evolution lineage chain for one candidate."""
+        record = self.lineage_repository.record(candidate_id)
+        nodes = [record] if record else []
+        deployment_id = (record or {}).get("deployment_id", "")
+        related = {"promote": [], "canary": [], "rollback": []}
+        if deployment_id:
+            for lane in ("promote", "canary", "rollback"):
+                row = self.lineage_repository.node(lane + ":" + deployment_id)
+                if row:
+                    related[lane].append(row)
+        if not nodes and not any(related.values()):
+            raise ValueError("evolution lineage not found for candidate")
+        return {"candidate_id": candidate_id, "lineage": nodes, "events": related}
 
     def candidate_reviewers(self, tenant_id: str, deployment=None) -> list:
         """Return every shadow/canary candidate reviewer (prompt + rule skill).

@@ -56,17 +56,7 @@ def apply_safety_floor(
     risk_level = policy.risk_level
     if RISK_RANK[risk_level] < RISK_RANK[floor.minimum_risk_level]:
         risk_level = floor.minimum_risk_level
-        floor = SafetyFloor(
-            **{
-                "minimum_risk_level": risk_level,
-                "require_critic": resolved_floor.require_critic,
-                "require_evidence": resolved_floor.require_evidence,
-                "require_verifier": resolved_floor.require_verifier,
-                "require_sandbox": resolved_floor.require_sandbox,
-                "mandatory_tool_denies": resolved_floor.mandatory_tool_denies,
-                "mandatory_approval_tools": resolved_floor.mandatory_approval_tools,
-            }
-        )
+        floor = replace(resolved_floor, minimum_risk_level=risk_level)
 
     # 2. Hardening applies to high / critical risk levels only.
     hardened = RISK_RANK[risk_level] >= RISK_RANK["high"]

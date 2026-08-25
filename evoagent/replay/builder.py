@@ -11,8 +11,8 @@ import uuid
 from typing import Any, Dict, List, Optional
 
 from ..decision_trace.trace import DecisionTrace
-from ..tools.audit import AuditEntry, hash_args
-from .models import ReplayLevel, ReplaySnapshot, fingerprint
+from ..tools.audit import AuditEntry
+from .models import ReplayLevel, ReplaySnapshot
 
 
 class ReplaySnapshotBuilder:

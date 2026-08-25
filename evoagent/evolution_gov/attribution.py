@@ -5,7 +5,7 @@ The report explains *why* an evolution happened and *with what outcome*
 replay changes and production outcome.
 """
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import Optional
 
 from .lineage import EvolutionLineage, LineageStage
 

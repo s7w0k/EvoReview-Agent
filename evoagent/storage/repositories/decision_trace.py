@@ -7,7 +7,6 @@ reconstruct the trace and replay can re-consume it in order.
 from typing import Any, Dict, List, Optional
 
 from ...decision_trace.trace import DecisionTrace, TraceEvent
-from ...storage.json_store import JSONFileStore
 from .base import PersistentRepository
 
 TABLE = "decision_trace_events"

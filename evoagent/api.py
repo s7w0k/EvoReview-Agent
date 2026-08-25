@@ -21,6 +21,10 @@ from .policy.codec import policy_from_dict
 TASK = re.compile(r"^/v1/tasks/([0-9a-f-]+)$")
 REPORT = re.compile(r"^/v1/tasks/([0-9a-f-]+)/report$")
 FIX = re.compile(r"^/v1/tasks/([0-9a-f-]+)/fix$")
+TASK_DECISION_TRACE = re.compile(r"^/v1/tasks/([0-9a-f-]+)/decision-trace$")
+TASK_REPLAY = re.compile(r"^/v1/tasks/([0-9a-f-]+)/replay$")
+DEPLOYMENT_METRICS = re.compile(r"^/v1/deployments/([^\s/]+)/metrics$")
+EVOLUTION_LINEAGE = re.compile(r"^/v1/evolution/([^\s/]+)/lineage$")
 FEEDBACK = re.compile(r"^/v1/tasks/([0-9a-f-]+)/feedback$")
 CHAT_SESSIONS = re.compile(r"^/v1/tasks/([0-9a-f-]+)/chat/sessions$")
 CHAT_SESSION = re.compile(r"^/v1/chat/sessions/([0-9a-f-]+)$")
@@ -428,6 +432,44 @@ class ApiHandler(BaseHTTPRequestHandler):
                 self._send_json(404, {"error": str(exc)})
                 return
             self._send_json(200, row)
+            return
+        # Phase 11: observability / evidence export (plan section 14).
+        trace_match = TASK_DECISION_TRACE.match(path)
+        if trace_match:
+            try:
+                payload = self.service.task_decision_trace(trace_match.group(1))
+            except ValueError as exc:
+                self._send_json(404, {"error": str(exc)})
+                return
+            self._send_json(200, payload)
+            return
+        replay_match = TASK_REPLAY.match(path)
+        if replay_match:
+            try:
+                payload = self.service.task_replay(replay_match.group(1))
+            except ValueError as exc:
+                self._send_json(404, {"error": str(exc)})
+                return
+            self._send_json(200, payload)
+            return
+        deployment_metrics_match = DEPLOYMENT_METRICS.match(path)
+        if deployment_metrics_match:
+            try:
+                payload = self.service.deployment_metrics(
+                    deployment_metrics_match.group(1))
+            except ValueError as exc:
+                self._send_json(404, {"error": str(exc)})
+                return
+            self._send_json(200, payload)
+            return
+        lineage_match = EVOLUTION_LINEAGE.match(path)
+        if lineage_match:
+            try:
+                payload = self.service.evolution_lineage(lineage_match.group(1))
+            except ValueError as exc:
+                self._send_json(404, {"error": str(exc)})
+                return
+            self._send_json(200, payload)
             return
         self._send_json(404, {"error": "not found"})
 

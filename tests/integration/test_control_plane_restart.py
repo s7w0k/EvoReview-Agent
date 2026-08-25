@@ -14,9 +14,13 @@ import os
 import tempfile
 import unittest
 
+import pytest
+
 from evoagent.config import Settings
 from evoagent.policy.codec import policy_from_dict
 from evoagent.service import ReviewService
+
+pytestmark = pytest.mark.sqlite
 
 TENANT = "default"
 REPO = "org/repo"

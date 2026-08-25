@@ -5,7 +5,7 @@ skill is only a list of steps (tool calls / named checks) plus metadata.  There
 is no YAML dependency here; the source form is plain ``dict`` or ``json`` text,
 which keeps the parser dependency-free and safe.
 """
-from typing import Any, Dict, Mapping, Union
+from typing import Any, Mapping, Union
 
 from .schema import ProceduralStep, ProcedureTrigger, ProcedureSkill
 

@@ -75,8 +75,12 @@ class EvolutionLineage:
         """Return the ordered stages represented by this lineage."""
         stages = [node.stage for node in self._nodes]
         # keep first occurrence, ordered by stage order, to render canonical chain
+        ordered: List[LineageStage] = []
         seen = set()
-        ordered = [s for s in stages if not (s in seen or seen.add(s))]
+        for s in stages:
+            if s not in seen:
+                seen.add(s)
+                ordered.append(s)
         return sorted(ordered, key=lambda stage: stage.order)
 
     def has_stage(self, stage: LineageStage) -> bool:

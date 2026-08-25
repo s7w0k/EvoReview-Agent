@@ -4,9 +4,8 @@ Outcomes carry attribution (which policy / deployment / lane produced them) and
 must survive restarts so the regression monitor can replay them.  This is a thin
 store-backed companion to the in-memory ``OutcomeStore``.
 """
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
-from ...storage.json_store import JSONFileStore
 from .base import PersistentRepository
 
 TABLE = "production_outcomes"

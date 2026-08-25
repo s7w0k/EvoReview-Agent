@@ -15,13 +15,13 @@ from contextlib import nullcontext
 from dataclasses import dataclass, field
 import json
 import time
-from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Tuple
+from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Tuple, Type
 
 # Policy wiring is optional so the module keeps its current callers working.
 try:
     from .policy.models import ExecutionPolicy as _ExecutionPolicy
 except Exception:  # pragma: no cover - only during partial installs
-    _ExecutionPolicy = None
+    _ExecutionPolicy = None  # type: ignore[assignment,misc]
 
 
 class RuntimeBudgetExceeded(RuntimeError):
@@ -97,13 +97,13 @@ class ToolRegistry:
                 raise AgentLoopProtocolError(
                     "unknown tool arguments: %s" % ", ".join(sorted(unknown))
                 )
-        expected_types = {
+        expected_types: Dict[str, Any] = {
             "string": str, "integer": int, "number": (int, float),
             "boolean": bool, "object": dict, "array": list,
         }
         for key, value in arguments.items():
             spec = properties.get(key) or {}
-            expected = expected_types.get(spec.get("type"))
+            expected = expected_types.get(str(spec.get("type", "")))
             if expected and (not isinstance(value, expected) or (
                 spec.get("type") in {"integer", "number"} and isinstance(value, bool)
             )):
@@ -164,7 +164,8 @@ class AgentRuntime:
         cancel_check: Optional[Callable[[], bool]] = None,
         event_sink: Optional[Callable[[RuntimeEvent], None]] = None,
         span_factory: Optional[Callable[[str, Dict[str, Any]], Any]] = None,
-        non_retryable: Tuple[type, ...] = (ValueError, RuntimeCancelled, RuntimeBudgetExceeded),
+        non_retryable: Tuple[Type[BaseException], ...] = (
+            ValueError, RuntimeCancelled, RuntimeBudgetExceeded),
     ) -> Dict[str, Any]:
         state = dict(initial_state)
         started = time.monotonic()
@@ -273,6 +274,7 @@ class AgentLoop:
         execution_policy: Optional["_ExecutionPolicy"] = None,
         no_progress_detector=None,
     ):
+        self.max_tool_calls: Optional[int] = None
         if execution_policy is not None:
             max_steps = execution_policy.budget.max_steps
             timeout_seconds = int(execution_policy.budget.max_wall_time_seconds)
@@ -300,7 +302,7 @@ class AgentLoop:
         state = dict(initial_state)
         observations = list(state.get("observations") or [])
         started = time.monotonic()
-        actions: List[str] = []
+        actions: List[Dict[str, Any]] = []
 
         def emit(kind: str, **detail) -> None:
             if event_sink:

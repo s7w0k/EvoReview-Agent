@@ -6,7 +6,7 @@ logical invocation is keyed and tracked through a state machine.  ``FAILED`` and
 """
 import enum
 import threading
-from typing import Any, Dict, Optional
+from typing import Dict, Optional
 
 
 class InvocationState(str, enum.Enum):
@@ -41,7 +41,8 @@ class ToolInvocationGuard:
                 return InvocationState.REQUESTED
             if current in BLOCK_REPLAY:
                 raise UnknownInvocationError(
-                    "invocation %s left in %s; not auto-replaying" % (idempotency_key, current.value)
+                    "invocation %s left in %s; not auto-replaying"
+                    % (idempotency_key, current.value)
                 )
             return current
 

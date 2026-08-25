@@ -1,5 +1,5 @@
 """Compensation handlers for reversible side-effect tools."""
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Dict
 
 
 class CompensationHandler:

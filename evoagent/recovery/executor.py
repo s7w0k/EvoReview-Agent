@@ -10,7 +10,7 @@ class RecoveryNotSupported(RuntimeError):
     """A recovery action has no executable implementation."""
 
 
-def _backoff_seconds(policy: ExecutionPolicy, attempt: int) -> float:
+def _backoff_seconds(policy: Optional[ExecutionPolicy], attempt: int) -> float:
     base = policy.retry.backoff_seconds if policy is not None else 1.0
     exponential = (
         policy.retry.exponential_backoff if policy is not None else False
@@ -29,7 +29,7 @@ class RecoveryExecutor:
     def execute(
         self,
         event: FailureEvent,
-        execution_policy: ExecutionPolicy,
+        execution_policy: Optional[ExecutionPolicy],
         runtime_state: Dict[str, Any],
         model_switch: Optional[Any] = None,
     ) -> Dict[str, Any]:
@@ -50,7 +50,8 @@ class RecoveryExecutor:
                 "retain_last": runtime_state.get("context_reserve", 30),
             }
         if action == RecoveryAction.FALLBACK_AGENT:
-            fallback = execution_policy.agents.fallback_agents
+            fallback = execution_policy.agents.fallback_agents \
+                if execution_policy is not None else []
             return {"recovery": "fallback_agent", "agent": fallback[0] if fallback else None}
         if action == RecoveryAction.SKIP:
             return {"recovery": "skip"}

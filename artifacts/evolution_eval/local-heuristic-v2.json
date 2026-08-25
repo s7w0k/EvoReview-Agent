@@ -1,0 +1,86 @@
+{
+  "candidate_id": "local-heuristic-v2",
+  "baseline_id": "local-heuristic-v1-security",
+  "category": "all",
+  "dataset": {
+    "security": 5,
+    "reliability": 4,
+    "correctness": 4,
+    "regression": 3,
+    "total": 16
+  },
+  "hard_gate": {
+    "decision": "PASS",
+    "checks": {
+      "candidate_no_new_critical_miss": true,
+      "candidate_high_risk_not_worse": true,
+      "candidate_recall_not_worse": true,
+      "candidate_better_or_equal_f1": true
+    }
+  },
+  "baseline": {
+    "rules": [
+      "SEC-EVAL",
+      "SEC-HARDCODED-SECRET",
+      "SEC-SQL-CONCAT",
+      "SEC-SUBPROCESS-SHELL"
+    ],
+    "metrics": {
+      "true_positives": 2,
+      "false_positives": 0,
+      "false_negatives": 12,
+      "precision": 1.0,
+      "recall": 0.1429,
+      "f1": 0.25,
+      "high_risk_recall": 0.6667,
+      "critical_misses": 1,
+      "critical_miss_rule_ids": [
+        "SEC-SHELL"
+      ],
+      "task_success_rate": 0.375,
+      "tool_calls": 0,
+      "agent_steps": 16,
+      "latency_s": 0.0002,
+      "cost_usd": 0.0,
+      "recovery_rate": null,
+      "policy_violations": 0
+    }
+  },
+  "candidate": {
+    "rules": [
+      "REL-DEBUG-PRINT",
+      "REL-EMPTY-EXCEPT",
+      "SEC-EVAL",
+      "SEC-HARDCODED-SECRET",
+      "SEC-SQL-CONCAT",
+      "SEC-SUBPROCESS-SHELL",
+      "SEC-OS-SYSTEM"
+    ],
+    "metrics": {
+      "true_positives": 4,
+      "false_positives": 1,
+      "false_negatives": 10,
+      "precision": 0.8,
+      "recall": 0.2857,
+      "f1": 0.4211,
+      "high_risk_recall": 1.0,
+      "critical_misses": 0,
+      "critical_miss_rule_ids": [],
+      "task_success_rate": 0.4375,
+      "tool_calls": 0,
+      "agent_steps": 16,
+      "latency_s": 0.0003,
+      "cost_usd": 0.0,
+      "recovery_rate": null,
+      "policy_violations": 0
+    }
+  },
+  "delta": {
+    "f1": "+0.1711 (68%)",
+    "high_risk_recall": "+0.3333 (50%)",
+    "tool_calls": "0",
+    "latency_s": "+0.0001 (50%)",
+    "critical_misses": "-1 (-100%)",
+    "false_positives": "+1"
+  }
+}

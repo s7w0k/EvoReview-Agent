@@ -3,7 +3,7 @@ import time
 import enum
 import uuid
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 
 class FailureType(str, enum.Enum):

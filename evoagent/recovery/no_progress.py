@@ -1,6 +1,6 @@
 """Detect agent no-progress loops (e.g. repeated identical tool calls)."""
 import json
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 
 def _stable_args(arguments: Any) -> str:

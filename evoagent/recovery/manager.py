@@ -12,7 +12,7 @@ from typing import Any, Dict, Optional
 from ..policy.models import ExecutionPolicy
 from .classifier import FailureClassifier
 from .executor import RecoveryExecutor
-from .failures import FailureEvent, FailureType, RecoveryAction
+from .failures import FailureEvent, RecoveryAction
 from .planner import RecoveryPlanner
 
 

@@ -79,6 +79,10 @@ class Settings:
     auto_post_review: bool
     database_url: str = ""
     redis_url: str = ""
+    # Durable control-plane backend selection (hardening plan Phase 7):
+    # sqlite (default dev) | postgres (production) | json (test fallback).
+    control_plane_backend: str = "sqlite"
+    control_plane_path: str = ""
     async_workers: int = 2
     agent_max_workers: int = 4
     agent_retries: int = 1
@@ -285,7 +289,9 @@ class Settings:
         if not 0.0 <= self.eval_min_improvement <= 1.0:
             raise ValueError("EVOAGENT_EVAL_MIN_IMPROVEMENT must be between 0 and 1")
         if self.eval_min_holdout_cases > self.eval_max_cases:
-            raise ValueError("EVOAGENT_EVAL_MIN_HOLDOUT_CASES cannot exceed EVOAGENT_EVAL_MAX_CASES")
+            raise ValueError(
+                "EVOAGENT_EVAL_MIN_HOLDOUT_CASES cannot exceed EVOAGENT_EVAL_MAX_CASES"
+            )
         if not 0.0 <= self.eval_max_metric_regression <= 1.0:
             raise ValueError("EVOAGENT_EVAL_MAX_METRIC_REGRESSION must be between 0 and 1")
         if self.eval_source not in {"builtin", "github-real", "all"}:
@@ -414,6 +420,10 @@ class Settings:
             auto_post_review=_bool("EVOAGENT_AUTO_POST_REVIEW"),
             database_url=os.getenv("EVOAGENT_DATABASE_URL", ""),
             redis_url=os.getenv("EVOAGENT_REDIS_URL", ""),
+            control_plane_backend=os.getenv(
+                "CONTROL_PLANE_BACKEND", "sqlite"
+            ).strip().lower(),
+            control_plane_path=os.getenv("CONTROL_PLANE_PATH", ""),
             async_workers=_int("EVOAGENT_ASYNC_WORKERS", 2),
             agent_max_workers=_int("EVOAGENT_AGENT_MAX_WORKERS", 4),
             agent_retries=_non_negative_int("EVOAGENT_AGENT_RETRIES", 1),

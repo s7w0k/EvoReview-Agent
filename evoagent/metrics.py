@@ -131,7 +131,7 @@ class Metrics:
                 lines.append('evoagent_agent_seconds_count{%s} %d' % (label, count))
             for key, value in sorted(self.finding_distribution.items()):
                 tenant, repository, rule_id, model = key
-                labels = [
+                label_parts = [
                     "tenant=%s" % _quote(tenant),
                     "repository=%s" % _quote(repository),
                     "rule_id=%s" % _quote(rule_id),
@@ -139,7 +139,7 @@ class Metrics:
                 ]
                 lines.append(
                     "evoagent_finding_distribution_total{%s} %d"
-                    % (",".join(labels), value)
+                    % (",".join(label_parts), value)
                 )
             for rule_id in sorted(set(self.rule_total) | set(self.rule_fp)):
                 label = "rule_id=%s" % _quote(rule_id)

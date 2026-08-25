@@ -4,9 +4,8 @@ Each task's routing decision is written here so production metrics stay
 attributable across restarts.  The natural key is ``task_id:deployment_id`` so a
 retried task never pollutes the exposure metrics twice (unique constraint).
 """
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
-from ...storage.json_store import JSONFileStore
 from .base import PersistentRepository
 
 TABLE = "policy_exposures"

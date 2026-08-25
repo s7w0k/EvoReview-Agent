@@ -33,6 +33,7 @@ __all__ = [
     "ToolTimeoutError",
     "ToolInvocationGuard",
     "UnknownInvocationError",
+    "GovernedToolRegistry",
     "build_runtime_tools",
     "build_tool_metadata",
     "procedure_tool_invoker",

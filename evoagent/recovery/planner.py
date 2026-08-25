@@ -20,15 +20,12 @@ class RecoveryPlanner:
     def plan(
         self,
         failure_type: FailureType,
-        execution_policy: ExecutionPolicy,
+        execution_policy: Optional[ExecutionPolicy],
         runtime_state: Dict[str, Any],
         context: Optional[Dict[str, Any]] = None,
     ) -> RecoveryAction:
         context = context or {}
         attempt = int(runtime_state.get("attempt", 0))
-        max_retries = (
-            execution_policy.retry.max_retries if execution_policy is not None else 1
-        )
         canned = self._canned_steps(failure_type, context)
         if canned is None:
             return RecoveryAction.ABORT
@@ -40,7 +37,11 @@ class RecoveryPlanner:
         if failure_type in RETRYABLE_FOR_BACKOFF:
             if context.get("side_effect_unknown"):
                 return [RecoveryAction.HUMAN_REVIEW]
-            return [RecoveryAction.RETRY_WITH_BACKOFF, RecoveryAction.SWITCH_MODEL, RecoveryAction.ABORT]
+            return [
+                RecoveryAction.RETRY_WITH_BACKOFF,
+                RecoveryAction.SWITCH_MODEL,
+                RecoveryAction.ABORT,
+            ]
 
         if failure_type == FailureType.MODEL_CONTEXT_OVERFLOW:
             return [RecoveryAction.COMPRESS_CONTEXT, RecoveryAction.RETRY, RecoveryAction.ABORT]

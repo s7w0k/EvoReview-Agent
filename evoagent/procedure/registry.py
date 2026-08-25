@@ -127,7 +127,7 @@ class ProcedureRegistry:
                 f"cannot shadow {name!r} v{version} from {record.status.value}")
         record.status = SkillStatus.SHADOW
 
-    def activate(self, name: str, version: int) -> None:
+    def activate(self, name: str, version: int) -> ProcedureSkillVersion:
         """Promote a SHADOW / VALIDATED skill to ACTIVE.  Returns the record."""
         record = self._require(name, version)
         if record.status not in (

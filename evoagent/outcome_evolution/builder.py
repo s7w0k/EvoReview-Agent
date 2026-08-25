@@ -67,7 +67,7 @@ class OutcomeExperienceBuilder:
 
     def build(self, outcome: Outcome) -> OutcomeExperience:
         experience_type, confidence = _classify(outcome)
-        payload = {
+        payload: Dict[str, Any] = {
             "risk_level": outcome.risk_level,
             "deployment_lane": outcome.attribution.deployment_lane,
             "candidate_id": outcome.attribution.candidate_id,

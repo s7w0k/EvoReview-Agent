@@ -5,7 +5,7 @@ surface: ``save``, ``record``/``find``, ``all``, ``delete`` and ``count``.
 Repositories subclass this and groups records by a natural key (task_id, policy
 id, run id, ...).
 """
-from typing import Any, Dict, List, Optional
+from typing import Any, List, Optional
 
 from ...storage.json_store import JSONFileStore
 

@@ -430,6 +430,10 @@ class PolicyDeploymentManager:
         candidate = self._policies.get(deployment.policy_id)
 
         if deployment.state is DeploymentState.PROMOTED:
+            if candidate is None:
+                raise DeploymentNotFound(
+                    f"candidate policy {deployment.policy_id} missing for "
+                    f"{deployment.deployment_id}")
             return RoutingDecision(
                 policy=candidate, lane="candidate",
                 deployment_id=deployment.deployment_id,
@@ -441,6 +445,9 @@ class PolicyDeploymentManager:
             )
 
         if deployment.state is not DeploymentState.CANARY:
+            if baseline is None:
+                raise DeploymentNotFound(
+                    f"no policy available for {tenant_id}/{repository}/{risk_level}")
             return RoutingDecision(
                 policy=baseline, lane="baseline",
                 deployment_id=deployment.deployment_id,

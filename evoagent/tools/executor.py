@@ -51,10 +51,12 @@ class ToolExecutor:
         execution_context: Optional[Dict[str, Any]] = None,
     ) -> ToolExecutionResult:
         """Dispatch to the correct execution mode for ``metadata``."""
-        is_blocking = bool(metadata) and metadata.blocking
-        if not is_blocking:
-            return self._run_in_process(tool, arguments)
-        return self._run_subprocess(metadata, arguments)
+        is_blocking = metadata is not None and metadata.blocking
+        if is_blocking:
+            # metadata is guaranteed non-None for a blocking subprocess call.
+            assert metadata is not None
+            return self._run_subprocess(metadata, arguments)
+        return self._run_in_process(tool, arguments)
 
     # -- safe, in-process ----------------------------------------------------
 
@@ -67,7 +69,9 @@ class ToolExecutor:
 
     # -- potentially blocking, subprocess ------------------------------------
 
-    def _run_subprocess(self, metadata: ToolMetadata, arguments: Dict[str, Any]) -> ToolExecutionResult:
+    def _run_subprocess(
+        self, metadata: ToolMetadata, arguments: Dict[str, Any]
+    ) -> ToolExecutionResult:
         if not metadata.command:
             raise ValueError(
                 "blocking tool %s has no shell command template" % metadata.name

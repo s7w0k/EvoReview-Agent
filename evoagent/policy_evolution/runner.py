@@ -16,7 +16,7 @@ A snapshot's ``expected_output`` carries the ground truth that maps findings to
 the tool responsible for detecting them and a ``baseline`` block describing how
 the reference policy behaved.
 """
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Dict, List, Sequence
 
 from evoagent.policy.models import ExecutionPolicy
 
