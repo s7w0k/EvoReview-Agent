@@ -59,6 +59,7 @@ class ProcedureRunResult:
     observations: List[ProcedureObservation] = field(default_factory=list)
     contexts: Dict[str, Any] = field(default_factory=dict)
     complete: bool = False
+    status: str = "RUNNING"  # "SUCCESS" | "PARTIAL" | "FAILED" | "ABORTED"
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -66,6 +67,7 @@ class ProcedureRunResult:
             "steps_executed": self.steps_executed,
             "tool_calls": self.tool_calls,
             "complete": self.complete,
+            "status": self.status,
             "observations": [obs.to_dict() for obs in self.observations],
             "contexts": self.contexts,
         }
@@ -85,16 +87,32 @@ class ProcedureExecutor:
     # -- public API ---------------------------------------------------------
 
     def execute(self, skill: ProcedureSkill) -> ProcedureRunResult:
-        """Run the skill against the injected tool invoker / check evaluator."""
+        """Run the skill against the injected tool invoker / check evaluator.
+
+        Runs until the procedure is exhausted or a tool step fails with
+        ``on_failure="abort"``.  The ``on_failure`` policy (plan section 10.6)
+        decides whether a failed tool step halts the run (``abort``) or lets
+        the remaining steps execute (``continue``).  The resulting ``status``
+        is ``SUCCESS`` / ``PARTIAL`` / ``FAILED`` accordingly.
+        """
         result = ProcedureRunResult(skill_name=skill.name)
         symbols: Dict[str, Any] = {}
         previous: Optional[Any] = None
+        had_failure = False
 
         for index, step in enumerate(skill.procedure):
             self._enforce_step_budget(result, skill)
             if step.kind == "tool":
                 observation, output = self._run_tool_step(
                     step, index, symbols, previous, result)
+                failed = observation.error is not None
+                if failed:
+                    had_failure = True
+                    if step.on_failure == "abort":
+                        result.observations.append(observation)
+                        result.steps_executed += 1
+                        self._set_status(result, skill, had_failure, failed_abort=True)
+                        return result
                 previous = output
                 if step.result_var:
                     symbols[step.result_var] = output
@@ -104,8 +122,25 @@ class ProcedureExecutor:
             result.observations.append(observation)
             result.steps_executed += 1
 
-        result.complete = True
+        self._set_status(result, skill, had_failure, failed_abort=False)
         return result
+
+    def _set_status(
+        self,
+        result: ProcedureRunResult,
+        skill: ProcedureSkill,
+        had_failure: bool,
+        *,
+        failed_abort: bool,
+    ) -> None:
+        """Finalise the run's completion flag and ``status`` value."""
+        if failed_abort:
+            # A tool step failed and its on_failure policy halted the run.
+            result.complete = False
+            result.status = "FAILED"
+            return
+        result.complete = True
+        result.status = "PARTIAL" if had_failure else "SUCCESS"
 
     # -- internals ----------------------------------------------------------
 

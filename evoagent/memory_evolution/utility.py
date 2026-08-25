@@ -5,8 +5,8 @@ relevance, usefulness, confidence and freshness, and *evolution feedback* moves
 usefulness up when a memory helps find a verified finding and down when it is
 used but did not help.
 """
-from dataclasses import dataclass, field
-from typing import Dict, Optional
+from dataclasses import dataclass
+from typing import Dict
 
 
 @dataclass

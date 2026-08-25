@@ -20,12 +20,20 @@ class ReplayComparison:
 
     baseline: EvolutionMetrics
     candidate: EvolutionMetrics
+    baseline_utility: float = 0.0
     utility: float = 0.0
+    improvement: float = 0.0
     deltas: List[str] = field(default_factory=list)
 
-    def summary(self) -> str:
+    def is_improvement(self, min_improvement: float = 0.0) -> bool:
+        """True when the candidate beats the baseline by ``min_improvement``."""
+        return self.improvement >= min_improvement
+
+    def summary(self, min_improvement: float = 0.0) -> str:
+        accepted = "PROMOTE" if self.is_improvement(min_improvement) else "REJECT"
         lines = [
-            f"utility={self.utility:.4f}",
+            f"{accepted}: baseline_utility={self.baseline_utility:.4f} "
+            f"utility={self.utility:.4f} improvement={self.improvement:+.4f}",
             f"candidate quality {self.baseline.quality_score:.3f} "
             f"-> {self.candidate.quality_score:.3f}",
             f"candidate recall {self.baseline.high_risk_recall:.3f} "
@@ -47,19 +55,25 @@ class PolicyReplayEvaluator:
         baseline: object,
         candidate: object,
         weights: Optional[Dict[str, float]] = None,
+        min_improvement: float = 0.0,
     ) -> ReplayComparison:
         """Replay both policies and produce a comparison."""
         base_metrics = self._runner(baseline)
         cand_metrics = self._runner(candidate)
 
-        utility = evolution_utility(
+        baseline_utility = evolution_utility(
+            base_metrics, weights=weights, reference=base_metrics)
+        candidate_utility = evolution_utility(
             cand_metrics, weights=weights, reference=base_metrics)
+        improvement = candidate_utility - baseline_utility
 
         deltas = _metric_deltas(base_metrics, cand_metrics)
         return ReplayComparison(
             baseline=base_metrics,
             candidate=cand_metrics,
-            utility=utility,
+            baseline_utility=round(baseline_utility, 4),
+            utility=round(candidate_utility, 4),
+            improvement=round(improvement, 4),
             deltas=deltas,
         )
 

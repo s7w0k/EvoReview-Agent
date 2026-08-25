@@ -1,7 +1,9 @@
 """Checkpointed review workflow powered by EvoAgent's own runtime."""
 import threading
+import uuid
 from typing import Any, Dict, Optional, TypedDict
 
+from .decision_trace.trace import TraceEvent as DecisionTraceEvent
 from .diff_parser import ParsedDiff, parse_unified_diff
 from .models import ChangedLine, Finding, ReviewReport, Severity, TaskState, TraceEvent
 from .confidence import apply_enhancement, classify
@@ -44,6 +46,8 @@ class ReviewHarness:
         timeout_seconds: int = 120, node_retries: int = 2, observability=None,
         finding_clustering: str = "off", confidence_enhance: bool = False,
         confidence_buckets: tuple = (0.8, 0.5),
+        execution_policy=None, execution_context=None,
+        recovery_manager=None, trace_logger=None, replay_repository=None,
     ):
         self.store = store
         self.reviewer = reviewer
@@ -54,9 +58,21 @@ class ReviewHarness:
         self.finding_clustering = finding_clustering
         self.confidence_enhance = confidence_enhance
         self.confidence_buckets = confidence_buckets
+        # Closed-loop wiring (plan section 5.5): a resolved execution policy
+        # pins the runtime budget; the context/recovery/trace handles are kept
+        # for the replay and recovery phases.
+        self.execution_policy = execution_policy
+        self.execution_context = execution_context
+        self.recovery_manager = recovery_manager
+        self.trace_logger = trace_logger
+        self.replay_repository = replay_repository
         self.name = "evoagent-runtime"
         self._ctx = threading.local()
-        self.runtime = AgentRuntime(max_steps, timeout_seconds, node_retries)
+        self.runtime = AgentRuntime(
+            max_steps, timeout_seconds, node_retries,
+            execution_policy=execution_policy,
+            recovery_manager=recovery_manager,
+        )
 
     def run(
         self, task_id: str, repository: str, pull_request: Optional[int], diff: str,
@@ -80,6 +96,7 @@ class ReviewHarness:
         if checkpoints.get("reviewing", {}).get("status") == "completed":
             self._ctx.state = TaskState.REVIEWING
         try:
+            self._trace_begin(state)
             result = self.runtime.execute(
                 state,
                 [
@@ -97,6 +114,8 @@ class ReviewHarness:
                 task_id, report,
                 TraceEvent(self._ctx.step, TaskState.SUCCESS, "Review completed", utc_now()),
             )
+            self._trace_complete(task_id, "task_completed", report)
+            self._capture_snapshot(task_id, report)
             return report
         except TaskCancelled as exc:
             self._ctx.step += 1
@@ -116,6 +135,7 @@ class ReviewHarness:
                 )
             except Exception:
                 pass
+            self._trace_complete(task_id, "task_failed")
             raise
 
     def resume(
@@ -192,6 +212,59 @@ class ReviewHarness:
             self._ctx.task_id,
             TraceEvent(self._ctx.step, target, message, utc_now()),
         )
+
+    def _trace_begin(self, state: RuntimeState) -> None:
+        """Record the start of a real review into the decision trace (8.1)."""
+        logger = self.trace_logger
+        if logger is None:
+            return
+        task_id = state.get("task_id", "")
+        logger.begin(task_id)
+        logger.append(task_id, DecisionTraceEvent(
+            uuid.uuid4().hex, "policy_resolution", agent_id="runtime",
+            policy_id=(self.execution_policy.policy_id
+                       if self.execution_policy else ""),
+            data={"risk_level": (self.execution_context.risk_level
+                                 if self.execution_context else "low")},
+        ))
+        logger.append(task_id, DecisionTraceEvent(
+            uuid.uuid4().hex, "task_started", agent_id="runtime",
+            data={"repository": state.get("repository", "")},
+        ))
+
+    def _trace_complete(self, task_id: str, action_type: str,
+                        report: Optional[ReviewReport] = None) -> None:
+        logger = self.trace_logger
+        if logger is None:
+            return
+        data = {}
+        if report is not None:
+            data = {
+                "risk": report.risk,
+                "findings": len(report.findings),
+                "reviewer": report.reviewer,
+            }
+        logger.append(task_id, DecisionTraceEvent(
+            uuid.uuid4().hex, action_type, agent_id="runtime", data=data,
+        ))
+
+    def _capture_snapshot(self, task_id: str,
+                          report: Optional[ReviewReport] = None) -> None:
+        """Auto-generate and store a replay snapshot for a finished review (8.3)."""
+        if self.replay_repository is None:
+            return
+        from .replay.builder import ReplaySnapshotBuilder
+        builder = ReplaySnapshotBuilder(self.replay_repository)
+        expected = report.to_dict() if report is not None else None
+        snapshot = builder.build(
+            execution_context=self.execution_context,
+            decision_trace=self.trace_logger.trace(task_id)
+            if self.trace_logger is not None else None,
+            task_id=task_id, repository=self.execution_context.repository
+            if self.execution_context else "",
+            expected_output=expected,
+        )
+        self.replay_repository.save(snapshot)
 
     def _span(self, name: str, attributes: Dict[str, Any]):
         if self.observability:

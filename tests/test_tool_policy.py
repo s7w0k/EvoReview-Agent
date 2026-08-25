@@ -122,6 +122,9 @@ class GovernedRegistryTest(unittest.TestCase):
         ]
         engine = ToolPolicyEngine({"push_fix": meta["push_fix"]})
         registry = GovernedToolRegistry(reg_tools, high_policy(), engine)
+        # push_fix is side-effecting and requires approval; wire up an
+        # approving provider so the guard behaviour, not approval, is tested.
+        registry.approval_provider = lambda _decision: True
         with self.assertRaises(RuntimeError):
             registry.invoke_as("deployer", "push_fix", {})
         # Same idempotency key must be blocked on replay.

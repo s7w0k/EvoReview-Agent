@@ -7,6 +7,13 @@ non-idempotent side-effect tool was in flight).
 import re
 from typing import Any, Dict, Optional
 
+from ..errors import (
+    ModelContextOverflow,
+    ModelInvalidOutput,
+    ModelRateLimit,
+    ModelTimeout,
+    ModelUnavailable,
+)
 from .failures import FailureType
 
 
@@ -27,6 +34,18 @@ class FailureClassifier:
         text = " ".join(filter(None, [message, str(exc) if exc else ""]))
         lowered = _lower(text)
         exc_type = type(exc).__name__.lower() if exc else ""
+
+        # Standardised model exceptions take precedence (plan section 7.3).
+        if isinstance(exc, ModelRateLimit):
+            return FailureType.MODEL_RATE_LIMIT
+        if isinstance(exc, ModelTimeout):
+            return FailureType.MODEL_TIMEOUT
+        if isinstance(exc, ModelContextOverflow):
+            return FailureType.MODEL_CONTEXT_OVERFLOW
+        if isinstance(exc, ModelUnavailable):
+            return FailureType.MODEL_UNAVAILABLE
+        if isinstance(exc, ModelInvalidOutput):
+            return FailureType.MODEL_INVALID_OUTPUT
 
         # Explicit budget / policy bookkeeping.
         if isinstance(exc, MemoryError):

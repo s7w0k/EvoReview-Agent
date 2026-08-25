@@ -56,7 +56,9 @@ class RuntimePolicyEnforcementTest(unittest.TestCase):
         from evoagent.runtime import ToolRegistry
 
         def stepper(state):
-            return {"action": "tool", "tool": "read_file", "arguments": {"path": "x.txt"}}
+            step = state.get("loop_step", 1)
+            return {"action": "tool", "tool": "read_file",
+                    "arguments": {"path": "x-%d.txt" % step}}
 
         with self.assertRaises(RuntimeBudgetExceeded):
             loop.run(stepper, ToolRegistry(TOOLS), {})

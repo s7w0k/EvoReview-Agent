@@ -35,6 +35,13 @@ from .rollout import ReleaseManager
 from .skill_curator import SkillCurator
 from .semantic_reviewer import build_semantic_reviewer
 from .confidence import parse_buckets
+from .policy import PolicyResolver, RiskProfiler
+from .policy.repository import RuntimePolicyRepository
+from .recovery import RecoveryBudget, RecoveryManager
+from .decision_trace import DecisionTrace
+from .decision_trace.repository import DecisionTraceRepository
+from .replay import ReplayRepository
+from .execution import ReviewExecutionContext
 from .verifier import RepairVerifier
 from .chat import (
     CHAT_INSIGHT_CATEGORIES,
@@ -93,6 +100,20 @@ class ReviewService:
             settings.memory_working_ttl_seconds,
         )
         self.observability = Observability(settings.otel_service_name, settings.otel_endpoint)
+        # Closed-loop runtime-policy plumbing (plan section 5.2).
+        self.risk_profiler = RiskProfiler()
+        self.policy_resolver = PolicyResolver()
+        self.policy_repository = RuntimePolicyRepository()
+        self.recovery_manager = RecoveryManager(
+            budget=RecoveryBudget(
+                max_recovery_attempts=settings.recovery_max_attempts,
+                max_replans=settings.recovery_max_replans,
+                max_model_switches=settings.recovery_max_model_switches,
+            ),
+        )
+        self.trace_repository = DecisionTraceRepository()
+        self.replay_repository = ReplayRepository()
+        self.runtime_policy_version: Optional[int] = None
         self.registry = SkillRegistry(
             settings.skills_dir, settings.skill_sandbox, settings.skill_timeout_seconds,
             settings.skill_memory_mb, settings.skill_signing_key,
@@ -204,7 +225,7 @@ class ReviewService:
             extra_headers=dict(self.llm_config.get("headers") or {}),
         )
 
-    def _build_coordinator(self, reviewers: list) -> MultiAgentCoordinator:
+    def _build_coordinator(self, reviewers: list, execution_policy=None) -> MultiAgentCoordinator:
         return MultiAgentCoordinator(
             reviewers, max_workers=self.settings.agent_max_workers, store=self.store,
             agent_retries=self.settings.agent_retries,
@@ -212,16 +233,50 @@ class ReviewService:
             context_manager=self.context_manager, memory_manager=self.memory,
             agent_loop_max_steps=self.settings.agent_loop_max_steps,
             agent_loop_timeout_seconds=self.settings.agent_loop_timeout_seconds,
+            execution_policy=execution_policy,
         )
 
-    def _build_harness(self, reviewer) -> ReviewHarness:
+    def _build_harness(self, reviewer, execution_policy=None,
+                       context=None) -> ReviewHarness:
         return ReviewHarness(
             self.store, reviewer, self.settings.max_steps, self.settings.timeout_seconds,
             observability=self.observability,
             finding_clustering=self.settings.finding_clustering,
             confidence_enhance=self.settings.confidence_enhance,
             confidence_buckets=parse_buckets(self.settings.confidence_buckets),
+            execution_policy=execution_policy, execution_context=context,
+            recovery_manager=self.recovery_manager,
+            trace_logger=self.trace_repository,
+            replay_repository=self.replay_repository,
         )
+
+    def _resolve_execution_context(
+        self, task_id: str, repository: str, pull_request: Optional[int],
+        diff: str, tenant_id: str,
+    ) -> ReviewExecutionContext:
+        """Profile risk, resolve the active policy and freeze it in a context."""
+        parsed = parse_unified_diff(diff)
+        risk = self.risk_profiler.profile(parsed)
+        task_hint = {"task_id": task_id, "tenant_id": tenant_id}
+        # An overridden policy (e.g. from a deployment) wins; otherwise resolve.
+        policy = self.policy_resolver.resolve(task_hint, risk_profile=risk)
+        runtime_version = self.policy_repository.policy_version(policy.policy_id)
+        if runtime_version is None:
+            runtime_version = self.policy_repository.register(
+                policy, status="active", tenant_id=tenant_id,
+                risk_level=risk.level, metadata={"source": "review-service"},
+            )
+            self.runtime_policy_version = runtime_version
+        context = ReviewExecutionContext(
+            task_id=task_id, tenant_id=tenant_id, repository=repository,
+            pull_request=pull_request, parsed_diff=parsed, risk_profile=risk,
+            execution_policy=policy,
+            prompt_version=None,
+            skill_versions={},
+            runtime_policy_version=runtime_version,
+            model_name=str(self.llm_config.get("model")) if self.llm_config else None,
+        )
+        return context
 
     def candidate_reviewers(self, tenant_id: str, deployment=None) -> list:
         """Return every shadow/canary candidate reviewer (prompt + rule skill).
@@ -270,6 +325,9 @@ class ReviewService:
         deployment = self.store.get_deployment(tenant_id, "llm-review")
         evolved = self._active_evolved_reviewers(tenant_id)
         report = None
+        context = self._resolve_execution_context(
+            task_id, repository, pull_request, diff, tenant_id,
+        )
         if (
             (task.get("input") or {}).get("release_lane") == "canary"
             or (deployment and deployment.get("status") == "promoted")
@@ -279,17 +337,27 @@ class ReviewService:
                 canary_reviewer = self._build_coordinator([
                     item for item in self.registry.reviewers()
                     if not isinstance(item, OpenAICompatibleReviewer)
-                ] + evolved + [candidate])
-                harness = self._build_harness(canary_reviewer)
+                ] + evolved + [candidate],
+                    execution_policy=context.execution_policy)
+                harness = self._build_harness(
+                    canary_reviewer, context.execution_policy, context)
                 report = harness.run(task_id, repository, pull_request, diff, tenant_id)
         if report is None and evolved:
             tenant_reviewer = self._build_coordinator(
-                self.registry.reviewers() + evolved
+                self.registry.reviewers() + evolved,
+                execution_policy=context.execution_policy,
             )
-            harness = self._build_harness(tenant_reviewer)
+            harness = self._build_harness(
+                tenant_reviewer, context.execution_policy, context)
             report = harness.run(task_id, repository, pull_request, diff, tenant_id)
         if report is None:
-            report = self.harness.run(task_id, repository, pull_request, diff, tenant_id)
+            default_reviewer = self._build_coordinator(
+                self.registry.reviewers(),
+                execution_policy=context.execution_policy,
+            )
+            harness = self._build_harness(
+                default_reviewer, context.execution_policy, context)
+            report = harness.run(task_id, repository, pull_request, diff, tenant_id)
         self._record_skill_usage(tenant_id, evolved, report)
         self._record_finding_distribution(tenant_id, repository, report)
         return report

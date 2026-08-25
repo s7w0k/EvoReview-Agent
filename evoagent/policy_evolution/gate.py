@@ -35,12 +35,16 @@ class EvolutionGate:
         high_risk_recall_tolerance: float = 0.01,   # 1 percentage point
         require_zero_critical_misses: bool = True,
         reliability_tolerance: float = 0.0,
+        require_zero_policy_violations: bool = True,
+        require_zero_side_effect_incidents: bool = True,
     ):
         if high_risk_recall_tolerance < 0:
             raise ValueError("high_risk_recall_tolerance cannot be negative")
         self._recall_tolerance = high_risk_recall_tolerance
         self._require_zero_critical = require_zero_critical_misses
         self._reliability_tolerance = reliability_tolerance
+        self._require_zero_policy_violations = require_zero_policy_violations
+        self._require_zero_side_effect = require_zero_side_effect_incidents
 
     def evaluate(
         self,
@@ -65,5 +69,15 @@ class EvolutionGate:
             reasons.append(
                 "reliability dropped by "
                 f"{reliability_loss:.4f} > tolerance {self._reliability_tolerance}")
+
+        if self._require_zero_policy_violations and candidate.policy_violations > 0:
+            reasons.append(
+                "policy violation present: "
+                f"{candidate.policy_violations} (must be 0)")
+
+        if self._require_zero_side_effect and candidate.side_effect_safety_incidents > 0:
+            reasons.append(
+                "side-effect safety incident present: "
+                f"{candidate.side_effect_safety_incidents} (must be 0)")
 
         return GateDecision(approved=not reasons, reasons=reasons)

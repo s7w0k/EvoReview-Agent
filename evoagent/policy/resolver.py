@@ -9,19 +9,23 @@ Risk never *lowers* the safety posture: it may only raise the effective policy
 to a stricter level.  Override layers are provided as plain dicts keyed the same
 way ``ExecutionPolicy.to_dict()`` serializes.
 """
-from dataclasses import replace
+from dataclasses import asdict, replace
 from typing import Any, Dict, Optional
 
 from .defaults import default_policy
-from .models import ExecutionPolicy, RISK_RANK
+from .models import ExecutionPolicy, RISK_RANK, ToolPermission
 from .risk import RiskProfile
+from .safety_floor import SafetyFloor, apply_safety_floor
+from .tool_policy import merge_tool_permissions
 
 
 class PolicyResolver:
     """Layer runtime / tenant / repository / task overrides over a base policy."""
 
-    def __init__(self, defaults: Optional[Dict[str, ExecutionPolicy]] = None):
+    def __init__(self, defaults: Optional[Dict[str, ExecutionPolicy]] = None,
+                 safety_floor: Optional[SafetyFloor] = None):
         self.defaults = defaults or {}
+        self.safety_floor = safety_floor
 
     def resolve(
         self,
@@ -61,6 +65,10 @@ class PolicyResolver:
                 metadata={"task_override": True, "policy_id": policy.policy_id},
             )
 
+        # 6. Immutable safety floor runs last: it can only raise the posture.
+        if self.safety_floor is not None:
+            policy = apply_safety_floor(policy, self.safety_floor)
+
         return policy
 
     @staticmethod
@@ -82,7 +90,10 @@ class PolicyResolver:
         if "risk_level" in override:
             current["risk_level"] = override["risk_level"]
         if "tool_permissions" in override:
-            current["tool_permissions"].extend(override["tool_permissions"])
+            base_perms = [ToolPermission(**p) for p in current["tool_permissions"]]
+            override_perms = [ToolPermission(**p) for p in override["tool_permissions"]]
+            merged = merge_tool_permissions(base_perms, override_perms)
+            current["tool_permissions"] = [asdict(p) for p in merged]
         merged = ExecutionPolicy.from_dict(current)
         explicit = override.get("metadata") or {}
         return replace(

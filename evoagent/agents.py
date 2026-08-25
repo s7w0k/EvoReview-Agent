@@ -18,8 +18,12 @@ from .diff_parser import ParsedDiff
 from .memory import MemoryManager
 from .metrics import metrics
 from .models import Finding, Severity
+from .policy.defaults import default_policy
+from .policy.tool_policy import ToolPolicyEngine
 from .reviewer import LocalRuleReviewer, Reviewer
 from .runtime import AgentLoop, AgentRuntime, AgentTool, RuntimeNode, ToolRegistry
+from .tools.catalog import build_runtime_tools, build_tool_metadata
+from .tools.governed_registry import GovernedToolRegistry
 
 
 @dataclass
@@ -396,8 +400,10 @@ class MultiAgentCoordinator(Reviewer):
         context_manager: Optional[ContextManager] = None,
         memory_manager: Optional[MemoryManager] = None,
         agent_loop_max_steps: int = 4, agent_loop_timeout_seconds: int = 45,
+        execution_policy=None,
     ):
         self.agents = agents
+        self.execution_policy = execution_policy
         self.max_workers = max_workers
         self.store = store
         self.agent_retries = max(0, agent_retries)
@@ -431,16 +437,10 @@ class MultiAgentCoordinator(Reviewer):
             "repository": repository, "tenant_id": tenant_id,
             "bus": CollaborationBus(task_id, self.store),
         }
+        nodes = self._runtime_nodes()
         result = self.runtime.execute(
             state,
-            [
-                RuntimeNode("planner", self._plan_node, checkpoint=False),
-                RuntimeNode("specialists", self._specialist_node, checkpoint=False),
-                RuntimeNode("deliberation", self._deliberation_node, checkpoint=False),
-                RuntimeNode("evidence", self._evidence_node, checkpoint=False),
-                RuntimeNode("verifier", self._verify_node, checkpoint=False),
-                RuntimeNode("arbiter", self._arbitrate_node, checkpoint=False),
-            ],
+            nodes,
             task_id=task_id,
         )
         summary = self._make_summary(result)
@@ -448,6 +448,48 @@ class MultiAgentCoordinator(Reviewer):
             with self._summary_lock:
                 self._summaries[task_id] = summary
         return result["verified"]
+
+    def _runtime_nodes(self) -> list:
+        """Build the runtime node list; verification stages are policy-gated."""
+        nodes = [
+            RuntimeNode("planner", self._plan_node, checkpoint=False),
+            RuntimeNode("specialists", self._specialist_node, checkpoint=False),
+        ]
+        # Backward compatible: without a policy every stage runs as before.
+        if self.execution_policy is None or self.execution_policy.verification.critic_required:
+            nodes.append(
+                RuntimeNode("deliberation", self._deliberation_node, checkpoint=False)
+            )
+        if self.execution_policy is None or self.execution_policy.verification.evidence_required:
+            nodes.append(
+                RuntimeNode("evidence", self._evidence_node, checkpoint=False)
+            )
+        if self.execution_policy is None or self.execution_policy.verification.verifier_required:
+            nodes.append(
+                RuntimeNode("verifier", self._verify_node, checkpoint=False)
+            )
+        nodes.append(RuntimeNode("arbiter", self._arbitrate_node, checkpoint=False))
+        return nodes
+
+    def _enabled_agents(self) -> List[Reviewer]:
+        """Dynamic agent routing: only the policy's enabled agents take part."""
+        if self.execution_policy is None:
+            return list(self.agents)
+        enabled = self.execution_policy.agents.enabled_agents
+        if not enabled:
+            return list(self.agents)
+        by_name = {item.name: item for item in self.agents}
+        selected = []
+        for name in enabled:
+            agent = by_name.get(name)
+            if agent is not None and agent not in selected:
+                selected.append(agent)
+        if selected:
+            return selected
+        for item in self.agents:  # ensure at least the fallback exists
+            if item.name not in selected and item not in selected:
+                selected.append(item)
+        return selected or list(self.agents)
 
     def collaboration_summary(self, task_id: str) -> dict:
         with self._summary_lock:
@@ -464,7 +506,7 @@ class MultiAgentCoordinator(Reviewer):
         self._bus(state).send(sender, recipient, kind, content, correlation_id)
 
     def _plan_node(self, state: CollaborationState) -> Dict[str, Any]:
-        plan = self.planner.plan(state["parsed"], self.agents)
+        plan = self.planner.plan(state["parsed"], self._enabled_agents())
         for assignment in plan.assignments:
             self._emit(
                 state, self.planner.name, assignment.agent, "assignment",
@@ -500,92 +542,26 @@ class MultiAgentCoordinator(Reviewer):
 
     def _agent_tools(
         self, state: CollaborationState, assignment: ReviewAssignment,
-    ) -> ToolRegistry:
-        def search_diff(query: str, limit: int = 20):
-            value = str(query).strip().lower()
-            if not value:
-                raise ValueError("search_diff query is required")
-            hits = []
-            for index, line in enumerate(state["diff"].splitlines(), 1):
-                if value in line.lower():
-                    hits.append({"diff_line": index, "content": line[:500]})
-                if len(hits) >= max(1, min(int(limit), 50)):
-                    break
-            return hits
+    ) -> GovernedToolRegistry:
+        """Every agent tool comes from the governed catalog (plan 6.2 / 6.3).
 
-        def changed_line(path: str, line: int):
-            match = next((
-                item for item in state["parsed"].added_lines
-                if item.path == str(path) and item.line == int(line)
-            ), None)
-            if match is None:
-                return {"found": False, "path": path, "line": line}
-            return {
-                "found": True, "path": match.path, "line": match.line,
-                "content": match.content,
-            }
-
-        def list_changed_files():
-            return list(state["parsed"].files)
-
-        def recall_memory(query: str, limit: int = 5):
-            if not self.memory_manager or not state.get("repository"):
-                return []
-            return self.memory_manager.recall(
-                state.get("tenant_id", "default"), state["repository"], str(query),
-                limit=max(1, min(int(limit), 10)),
-            )
-
-        return ToolRegistry([
-            AgentTool(
-                "search_diff",
-                "Search the PR diff for an exact case-insensitive text fragment.",
-                {
-                    "type": "object",
-                    "properties": {
-                        "query": {"type": "string"},
-                        "limit": {"type": "integer", "minimum": 1, "maximum": 50},
-                    },
-                    "required": ["query"], "additionalProperties": False,
-                },
-                search_diff,
-            ),
-            AgentTool(
-                "changed_line",
-                "Read one added line by new-file path and line number.",
-                {
-                    "type": "object",
-                    "properties": {
-                        "path": {"type": "string"},
-                        "line": {"type": "integer", "minimum": 1},
-                    },
-                    "required": ["path", "line"], "additionalProperties": False,
-                },
-                changed_line,
-            ),
-            AgentTool(
-                "list_changed_files",
-                "List files changed by this PR.",
-                {
-                    "type": "object", "properties": {},
-                    "additionalProperties": False,
-                },
-                list_changed_files,
-            ),
-            AgentTool(
-                "recall_memory",
-                "Recall repository-scoped review experience relevant to a query.",
-                {
-                    "type": "object",
-                    "properties": {
-                        "query": {"type": "string"},
-                        "limit": {"type": "integer", "minimum": 1, "maximum": 10},
-                    },
-                    "required": ["query"], "additionalProperties": False,
-                },
-                recall_memory,
-            ),
-        ])
+        The registry authorises each call against the resolved execution policy,
+        so an agent can never invoke a side-effect or high-risk tool the policy
+        denies -- the same catalog used by procedures and live replay.
+        """
+        definitions = build_runtime_tools(
+            diff=state["diff"], parsed=state["parsed"],
+            memory_manager=self.memory_manager,
+            tenant_id=state.get("tenant_id", "default"),
+            repository=state.get("repository", ""),
+            workspace=getattr(self, "workspace", None),
+        )
+        policy = self.execution_policy or default_policy("low")
+        return GovernedToolRegistry(
+            [definition.tool for definition in definitions],
+            execution_policy=policy,
+            policy_engine=ToolPolicyEngine(build_tool_metadata()),
+        )
 
     def _run_agent_loop(
         self, state: CollaborationState, agent: Reviewer,
@@ -641,6 +617,7 @@ class MultiAgentCoordinator(Reviewer):
 
         result = self.agent_loop.run(
             managed_step, tools, loop_state, on_event,
+            agent_id=agent.name, task_id=state.get("task_id", ""),
         )
         findings = list(result.output or [])
         if not all(isinstance(item, Finding) for item in findings):
@@ -889,13 +866,21 @@ class MultiAgentCoordinator(Reviewer):
     def _verify_node(self, state: CollaborationState) -> Dict[str, Any]:
         fix_ready = {}
         decisions = {}
+        # Policy may gate the critic/evidence stages; fall back to permissive
+        # inputs so verification does not KeyError when a stage is skipped.
+        critiques = state.get("critiques", {}) or {}
+        reproductions = state.get("reproductions", {}) or {}
         for finding in state["specialist_findings"]:
             key = finding_key(finding)
             ready = self.fix_agent.assess(finding)
             fix_ready[key] = ready
-            decision = self.verifier.verify(
-                finding, state["critiques"][key], state["reproductions"][key], ready,
+            critique = critiques.get(key) or Critique(
+                key, True, [], 0.0, [], requires_revision=False,
             )
+            reproduction = reproductions.get(key) or Reproduction(
+                key, True, "evidence stage disabled by policy", "",
+            )
+            decision = self.verifier.verify(finding, critique, reproduction, ready)
             decisions[key] = decision
             self._emit(
                 state, self.verifier.name, self.arbiter.name, "verification_decision",
@@ -904,13 +889,20 @@ class MultiAgentCoordinator(Reviewer):
         return {"fix_ready": fix_ready, "decisions": decisions}
 
     def _arbitrate_node(self, state: CollaborationState) -> Dict[str, Any]:
-        verified = self.arbiter.decide(
-            state["specialist_findings"], state["decisions"]
-        )
-        rejected = [
-            {"finding_key": key, "reasons": decision.reasons}
-            for key, decision in state["decisions"].items() if not decision.approved
-        ]
+        findings = state["specialist_findings"]
+        decisions = state.get("decisions", {}) or {}
+        if decisions:
+            # Verifier stage ran: filter by approved decisions.
+            verified = self.arbiter.decide(findings, decisions)
+            rejected = [
+                {"finding_key": key, "reasons": decision.reasons}
+                for key, decision in decisions.items() if not decision.approved
+            ]
+        else:
+            # No verifier stage (policy-gated off): every specialist finding
+            # passes straight through.
+            verified = list(findings)
+            rejected = []
         self._emit(
             state, self.arbiter.name, "review-report", "arbitration_decision",
             {
@@ -922,11 +914,12 @@ class MultiAgentCoordinator(Reviewer):
             approved_keys = {finding_key(item) for item in verified}
             for finding in state["specialist_findings"]:
                 key = finding_key(finding)
-                decision = state["decisions"][key]
+                decision = decisions.get(key)
                 self.memory_manager.remember_finding(
                     state.get("tenant_id", "default"), state["repository"],
                     state.get("task_id", ""), finding.to_dict(),
-                    key in approved_keys, decision.reasons,
+                    key in approved_keys,
+                    decision.reasons if decision else [],
                 )
             if state.get("task_id"):
                 outcomes = state.get("agent_outcomes", [])

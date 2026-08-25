@@ -2,7 +2,7 @@
 from typing import Any, Callable, Dict, List, Optional
 
 from ..runtime import AgentLoopProtocolError, ToolRegistry
-from .models import ReplaySnapshot
+from .models import ReplayLevel, ReplaySnapshot
 from .recorder import ReplayToolRegistry
 
 
@@ -25,9 +25,11 @@ class ReplayRunner:
         stepper: Callable[[Dict[str, Any]], Dict[str, Any]],
         mode: str = "deterministic",
         state: Optional[Dict[str, Any]] = None,
+        replay_level: Optional[ReplayLevel] = None,
     ) -> Dict[str, Any]:
         tools = ReplayToolRegistry(
-            snapshot, self.live_registry, self.read_only_tools, mode=mode
+            snapshot, self.live_registry, self.read_only_tools, mode=mode,
+            replay_level=replay_level,
         )
         runtime_state = dict(state or {})
         runtime_state["observations"] = []

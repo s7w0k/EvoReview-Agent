@@ -13,6 +13,19 @@ from .executor import (
     ProcedureRunResult,
     ProcedureStepError,
 )
+from .lifecycle import (
+    CandidateStatus,
+    CandidateTransitionError,
+    ProcedureCandidate,
+    ProcedureCandidateLifecycle,
+    Transition,
+)
+from .miner import (
+    CandidateSource,
+    ProcedureMiner,
+    ProcedurePattern,
+    TraceRecord,
+)
 from .parser import parse_procedure, parse_json, parse_step
 from .registry import (
     ProcedureNotActive,
@@ -28,6 +41,10 @@ from .schema import (
     ProcedureSkill,
     ProcedureTrigger,
 )
+from .synthesizer import (
+    ProcedureSynthesizer,
+    SynthesisResult,
+)
 from .validator import (
     ProcedureValidationIssue,
     ProcedureValidationResult,
@@ -36,24 +53,35 @@ from .validator import (
 )
 
 __all__ = [
+    "CandidateSource",
+    "CandidateStatus",
+    "CandidateTransitionError",
     "ProceduralStep",
     "ProcedureBudget",
     "ProcedureBudgetExceeded",
+    "ProcedureCandidate",
+    "ProcedureCandidateLifecycle",
     "ProcedureExecutor",
+    "ProcedureMiner",
     "ProcedureNotActive",
     "ProcedureObservation",
+    "ProcedurePattern",
     "ProcedureRegistry",
     "ProcedureRunResult",
     "ProcedureSkill",
     "ProcedureSkillConflict",
     "ProcedureSkillVersion",
     "ProcedureStepError",
+    "ProcedureSynthesizer",
     "ProcedureTrigger",
     "ProcedureValidationIssue",
     "ProcedureValidationResult",
     "ProcedureValidator",
     "RUNNABLE",
     "SkillStatus",
+    "SynthesisResult",
+    "TraceRecord",
+    "Transition",
     "parse_json",
     "parse_procedure",
     "parse_step",

@@ -22,18 +22,28 @@ DEFAULT_WEIGHTS: Dict[str, float] = {
 class EvolutionMetrics:
     """Deterministic summary of a single policy run across tasks."""
 
-    quality_score: float = 0.0       # 0..1
+    # -- finding-quality (plan section 11.6) --
+    quality_score: float = 0.0       # finding F1 (0..1)
+    finding_f1: float = 0.0          # explicit alias of quality_score
     high_risk_recall: float = 0.0    # 0..1
     critical_misses: int = 0         # must stay 0 under hard safety
-    reliability_score: float = 1.0   # 0..1 (1 = always completes)
-    cost: float = 0.0                # relative cost units
-    latency: float = 0.0             # relative latency units
-    failure_rate: float = 0.0        # 0..1
-    tool_calls: int = 0
-    agent_steps: int = 0
+    false_positive_rate: float = 0.0  # fp / (fp + tn), 0..1
     true_positives: int = 0
     false_positives: int = 0
     false_negatives: int = 0
+    # -- reliability / throughput --
+    task_success_rate: float = 0.0   # succeeded tasks / all tasks, 0..1
+    failure_rate: float = 0.0        # 0..1
+    reliability_score: float = 1.0   # 0..1 (1 = always completes)
+    recovery_success_rate: float = 1.0  # successful recoveries / attempts, 0..1
+    # -- cost / resource --
+    cost: float = 0.0                # relative cost units
+    latency: float = 0.0             # relative latency units
+    tool_calls: int = 0
+    agent_steps: int = 0
+    # -- safety governance --
+    policy_violations: int = 0
+    side_effect_safety_incidents: int = 0
 
     @classmethod
     def from_finding_counts(cls, tp, fp, fn, high_risk_recall=0.0,
@@ -48,15 +58,24 @@ class EvolutionMetrics:
             f1 = 2 * precision * recall / (precision + recall)
         else:
             f1 = 0.0
+        false_positive_rate = _fpr(fp, tn=extra.pop("true_negatives", 0),
+                                   tp=tp)
         return cls(
             quality_score=round(f1, 4),
+            finding_f1=round(f1, 4),
             high_risk_recall=high_risk_recall,
             critical_misses=critical_misses,
+            false_positive_rate=false_positive_rate,
             true_positives=tp,
             false_positives=fp,
             false_negatives=fn,
             **extra,
         )
+
+
+def _fpr(fp, *, tn, tp):
+    denominator = fp + tn
+    return (fp / denominator) if denominator else (0.0 if fp == 0 else 1.0)
 
 
 def evolution_utility(

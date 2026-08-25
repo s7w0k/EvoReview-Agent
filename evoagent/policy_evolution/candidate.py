@@ -12,6 +12,8 @@ from typing import Any, Dict, List, Optional
 
 from evoagent.policy.models import AgentPolicy, ExecutionPolicy
 
+from .evolution_scope import assert_evolvable
+
 
 class CandidateOperation(str, Enum):
     REMOVE_AGENT = "remove_agent"
@@ -20,6 +22,45 @@ class CandidateOperation(str, Enum):
     RAISE_MAX_STEPS = "raise_max_steps"
     ENABLE_EVIDENCE = "enable_evidence"
     DISABLE_EVIDENCE = "disable_evidence"
+
+
+# The policy fields each operation touches (plan section 11.1 whitelist).
+_OPERATION_FIELDS: Dict[CandidateOperation, tuple] = {
+    CandidateOperation.REMOVE_AGENT: ("enabled_agents",),
+    CandidateOperation.ADD_AGENT: ("enabled_agents",),
+    CandidateOperation.LOWER_MAX_STEPS: ("max_steps",),
+    CandidateOperation.RAISE_MAX_STEPS: ("max_steps",),
+    CandidateOperation.ENABLE_EVIDENCE: ("evidence_required",),
+    CandidateOperation.DISABLE_EVIDENCE: ("evidence_required",),
+}
+
+
+def candidate_signature(
+    parent: ExecutionPolicy,
+    operation: CandidateOperation,
+    scope: str = "runtime",
+    *,
+    details: Optional[str] = None,
+) -> str:
+    """Deterministic signature for dedupe / cooldown / repeated-failure block.
+
+    Computed from the parent version, the normalised mutation and the scope
+    (plan section 11.3).  Identical parents + mutations + scope collide, so a
+    repeated identical attempt can be recognised and blocked.
+    """
+    import hashlib
+
+    fields = _OPERATION_FIELDS.get(operation, ())
+    state = {field: _snapshot_field(parent, field) for field in fields}
+    payload = ":".join([
+        str(parent.policy_id),
+        str(parent.policy_version),
+        operation.value,
+        scope,
+        _stable_json(state),
+        details or "",
+    ])
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
 @dataclass
@@ -33,6 +74,9 @@ class PolicyCandidate:
     hypothesis_id: Optional[str] = None
     created_at: str = ""
     metadata: Dict[str, Any] = field(default_factory=dict)
+    signature: str = ""
+    changed_fields: Dict[str, tuple] = field(default_factory=dict)
+    scope: str = "runtime"
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -41,6 +85,12 @@ class PolicyCandidate:
             "operation": self.operation.value,
             "hypothesis_id": self.hypothesis_id,
             "created_at": self.created_at,
+            "signature": self.signature,
+            "scope": self.scope,
+            "changed_fields": {
+                key: {"before": before, "after": after}
+                for key, (before, after) in self.changed_fields.items()
+            },
             "policy": self.policy.to_dict(),
             "metadata": dict(self.metadata),
         }
@@ -84,12 +134,20 @@ class PolicyCandidateGenerator:
                 # An operation may be inapplicable to this parent; skip it
                 # rather than emitting a broken candidate.
                 continue
+            # Every mutation must stay inside the evolvable-field whitelist.
+            assert_evolvable(_OPERATION_FIELDS.get(operation, ()))
+            changed = _collect_changes(parent, policy, operation)
             candidates.append(PolicyCandidate(
                 candidate_id=f"{self._prefix}-{index + 1}",
                 policy=policy,
                 parent_policy_id=parent.policy_id,
                 operation=operation,
                 hypothesis_id=hypothesis_id,
+                signature=candidate_signature(
+                    parent, operation, details=";".join(
+                        f"{k}={before}->{after}"
+                        for k, (before, after) in changed.items())),
+                changed_fields=changed,
             ))
         return candidates
 
@@ -155,3 +213,48 @@ class PolicyCandidateGenerator:
             raise ValueError(f"unknown candidate operation: {op}")
 
         return ExecutionPolicy(**base_kwargs)
+
+
+def _collect_changes(
+    parent: ExecutionPolicy,
+    policy: ExecutionPolicy,
+    operation: CandidateOperation,
+) -> Dict[str, tuple]:
+    """Return ``{field: (before, after)}`` for the fields an op may touch."""
+    changes: Dict[str, tuple] = {}
+    for field in _OPERATION_FIELDS.get(operation, ()):
+        before = _snapshot_field(parent, field)
+        after = _snapshot_field(policy, field)
+        if before != after:
+            changes[field] = (before, after)
+    return changes
+
+
+def _snapshot_field(policy: ExecutionPolicy, field: str):
+    if field == "enabled_agents":
+        return list(policy.agents.enabled_agents)
+    if field == "max_parallel_agents":
+        return policy.agents.max_parallel_agents
+    if field == "max_steps":
+        return policy.budget.max_steps
+    if field == "max_tool_calls":
+        return policy.budget.max_tool_calls
+    if field == "critic_required":
+        return policy.verification.critic_required
+    if field == "evidence_required":
+        return policy.verification.evidence_required
+    if field == "verifier_required":
+        return policy.verification.verifier_required
+    if field == "max_retries":
+        return policy.retry.max_retries
+    if field == "read_only_tool_allowlist":
+        return sorted(tp.tool_name for tp in policy.tool_permissions if tp.allow)
+    if field == "retry_count":
+        return policy.retry.max_retries
+    return getattr(policy, field, None)
+
+
+def _stable_json(value: Any) -> str:
+    import json
+
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), default=str)

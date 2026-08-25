@@ -36,6 +36,10 @@ class AgentLoopProtocolError(RuntimeError):
     """An agent returned an invalid loop action."""
 
 
+class AgentLoopNoProgress(RuntimeError):
+    """The agent repeated the same action without making progress."""
+
+
 @dataclass(frozen=True)
 class AgentTool:
     name: str
@@ -136,6 +140,7 @@ class AgentRuntime:
     def __init__(
         self, max_steps: int = 8, timeout_seconds: int = 120,
         node_retries: int = 0, execution_policy: Optional["_ExecutionPolicy"] = None,
+        recovery_manager=None,
     ):
         if execution_policy is not None:
             max_steps = execution_policy.budget.max_steps
@@ -151,6 +156,7 @@ class AgentRuntime:
         self.timeout_seconds = timeout_seconds
         self.node_retries = node_retries
         self.execution_policy = execution_policy
+        self.recovery_manager = recovery_manager
 
     def execute(
         self, initial_state: Dict[str, Any], nodes: Iterable[RuntimeNode],
@@ -229,6 +235,22 @@ class AgentRuntime:
                         "node_failed", node.name, attempt,
                         error=str(exc)[:1000], will_retry=offset <= retries,
                     )
+                    # Recovery (plan section 7.2): classify + plan + execute the
+                    # failure instead of an unconditional naive retry.
+                    if self.recovery_manager is not None:
+                        outcome = self.recovery_manager.handle(
+                            exc,
+                            {"node": node.name, "attempt": attempt},
+                            state,
+                            node.name,
+                            agent_id="runtime",
+                            tool_context={"node_name": node.name},
+                        )
+                        state.update(outcome.updates or {})
+                        if not outcome.recoverable or outcome.should_abort:
+                            break
+                        # RETRY / RETRY_WITH_BACKOFF / SWITCH_MODEL / COMPRESS ...
+                        continue
             if last_error is not None:
                 raise last_error
         return state
@@ -249,6 +271,7 @@ class AgentLoop:
         self, max_steps: int = 4, timeout_seconds: int = 45,
         max_observation_chars: int = 4000,
         execution_policy: Optional["_ExecutionPolicy"] = None,
+        no_progress_detector=None,
     ):
         if execution_policy is not None:
             max_steps = execution_policy.budget.max_steps
@@ -263,19 +286,29 @@ class AgentLoop:
         self.max_steps = max_steps
         self.timeout_seconds = timeout_seconds
         self.max_observation_chars = max(256, max_observation_chars)
+        if no_progress_detector is None:
+            from .recovery.no_progress import NoProgressDetector
+            no_progress_detector = NoProgressDetector()
+        self.no_progress_detector = no_progress_detector
 
     def run(
         self, stepper: Callable[[Dict[str, Any]], Dict[str, Any]],
         tools: Any, initial_state: Dict[str, Any],
         event_sink: Optional[Callable[[str, Dict[str, Any]], None]] = None,
+        agent_id: str = "", task_id: str = "",
     ) -> AgentLoopResult:
         state = dict(initial_state)
         observations = list(state.get("observations") or [])
         started = time.monotonic()
+        actions: List[str] = []
 
         def emit(kind: str, **detail) -> None:
             if event_sink:
                 event_sink(kind, detail)
+
+        from .recovery.classifier import FailureClassifier
+        from .recovery.failures import RETRYABLE_FOR_BACKOFF
+        _classifier = FailureClassifier()
 
         for step in range(1, self.max_steps + 1):
             if time.monotonic() - started > self.timeout_seconds:
@@ -302,8 +335,21 @@ class AgentLoop:
             arguments = action.get("arguments") or {}
             if not isinstance(arguments, dict):
                 raise AgentLoopProtocolError("tool arguments must be an object")
+            # No-progress detection (plan section 7.5): the same tool+args
+            # repeated long enough is AGENT_NO_PROGRESS, not a recoverable loop.
+            actions.append(
+                {"action": "tool", "tool": tool_name, "arguments": arguments}
+            )
+            if self.no_progress_detector.detect(actions):
+                emit("agent_loop_no_progress", step=step, tool=tool_name)
+                raise AgentLoopNoProgress(
+                    "agent repeated the same tool without making progress: %s" % tool_name
+                )
             try:
-                if isinstance(tools, ToolRegistry):
+                invoke_as = getattr(tools, "invoke_as", None)
+                if invoke_as is not None and agent_id:
+                    value = invoke_as(agent_id, tool_name, arguments, task_id=task_id)
+                elif isinstance(tools, ToolRegistry):
                     value = tools.invoke(tool_name, arguments)
                 else:
                     tool = tools.get(tool_name)
@@ -318,10 +364,17 @@ class AgentLoop:
                     "step": step, "tool": tool_name, "ok": True,
                     "result": rendered[:self.max_observation_chars],
                 }
+            except AgentLoopNoProgress:
+                raise
             except Exception as exc:
+                # Tool failure classification (plan section 7.4): distinguish
+                # recoverable runtime failures from normal observation failures.
+                failure_type = _classifier.classify(exc)
                 observation = {
                     "step": step, "tool": tool_name, "ok": False,
                     "error": str(exc)[:1000],
+                    "failure_type": failure_type.value,
+                    "recoverable": failure_type in RETRYABLE_FOR_BACKOFF,
                 }
             observations.append(observation)
             emit("agent_loop_observation", **observation)

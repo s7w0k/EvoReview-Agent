@@ -15,6 +15,7 @@ class ProceduralStep:
     args: Dict[str, Any] = field(default_factory=dict)
     result_var: str = ""
     check: str = ""
+    on_failure: str = "continue"  # "abort" | "continue" (plan section 10.6)
 
     def to_dict(self) -> Dict[str, Any]:
         value = {"kind": self.kind}
@@ -26,6 +27,8 @@ class ProceduralStep:
             value["result_var"] = self.result_var
         if self.check:
             value["check"] = self.check
+        if self.on_failure and self.on_failure != "continue":
+            value["on_failure"] = self.on_failure
         return value
 
     @classmethod
@@ -36,6 +39,7 @@ class ProceduralStep:
             args=dict(value.get("args", {})),
             result_var=str(value.get("result_var", "")),
             check=str(value.get("check", "")),
+            on_failure=str(value.get("on_failure", "continue")),
         )
 
 

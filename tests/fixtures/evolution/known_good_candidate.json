@@ -1,0 +1,20 @@
+{
+  "name": "known-good-candidate",
+  "expectation": "pass",
+  "baseline": {
+    "quality_score": 0.72,
+    "finding_f1": 0.72,
+    "high_risk_recall": 0.90,
+    "critical_misses": 0,
+    "reliability_score": 1.0,
+    "false_positive_rate": 0.05
+  },
+  "candidate": {
+    "quality_score": 0.78,
+    "finding_f1": 0.78,
+    "high_risk_recall": 0.92,
+    "critical_misses": 0,
+    "reliability_score": 1.0,
+    "false_positive_rate": 0.04
+  }
+}

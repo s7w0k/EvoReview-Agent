@@ -7,6 +7,13 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional
 
 from .diff_parser import ParsedDiff
+from .errors import (
+    ModelContextOverflow,
+    ModelInvalidOutput,
+    ModelRateLimit,
+    ModelTimeout,
+    ModelUnavailable,
+)
 from .models import Finding, Severity
 
 
@@ -291,16 +298,53 @@ class OpenAICompatibleReviewer(Reviewer):
                 body = json.loads(response.read().decode("utf-8"))
         except urllib.error.HTTPError as exc:
             detail = exc.read(1000).decode("utf-8", errors="replace")
-            raise RuntimeError("%s API returned HTTP %d: %s" % (self.provider, exc.code, detail)) from exc
-        except (urllib.error.URLError, socket.timeout, ValueError, KeyError) as exc:
-            raise RuntimeError("%s review request failed: %s" % (self.provider, exc)) from exc
+            status = exc.code
+            if status == 429:
+                raise ModelRateLimit(
+                    "%s API rate limit hit (HTTP 429)" % self.provider,
+                    status_code=status, provider=self.provider, detail=detail,
+                ) from exc
+            if status == 408:
+                raise ModelTimeout(
+                    "%s API request timed out (HTTP 408)" % self.provider,
+                    status_code=status, provider=self.provider, detail=detail,
+                ) from exc
+            if status == 400 and (
+                "context length" in detail.lower()
+                or "maximum context" in detail.lower()
+                or "token" in detail.lower() and "length" in detail.lower()
+            ):
+                raise ModelContextOverflow(
+                    "%s API rejected oversized context (HTTP 400)" % self.provider,
+                    status_code=status, provider=self.provider, detail=detail,
+                ) from exc
+            raise ModelUnavailable(
+                "%s API unavailable (HTTP %d)" % (self.provider, status),
+                status_code=status, provider=self.provider, detail=detail,
+            ) from exc
+        except socket.timeout as exc:
+            raise ModelTimeout(
+                "%s API request timed out" % self.provider,
+                provider=self.provider,
+            ) from exc
+        except (urllib.error.URLError, ValueError, KeyError) as exc:
+            raise ModelUnavailable(
+                "%s API request failed: %s" % (self.provider, exc),
+                provider=self.provider,
+            ) from exc
         try:
             content = body["choices"][0]["message"]["content"]
             result = json.loads(content)
         except (KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
-            raise RuntimeError("%s returned an invalid JSON review response" % self.provider) from exc
+            raise ModelInvalidOutput(
+                "%s returned an invalid JSON review response" % self.provider,
+                provider=self.provider,
+            ) from exc
         if not isinstance(result, dict):
-            raise RuntimeError("%s returned a non-object JSON response" % self.provider)
+            raise ModelInvalidOutput(
+                "%s returned a non-object JSON response" % self.provider,
+                provider=self.provider,
+            )
         return result
 
     @staticmethod

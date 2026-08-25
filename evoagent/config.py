@@ -85,6 +85,10 @@ class Settings:
     collaboration_rounds: int = 2
     agent_loop_max_steps: int = 4
     agent_loop_timeout_seconds: int = 45
+    # Closed-loop runtime-policy recovery budgets (plan section 7.6).
+    recovery_max_attempts: int = 3
+    recovery_max_replans: int = 2
+    recovery_max_model_switches: int = 2
     context_max_tokens: int = 12000
     context_reserved_tokens: int = 2500
     memory_enabled: bool = True

@@ -3,7 +3,7 @@ import threading
 from typing import Any, Dict, List, Optional
 
 from ..runtime import AgentLoopProtocolError, AgentTool, ToolRegistry
-from .models import ReplaySnapshot, fingerprint
+from .models import ReplayLevel, ReplayObservationIndex, ReplaySnapshot, fingerprint
 
 
 class ReplayRecorder(ToolRegistry):
@@ -60,22 +60,34 @@ class ReplayToolRegistry(ToolRegistry):
         live_registry: Optional[ToolRegistry] = None,
         read_only_tools: Optional[List[str]] = None,
         mode: str = "deterministic",
+        replay_level: Optional[ReplayLevel] = None,
     ):
         super().__init__((live_registry._tools.values() if live_registry else []))
         self.snapshot = snapshot
         self.live_registry = live_registry
         self.read_only_tools = set(read_only_tools or ["read_file", "search_code", "list_files"])
         self.mode = mode
+        self.replay_level = replay_level or ReplayLevel(
+            snapshot.replay_level or ReplayLevel.L1_TOOL.value
+        )
+        # Ordered, occurrence-aware index (plan section 8.4): repeated tool+args
+        # calls consume each observation exactly once, in original order.
+        self._index = ReplayObservationIndex(snapshot.tool_observations)
 
     def invoke(self, name: str, arguments: Dict[str, Any]) -> Any:
         if self.mode == "deterministic":
-            recorded = self.snapshot.lookup(name, arguments)
+            recorded = self._index.take(name, arguments)
             if recorded is not None:
                 return recorded
             raise AgentLoopProtocolError(
                 "no recorded observation for deterministic replay: %s" % fingerprint(name, arguments)
             )
-        # Live mode re-invokes read-only tools only.
+        # Live mode re-invokes read-only tools only, via a governed live
+        # registry so a side-effect tool is denied by policy (fail-closed).
+        if getattr(self.live_registry, "invoke_as", None) is not None:
+            return self.live_registry.invoke_as(
+                "replay-agent", name, arguments, task_id=self.snapshot.task_id,
+            )
         if name not in self.read_only_tools:
             raise AgentLoopProtocolError(
                 "side-effect tool %s not allowed in live replay" % name

@@ -1,0 +1,42 @@
+# Configuration for the Phase 11 CI toolchain (15.3 ruff / 15.4 mypy /
+# 15.5 coverage). The ``evoagent`` package is stdlib-only and importable from
+# the repo root, so no packaging metadata is needed.
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+# Keep the ruleset stable across an older, type-annotated codebase: catch real
+# problems (undefined names, unused imports, formatting) but do not force
+# modernisation churn (UP) over the standard-library-only modules.
+select = ["E", "F", "W"]
+ignore = ["W292"]  # trailing-newline is cosmetic; skip to avoid churn
+
+[tool.mypy]
+python_version = "3.9"
+check_untyped_defs = true
+warn_redundant_casts = true
+warn_unused_configs = true
+no_implicit_optional = true
+ignore_missing_imports = true
+
+# Phase 15.4: type-check the core evolved modules.
+[[tool.mypy.overrides]]
+module = [
+    "evoagent.policy",
+    "evoagent.tools",
+    "evoagent.recovery",
+    "evoagent.replay",
+    "evoagent.procedure",
+    "evoagent.policy_evolution",
+]
+disallow_untyped_defs = true
+
+[tool.coverage.run]
+source = ["evoagent"]
+omit = ["*/tests/*"]
+
+[tool.coverage.report]
+fail_under = 85
+show_missing = true

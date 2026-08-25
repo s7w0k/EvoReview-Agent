@@ -11,8 +11,11 @@ class RecoveryNotSupported(RuntimeError):
 
 
 def _backoff_seconds(policy: ExecutionPolicy, attempt: int) -> float:
-    base = policy.retry.backoff_seconds
-    if policy.retry.exponential_backoff:
+    base = policy.retry.backoff_seconds if policy is not None else 1.0
+    exponential = (
+        policy.retry.exponential_backoff if policy is not None else False
+    )
+    if exponential:
         return base * (2 ** max(0, attempt - 1))
     return base
 

@@ -26,7 +26,9 @@ class RecoveryPlanner:
     ) -> RecoveryAction:
         context = context or {}
         attempt = int(runtime_state.get("attempt", 0))
-        max_retries = execution_policy.retry.max_retries
+        max_retries = (
+            execution_policy.retry.max_retries if execution_policy is not None else 1
+        )
         canned = self._canned_steps(failure_type, context)
         if canned is None:
             return RecoveryAction.ABORT

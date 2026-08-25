@@ -47,6 +47,9 @@ class SideEffectToolTest(unittest.TestCase):
             )],
             policy(), engine,
         )
+        # write_comment requires human approval; approve so the idempotency
+        # guard (not approval) is what is under test.
+        registry.approval_provider = lambda _decision: True
         with self.assertRaises(RuntimeError):
             registry.invoke_as("deployer", "write_comment", {"text": "x"})
         from evoagent.tools.invocation import UnknownInvocationError

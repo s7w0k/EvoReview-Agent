@@ -7,25 +7,128 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  # 15.1 unit: full unit suite on a matrix of Pythons.
+  unit:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.9", "3.11", "3.12"]
-
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - run: python -m unittest discover -s tests
+      - run: python -c "import evoagent.policy, evoagent.tools, evoagent.recovery, evoagent.replay, evoagent.procedure, evoagent.policy_evolution, evoagent.evolution_gov, evoagent.memory_evolution, evoagent.outcome_evolution, evoagent.decision_trace; print('all modules import ok')"
 
-      # The ``evoagent`` package is importable from the repository root (the
-      # test-suite imports ``evoagent.*`` directly and the core dependencies are
-      # standard-library only), so no pip install is required.
-      - name: Run the full unit-test suite
-        run: python -m unittest discover -s tests
+  # 15.3 lint: ruff check (fast, fails on style / unused imports).
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --upgrade ruff
+      - run: ruff check evoagent/memory_evolution evoagent/outcome_evolution tests/e2e tests/test_evolution_regression_fixtures.py tests/test_phase10_memory.py tests/test_phase9_outcome_experience.py
 
-      - name: Verify every package imports cleanly
-        run: python -c "import evoagent.policy, evoagent.tools, evoagent.recovery, evoagent.replay, evoagent.procedure, evoagent.policy_evolution, evoagent.evolution_gov, evoagent.memory_evolution, evoagent.decision_trace; print('all modules import ok')"
+  # 15.4 typecheck: mypy on the core evolved modules.
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --upgrade mypy
+      - run: mypy evoagent
+
+  # 15.5 coverage: harness core must hold >= 85%.
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --upgrade coverage pytest
+      - run: coverage run -m pytest tests -q
+      - run: coverage report --fail-under=85
+
+  # 15.2 sqlite-integration: whole suite SQLite-backed (default store).
+  sqlite-integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pytest tests -q -m "not integration"
+
+  # 15.1 harness-e2e: the full self-evolution closed-loop must always pass.
+  harness-e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pytest tests/e2e -q
+
+  # 15.1 + 15.6 evolution-regression: the Known-Good / Known-Bad fixtures.
+  evolution-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pytest tests/test_evolution_regression_fixtures.py -q
+
+  # 15.2 postgres-integration / redis-integration: exercise the extra adapters
+  # against real services via the service containers.
+  postgres-integration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: evo
+          POSTGRES_PASSWORD: evo
+          POSTGRES_DB: evoreview
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U evo"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      EVOREVIEW_DB_DSN: postgresql://evo:evo@localhost:5432/evoreview
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --upgrade pytest psycopg2-binary
+      - run: python -m pytest tests -q -m integration -k postgres
+
+  redis-integration:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      EVOREVIEW_REDIS_URL: redis://localhost:6379/0
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --upgrade pytest redis
+      - run: python -m pytest tests -q -m integration -k redis

@@ -1,0 +1,20 @@
+{
+  "name": "known-bad-candidate",
+  "expectation": "reject",
+  "reason": "critical miss must gate-reject even if quality improves",
+  "baseline": {
+    "quality_score": 0.72,
+    "finding_f1": 0.72,
+    "high_risk_recall": 0.90,
+    "critical_misses": 0,
+    "reliability_score": 1.0
+  },
+  "candidate": {
+    "quality_score": 0.85,
+    "finding_f1": 0.85,
+    "high_risk_recall": 0.20,
+    "critical_misses": 1,
+    "policy_violations": 1,
+    "reliability_score": 0.95
+  }
+}

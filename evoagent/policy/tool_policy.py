@@ -4,10 +4,10 @@ Harness does not just know which tools exist; it decides which agent, in which
 task, under which risk level and budget, may invoke which tool.  The
 ``ToolPolicyEngine`` sits between an agent's tool request and the actual call.
 """
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Any, Dict, List, Optional
 
-from .models import ExecutionPolicy, RISK_RANK
+from .models import ExecutionPolicy, RISK_RANK, ToolPermission
 
 
 @dataclass(frozen=True)
@@ -24,6 +24,11 @@ class ToolMetadata:
     tenant_scoped: bool = False
     compensatable: bool = False
     compensation_tool: Optional[str] = None
+    # True when the handler must run in an isolated subprocess so a blocking
+    # call can be terminated when the timeout fires.  ``command`` is the shell
+    # template executed when the tool is e.g. ``run_tests``.
+    blocking: bool = False
+    command: Optional[str] = None
 
 
 @dataclass
@@ -106,3 +111,31 @@ class ToolPolicyEngine:
     @staticmethod
     def _default_allowed(meta: ToolMetadata) -> bool:
         return meta.risk_level == "low" and not meta.side_effect
+
+
+def merge_tool_permissions(
+    base: List[ToolPermission], override: List[ToolPermission],
+) -> List[ToolPermission]:
+    """Merge two permission lists keyed by ``tool_name``.
+
+    Each override entry replaces only the fields it carries for the same tool,
+    keeping every remaining field from ``base``.  This is a *true merge* instead
+    of ``base + override``: a more-specific layer (repository deny) overrides a
+    lower-precedence layer (system allow) per tool, while tools only present in
+    ``base`` stay untouched.  Immutable hard denies are re-applied afterwards by
+    the safety floor so a task allow cannot re-enable them.
+    """
+    merged: Dict[str, ToolPermission] = {p.tool_name: p for p in base}
+    for override_perm in override:
+        existing = merged.get(override_perm.tool_name)
+        if existing is None:
+            merged[override_perm.tool_name] = override_perm
+            continue
+        merged[override_perm.tool_name] = replace(
+            existing,
+            allow=override_perm.allow,
+            max_calls=override_perm.max_calls,
+            requires_sandbox=override_perm.requires_sandbox,
+            requires_approval=override_perm.requires_approval,
+        )
+    return list(merged.values())
