@@ -17,6 +17,12 @@ import json
 import time
 from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Tuple
 
+# Policy wiring is optional so the module keeps its current callers working.
+try:
+    from .policy.models import ExecutionPolicy as _ExecutionPolicy
+except Exception:  # pragma: no cover - only during partial installs
+    _ExecutionPolicy = None
+
 
 class RuntimeBudgetExceeded(RuntimeError):
     """The configured step or wall-clock budget was exhausted."""
@@ -129,8 +135,12 @@ class AgentRuntime:
 
     def __init__(
         self, max_steps: int = 8, timeout_seconds: int = 120,
-        node_retries: int = 0,
+        node_retries: int = 0, execution_policy: Optional["_ExecutionPolicy"] = None,
     ):
+        if execution_policy is not None:
+            max_steps = execution_policy.budget.max_steps
+            timeout_seconds = int(execution_policy.budget.max_wall_time_seconds)
+            node_retries = execution_policy.retry.max_retries
         if max_steps < 1:
             raise ValueError("runtime max_steps must be at least 1")
         if timeout_seconds < 1:
@@ -140,6 +150,7 @@ class AgentRuntime:
         self.max_steps = max_steps
         self.timeout_seconds = timeout_seconds
         self.node_retries = node_retries
+        self.execution_policy = execution_policy
 
     def execute(
         self, initial_state: Dict[str, Any], nodes: Iterable[RuntimeNode],
@@ -237,7 +248,14 @@ class AgentLoop:
     def __init__(
         self, max_steps: int = 4, timeout_seconds: int = 45,
         max_observation_chars: int = 4000,
+        execution_policy: Optional["_ExecutionPolicy"] = None,
     ):
+        if execution_policy is not None:
+            max_steps = execution_policy.budget.max_steps
+            timeout_seconds = int(execution_policy.budget.max_wall_time_seconds)
+            self.max_tool_calls = execution_policy.budget.max_tool_calls
+        else:
+            self.max_tool_calls = None
         if max_steps < 1:
             raise ValueError("agent loop max_steps must be at least 1")
         if timeout_seconds < 1:
@@ -277,6 +295,9 @@ class AgentLoop:
                 )
             if kind != "tool":
                 raise AgentLoopProtocolError("unsupported agent loop action: %s" % kind)
+            if self.max_tool_calls is not None and len(observations) >= self.max_tool_calls:
+                emit("agent_loop_budget_exhausted", step=step, budget="tool_calls")
+                raise RuntimeBudgetExceeded("agent loop tool-call budget exceeded")
             tool_name = str(action.get("tool", "")).strip()
             arguments = action.get("arguments") or {}
             if not isinstance(arguments, dict):

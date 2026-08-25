@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # The ``evoagent`` package is importable from the repository root (the
+      # test-suite imports ``evoagent.*`` directly and the core dependencies are
+      # standard-library only), so no pip install is required.
+      - name: Run the full unit-test suite
+        run: python -m unittest discover -s tests
+
+      - name: Verify every package imports cleanly
+        run: python -c "import evoagent.policy, evoagent.tools, evoagent.recovery, evoagent.replay, evoagent.procedure, evoagent.policy_evolution, evoagent.evolution_gov, evoagent.memory_evolution, evoagent.decision_trace; print('all modules import ok')"
