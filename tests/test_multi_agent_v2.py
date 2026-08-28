@@ -43,8 +43,9 @@ def test_planner_security_only():
     decision = SemanticPlanner().plan(ctx)
     types = {t.task_type for t in decision.tasks}
     assert "review.security" in types
-    assert "critique.findings" in types  # high risk => critic
-    assert "verify.findings" in types
+    assert "critique.findings" not in types  # runtime conditional
+    assert "verify.findings" not in types
+    assert "fix.generate" not in types
     assert any("AUTH_CHANGE" in r for r in decision.rationale_codes)
 
 
@@ -182,7 +183,8 @@ def test_coordinator_v2_builds_planner_graph(monkeypatch):
     graph = coord._build_graph_v2(state, summary, {"level": "high"})
     types = {n.task_type for n in graph.nodes.values()}
     assert "review.security" in types
-    assert "verify.findings" in types
+    assert "verify.findings" not in types
+    assert "critique.findings" not in types
     # graph must be valid per the validator over the default agent rosetta
     validator = TaskGraphValidator(available_agents=set(coord._available_agents()))
     assert validator.is_valid(graph), validator.validate(graph)
@@ -597,8 +599,10 @@ def test_evaluation_metrics_and_report():
         "expected_count": 1,
     }
     scores = evaluate_run(record)
-    assert set(scores) <= {"planning_quality", "replan_quality",
-                           "collaboration_quality", "loop_quality", "efficiency"}
+    assert set(scores) <= {"detection_quality", "planning_quality",
+                           "replan_quality", "collaboration_quality",
+                           "loop_quality", "latency_ms", "tool_calls",
+                           "a2a_calls"}
     agg = aggregate_metrics([scores, scores])
     assert agg["overall"] > 0 and agg["runs"] == 2
 
@@ -658,10 +662,9 @@ def test_v4_full_corpus_count_and_distribution():
     corpus = build_full_corpus()
     from collections import Counter
     sizes = Counter(s["category"] for s in corpus)
-    # plan §4.5: planning 15 / replan 10 / collaboration 10 / deep_loop 10 /
-    # fix 5 / failure 10 == 60
+    # final plan: mechanism-isolated 80-case corpus.
     assert sizes == CATEGORY_SIZES
-    assert len(corpus) == sum(CATEGORY_SIZES.values()) == 60
+    assert len(corpus) == sum(CATEGORY_SIZES.values()) == 80
 
 
 def test_v4_full_corpus_gold_and_uniqueness():
@@ -689,9 +692,9 @@ def test_v4_full_corpus_roundtrip_write():
     )
     path = os.path.join(os.path.dirname(__file__), "_v4_corpus_tmp.jsonl")
     try:
-        assert write_full_corpus(path) == 60
+        assert write_full_corpus(path) == 80
         reloaded = load_scenarios(path)
-        assert len(reloaded) == 60
+        assert len(reloaded) == 80
         assert all(set(GOLD_KEYS) <= set(s) for s in reloaded)
     finally:
         if os.path.exists(path):
@@ -741,14 +744,14 @@ def test_v4_attribution_runtime():
     miss = {"artifact": {"count": 0, "replan_count": 0}, "expected_count": 1,
             "expected_replan": True, "expected_replan_target": "security-agent"}
     codes = attribute_runtime(miss)
-    assert "SPECIALIST_LOOP_TOO_SHALLOW" in codes
+    assert "SHALLOW_LOOP_FAILURE" in codes
     assert "REPLAN_INSUFFICIENT" in codes
 
     # replan happened but target diverged from gold
     wrong = {"artifact": {"count": 1, "replan_count": 1}, "expected_count": 1,
              "expected_replan": True, "expected_replan_target": "security-agent",
              "collaborations": ["reliability-agent"]}
-    assert "REPLAN_TARGET_ERROR" in attribute_runtime(wrong)
+    assert "WRONG_REPLAN_TARGET" in attribute_runtime(wrong)
 
     # correct run emits nothing
     clean = {"artifact": {"count": 1, "replan_count": 0}, "expected_count": 1,
@@ -762,10 +765,10 @@ def test_v4_report_includes_attribution():
               "tool_calls": 2, "a2a_calls": 2, "loop_sizes": [2],
               "expected_count": 1, "expected_replan": True,
               "expected_replan_target": "security-agent",
-              "attribution": ["SPECIALIST_LOOP_TOO_SHALLOW",
+              "attribution": ["SHALLOW_LOOP_FAILURE",
                               "REPLAN_INSUFFICIENT"]}
     report = build_report({"A": [record]})
     assert "attributions" in report["variants"][0]
-    assert "SPECIALIST_LOOP_TOO_SHALLOW" in report["variants"][0]["attributions"]
+    assert "SHALLOW_LOOP_FAILURE" in report["variants"][0]["attributions"]
     md = render_markdown(report)
     assert "Evolution Attribution" in md

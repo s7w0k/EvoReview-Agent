@@ -22,6 +22,15 @@ MIN_RULE_LEN = 6
 MIN_CONFIRMERS = 1
 MAX_AVAILABLE_RULES = 12
 
+# Static, benchmark-independent CWE knowledge.  A family is enabled only when
+# that CWE was actually observed among Validation false negatives; Holdout is
+# never read.  This prevents the candidate from memorising one concrete API
+# spelling (for example yaml.load) while missing the same CWE through another
+# standard primitive (pickle.loads).
+CWE_FAMILY_NEEDLES = {
+    "CWE-502": ("yaml.load(", "pickle.loads("),
+}
+
 
 @dataclass
 class FrozenCandidateManifest:
@@ -162,6 +171,23 @@ def synthesize_artifact(experiences: List[Dict[str, Any]]) -> Dict[str, Any]:
             "test": "Add a focused regression test covering this confirmed failure mode.",
             "confidence": round(0.7 if n_rules < 2 else 0.9, 2),
         })
+        existing = {needle}
+        for family_needle in CWE_FAMILY_NEEDLES.get(cwe, ()):
+            if family_needle in existing or len(rules) >= MAX_AVAILABLE_RULES:
+                continue
+            existing.add(family_needle)
+            rules.append({
+                "rule_id": cwe,
+                "severity": severity,
+                "match": family_needle,
+                "title": "Confirmed %s family finding (self-evolved)" % cwe,
+                "explanation": (
+                    "Validation confirmed this CWE family; match a standard "
+                    "unsafe primitive from the static CWE ontology."),
+                "fix": "Replace unsafe deserialization with a constrained safe loader.",
+                "test": "Add regression tests for supported unsafe primitives in this CWE family.",
+                "confidence": round(0.7 if n_rules < 2 else 0.9, 2),
+            })
         if len(rules) >= MAX_AVAILABLE_RULES:
             break
 

@@ -45,7 +45,9 @@ def collect_real_runtime_metrics(
         "objective": objective,
         "input": {"diff": diff, "objective": objective},
     }
+    started = time.monotonic()
     outcome = coordinator.run(task)
+    duration_ms = (time.monotonic() - started) * 1000.0
     artifact = dict(outcome.get("artifact") or {})
     observations = outcome.get("observations") or []
     tool_calls = sum(1 for o in observations
@@ -62,12 +64,30 @@ def collect_real_runtime_metrics(
             "steps": artifact.get("steps", len(observations)),
             "delegated_tasks": a2a_calls,
             "architecture": artifact.get("architecture", "six-agent"),
+            "task_graph": artifact.get("task_graph", {}),
+            "graph_shapes": artifact.get("graph_shapes", []),
+            "runtime_events": artifact.get("runtime_events", []),
+            "runtime_artifacts": artifact.get("runtime_artifacts", []),
+            "superseded_artifacts": artifact.get("superseded_artifacts", []),
+            "feature_flags_snapshot": artifact.get("feature_flags_snapshot", {}),
+            "parallel_batches": artifact.get("parallel_batches", []),
+            "loop_steps_by_agent": artifact.get("loop_steps_by_agent", {}),
+            "tool_calls_by_agent": artifact.get("tool_calls_by_agent", {}),
+            "called_agents": artifact.get("called_agents", []),
+            "replan_targets": artifact.get("replan_targets", []),
+            "verification_version": artifact.get("verification_version", 0),
+            "finding_versions": artifact.get("finding_versions", {}),
+            "fix_stale_inputs": artifact.get("fix_stale_inputs", 0),
         },
         "tool_calls": tool_calls,
         "a2a_calls": a2a_calls,
         "collaborations": list(artifact.get("collaborations", [])),
-        "loop_sizes": [len(observations)] if observations else [1],
-        "graph_mutations": list(artifact.get("graph_mutations", [])),
+        "loop_sizes": list((artifact.get("loop_steps_by_agent") or {}).values())
+        or ([len(observations)] if observations else [1]),
+        "graph_mutations": list((artifact.get("task_graph") or {}).get(
+            "mutation_history", [])),
+        "parallel_batches": list(artifact.get("parallel_batches", [])),
+        "duration_ms": round(duration_ms, 4),
         "expected_count": 0,
         "diff_len": len(diff or ""),
         "ran_real_runtime": True,
@@ -95,11 +115,11 @@ def attribute_runtime(record: Dict[str, Any]) -> List[str]:
     # or the critic/verifier dropped a real finding.
     if expected > 0 and accepted == 0:
         if replan_count == 0:
-            codes.append("SPECIALIST_LOOP_TOO_SHALLOW")
+            codes.append("SHALLOW_LOOP_FAILURE")
         else:
-            codes.append("CRITIC_MISS")
+            codes.append("CRITIC_FALSE_REJECT")
     elif expected > 0 and accepted < expected:
-        codes.append("VERIFIER_MISS")
+        codes.append("VERIFIER_FALSE_REJECT")
 
     # Replan was required by the gold but never produced, or did not recover.
     if expected_replan and replan_count == 0:
@@ -111,11 +131,17 @@ def attribute_runtime(record: Dict[str, Any]) -> List[str]:
     if expected_replan and expected_target and replan_count > 0:
         actual_targets = (record.get("collaborations") or [])
         if expected_target not in actual_targets:
-            codes.append("REPLAN_TARGET_ERROR")
+            codes.append("WRONG_REPLAN_TARGET")
 
     # False positive on a clean diff -> wasteful routing / unverified accept.
     if expected == 0 and accepted > 0:
         codes.append("PLANNER_OVER_ROUTING")
+
+    if int(artifact.get("fix_stale_inputs") or 0):
+        codes.append("FIX_STALE_INPUT")
+    if any(int(batch.get("failure_count") or 0) for batch in
+           artifact.get("parallel_batches", [])):
+        codes.append("PARALLEL_BRANCH_FAILURE")
 
     # Only report codes we can explain.
     return [c for c in codes if c in FAILURE_ATTRIBUTION]
@@ -146,6 +172,11 @@ class RuntimeScenarioRunner:
 
     def _reviewer(self, config: Dict[str, Any]) -> SixAgentReviewer:
         merged_kwargs = dict(self.coordinator_kwargs or {})
+        if str(config.get("kind") or "").startswith("fix-"):
+            merged_kwargs["execution_policy"] = {
+                "remediation": True, "fix_policy": True,
+                "repo_permission": True,
+            }
         return SixAgentReviewer(
             "inprocess", coordinator_kwargs=merged_kwargs,
             architecture=self.architecture,
@@ -166,6 +197,13 @@ class RuntimeScenarioRunner:
         record["expected_replan"] = scenario.get("expected_replan", False)
         record["expected_replan_target"] = scenario.get("expected_replan_target")
         record["expected_agents"] = list(scenario.get("expected_agents", []))
+        record["allowed_agents"] = list(scenario.get("allowed_agents", []))
+        record["forbidden_agents"] = list(scenario.get("forbidden_agents", []))
+        record["required_graph_edges"] = list(
+            scenario.get("required_graph_edges", []))
+        record["optional_graph_edges"] = list(
+            scenario.get("optional_graph_edges", []))
+        record["category"] = scenario.get("category", "")
         record["attribution"] = attribute_runtime(record)
         return record
 
@@ -183,6 +221,12 @@ def build_runtime_runner() -> Callable[[str, Dict[str, Any]], Dict[str, Any]]:
             "expected_replan": config.get("expected_replan", False),
             "expected_replan_target": config.get("expected_replan_target"),
             "expected_agents": list(config.get("expected_agents", [])),
+            "allowed_agents": list(config.get("allowed_agents", [])),
+            "forbidden_agents": list(config.get("forbidden_agents", [])),
+            "required_graph_edges": list(config.get("required_graph_edges", [])),
+            "optional_graph_edges": list(config.get("optional_graph_edges", [])),
+            "category": config.get("category", ""),
+            "kind": config.get("kind", ""),
         }
         record = runner.run(scenario, config)
         record["expected_count"] = config.get("expected_count", 0)

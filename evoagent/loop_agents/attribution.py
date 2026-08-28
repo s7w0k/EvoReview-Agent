@@ -19,6 +19,15 @@ FAILURE_ATTRIBUTION = {
     "VERIFIER_FALSE_REJECTION": "the verifier rejected a finding with real evidence",
     "SPECIALIST_LOOP_TOO_SHALLOW": "a specialist loop stopped before reaching evidence",
     "TOOL_SELECTION_ERROR": "the wrong tool was invoked for the evidence need",
+    "WRONG_REPLAN_TARGET": "the replan target differs from the required specialist",
+    "REPLAN_TOO_LATE": "replan was emitted only after downstream finalization",
+    "CRITIC_FALSE_ACCEPT": "critic retained a plausible unsupported finding",
+    "CRITIC_FALSE_REJECT": "critic removed a finding with sufficient evidence",
+    "VERIFIER_FALSE_ACCEPT": "verifier accepted a finding not independently reproduced",
+    "VERIFIER_FALSE_REJECT": "verifier rejected a reproducible finding",
+    "SHALLOW_LOOP_FAILURE": "the shallow loop stopped before required evidence tools",
+    "PARALLEL_BRANCH_FAILURE": "one READY parallel branch failed",
+    "FIX_STALE_INPUT": "fix consumed a stale finding or verification version",
 }
 
 

@@ -54,6 +54,14 @@ class AblationRunner:
                     "expected_replan_target": scenario.get(
                         "expected_replan_target"),
                     "expected_agents": list(scenario.get("expected_agents", [])),
+                    "allowed_agents": list(scenario.get("allowed_agents", [])),
+                    "forbidden_agents": list(scenario.get("forbidden_agents", [])),
+                    "required_graph_edges": list(scenario.get(
+                        "required_graph_edges", [])),
+                    "optional_graph_edges": list(scenario.get(
+                        "optional_graph_edges", [])),
+                    "category": scenario.get("category", ""),
+                    "objective": scenario.get("objective", "review"),
                 }
                 record = self.run_scenario(scenario.get("diff", ""), config)
                 record["expected_count"] = scenario.get("expected_count", 0)

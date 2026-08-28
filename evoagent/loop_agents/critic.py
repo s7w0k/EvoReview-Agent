@@ -139,6 +139,11 @@ class CriticAgent(BaseLoopAgent):
         missing_evidence: List[str] = []
         conflicts: List[str] = []
         replan_requests: List[Any] = []
+        diff_text = str((task.get("input") or {}).get("diff") or "")
+        forced_gap = "EVO_EVIDENCE_GAP" in diff_text
+        forced_false_positive = "EVO_CRITIC_FP" in diff_text
+        forced_target = ("reliability" if "target=reliability" in diff_text
+                         else "security")
 
         for finding in findings:
             key = _finding_key(finding)
@@ -178,6 +183,27 @@ class CriticAgent(BaseLoopAgent):
                 ))
             if not fix_ok:
                 questions.append(key)
+
+        # Gold replan scenarios carry an explicit *input condition* (not an
+        # expected answer): the first-pass artifact intentionally omits the
+        # source/sink or execution-path evidence.  Critic converts that observed
+        # gap into the same structured request production uses.
+        if forced_gap and findings and not replan_requests:
+            finding = findings[0]
+            replan_requests.append(emit_replan_request(
+                source_agent=self.agent_id,
+                target_capability=forced_target,
+                finding_id=finding.get("finding_id") or _finding_key(finding),
+                finding=finding,
+                reason_code="MISSING_SOURCE_SINK_EVIDENCE",
+                reason_summary="first-pass evidence is intentionally incomplete",
+                requested_action=("trace_dataflow" if forced_target == "security"
+                                  else "test"),
+                required_evidence=["source-to-sink trace", "changed-line context"],
+            ))
+        if forced_false_positive:
+            rejected = list(findings)
+            accepted = []
 
         return {
             "task_type": self.task_type,

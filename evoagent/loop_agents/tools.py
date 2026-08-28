@@ -381,7 +381,8 @@ def build_expert_definitions(ctx: ExpertContext):
         )
         # NEW_EXTERNAL_INPUT: request body, cli args, stdin, env uploads
         new_external_inputs = any(
-            k in blob for k in ("request", "args", "sys.argv", "input", "stdin", "upload")
+            k in blob for k in ("request.", "request[", "args", "sys.argv",
+                                "input", "stdin", "upload")
         )
         test_changes = "test" in change_types
         security_hits = bool(

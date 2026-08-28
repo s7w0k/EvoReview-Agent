@@ -38,6 +38,7 @@ class AgentPlanState:
 
 
 class AgentTaskStatus:
+    SUPERSEDED = 'superseded'
     PENDING = "pending"
     RUNNING = "running"
     COMPLETED = "completed"
@@ -60,6 +61,7 @@ class AgentTaskNode:
     agent_id: str = ""
     #: whether the node runs at concurrency 1 (e.g. Fix).
     serial: bool = False
+    metadata: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -77,6 +79,7 @@ class AgentTaskNode:
             artifact_ids=list(value.get("artifact_ids", [])),
             agent_id=str(value.get("agent_id", "")),
             serial=bool(value.get("serial", False)),
+            metadata=dict(value.get("metadata", {})),
         )
 
 
@@ -87,6 +90,7 @@ class CoordinatorTaskGraph:
     graph_id: str
     nodes: Dict[str, AgentTaskNode] = field(default_factory=dict)
     revision: int = 1
+    mutation_history: List[Dict[str, Any]] = field(default_factory=list)
 
     def add(self, node: AgentTaskNode) -> None:
         self.nodes[node.node_id] = node
@@ -114,10 +118,18 @@ class CoordinatorTaskGraph:
             if node.status == AgentTaskStatus.PENDING and self.ready(node)
         ]
 
+    def terminal(self) -> bool:
+        terminal = {
+            AgentTaskStatus.COMPLETED, AgentTaskStatus.FAILED,
+            AgentTaskStatus.REJECTED, AgentTaskStatus.SUPERSEDED,
+        }
+        return bool(self.nodes) and all(n.status in terminal for n in self.nodes.values())
+
     def to_dict(self) -> Dict[str, Any]:
         return {
             "graph_id": self.graph_id,
             "revision": self.revision,
+            "mutation_history": list(self.mutation_history),
             "nodes": {
                 key: node.to_dict() for key, node in sorted(self.nodes.items())
             },

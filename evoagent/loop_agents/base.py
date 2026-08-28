@@ -18,6 +18,7 @@ from typing import Any, Dict, List, Optional
 
 from ..runtime import AgentLoop, AgentLoopResult
 from .models import AgentPlanState
+from .decision import AgentDecision
 
 
 class BaseLoopAgent:
@@ -114,11 +115,12 @@ class BaseLoopAgent:
     def run(self, task: Dict[str, Any]) -> Dict[str, Any]:
         """Run the agent's loop and return its artifact + trace metadata."""
         self._plan_records = []
+        self._decision_records = []
         self._last_task = dict(task)
         initial = self.build_initial_state(dict(task))
         task_id = str(task.get("task_id", ""))
         tools = self.prepare(dict(task)) or self.tools
-        step_fn = self._shallow_step if not self.deep_loop else self.agent_step
+        step_fn = self._shallow_step if not self.deep_loop else self._decision_step
         result = self.agent_loop.run(
             step_fn, tools, initial,
             agent_id=self.agent_id, task_id=task_id,
@@ -131,7 +133,39 @@ class BaseLoopAgent:
             "observations": result.observations,
             "plan": list(self._plan_records),
             "agent_id": self.agent_id,
+            "decisions": list(getattr(self, "_decision_records", [])),
         }
+
+    def decide_next_action(self, state: Dict[str, Any]) -> AgentDecision:
+        """Normalize every specialist's next action into one decision model."""
+        raw = self.agent_step(state)
+        action = str(raw.get("action") or "final")
+        return AgentDecision(
+            action=action,
+            tool_name=raw.get("tool") if action == "tool" else None,
+            arguments=dict(raw.get("arguments") or {}),
+            reason_code=str(raw.get("reason_code") or (
+                "OBSERVATION_DRIVEN_TOOL" if action == "tool" else "GOAL_SATISFIED")),
+            confidence=float(raw.get("confidence", 0.8)),
+        )
+
+    def _decision_step(self, state: Dict[str, Any]) -> Dict[str, Any]:
+        raw = self.agent_step(state)
+        action = str(raw.get("action") or "final")
+        decision = AgentDecision(
+            action=action,
+            tool_name=raw.get("tool") if action == "tool" else None,
+            arguments=dict(raw.get("arguments") or {}),
+            reason_code=str(raw.get("reason_code") or (
+                "OBSERVATION_DRIVEN_TOOL" if action == "tool" else "GOAL_SATISFIED")),
+            confidence=float(raw.get("confidence", 0.8)),
+        )
+        if not hasattr(self, "_decision_records"):
+            self._decision_records = []
+        self._decision_records.append(decision.to_dict())
+        raw["reason_code"] = decision.reason_code
+        raw["confidence"] = decision.confidence
+        return raw
 
     def _shallow_step(self, state: Dict[str, Any]) -> Dict[str, Any]:
         """Shallow stepper (plan §4.4, ``deep_loop=False``).
@@ -143,7 +177,7 @@ class BaseLoopAgent:
         if state.get("observations"):
             self._last_state = state
             return {"action": "final", "agent_id": self.agent_id}
-        return self.agent_step(state)
+        return self._decision_step(state)
 
     # -- tool helpers --------------------------------------------------------
     def call_tool(self, name: str, arguments: Dict[str, Any], task_id: str = "") -> Any:

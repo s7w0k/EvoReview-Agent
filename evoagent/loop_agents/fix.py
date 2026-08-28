@@ -125,6 +125,14 @@ class FixAgent(BaseLoopAgent):
                         or (task.get("input") or {}).get("findings") or [])
         state["findings"] = findings
         state["finding"] = findings[0] if findings else {}
+        primary = state["finding"]
+        state["stale_input"] = bool(
+            primary.get("verification_artifact_id") and (
+                int(primary.get("finding_version", 1))
+                != int(primary.get("latest_finding_version", 1))
+                or int(primary.get("verification_version", 0)) <= 0
+            )
+        )
         state["objective"] = str(task.get("objective") or "generate a verified repair")
         state["plan"] = None
         return state
@@ -141,6 +149,10 @@ class FixAgent(BaseLoopAgent):
             state, str(state.get("objective")),
             ["generate patch", "compile", "test / replan"], confidence=0.8)
 
+        if state.get("stale_input"):
+            return final_action(
+                agent_id=self.agent_id, rejected=True,
+                reason_code="FIX_STALE_INPUT", verified=False)
         decision = choose_fix_tool(state, finding)
         if decision is None:
             active = _active_generator(state) or ""
@@ -197,6 +209,13 @@ class FixAgent(BaseLoopAgent):
             "test_results": {"passed": tests_passed, "run": len(tests)},
             "risk_summary": "low" if self._safe(primary) else "medium",
             "target_rule_id": primary.get("rule_id", ""),
+            "finding_id": primary.get("finding_id", ""),
+            "finding_version": int(primary.get("finding_version", 1)),
+            "verification_artifact_id": primary.get(
+                "verification_artifact_id", ""),
+            "verification_version": int(primary.get("verification_version", 0)),
+            "stale_input_rejected": bool((getattr(self, "_last_state", {}) or {}).get(
+                "stale_input")),
         }
 
 

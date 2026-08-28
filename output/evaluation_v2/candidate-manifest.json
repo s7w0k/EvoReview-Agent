@@ -13,19 +13,19 @@
     "gates": {
       "Validation Improvement": {
         "passed": true,
-        "detail": "candidate F1 0.9276 >= stable F1 0.7458"
+        "detail": "candidate F1 0.5777 >= stable F1 0.0000"
       },
       "High-risk Non-regression": {
         "passed": true,
-        "detail": "candidate HR-Recall 1.0000 >= stable 0.8750"
+        "detail": "candidate HR-Recall 0.1250 >= stable 0.0000"
       },
       "Critical Miss Non-regression": {
         "passed": true,
-        "detail": "candidate critical hits 16 >= stable 14"
+        "detail": "candidate critical hits 2 >= stable 0"
       },
       "Clean Accuracy Non-regression": {
         "passed": true,
-        "detail": "candidate clean 0.8958 >= stable 0.8958 - 0.02"
+        "detail": "candidate clean 1.0000 >= stable 1.0000 - 0.02"
       },
       "Catastrophic Forgetting": {
         "passed": true,
@@ -121,6 +121,21 @@
       {
         "rule_id": "CWE-502",
         "severity": "high",
+        "match": "pickle.loads(",
+        "ignore_case": false,
+        "include_paths": [],
+        "exclude_paths": [
+          "tests/"
+        ],
+        "title": "Confirmed CWE-502 family finding (self-evolved)",
+        "explanation": "Validation confirmed this CWE family; match a standard unsafe primitive from the static CWE ontology.",
+        "fix": "Replace unsafe deserialization with a constrained safe loader.",
+        "test": "Add regression tests for supported unsafe primitives in this CWE family.",
+        "confidence": 0.7
+      },
+      {
+        "rule_id": "CWE-502",
+        "severity": "high",
         "match": "return yaml.load(value",
         "ignore_case": false,
         "include_paths": [],
@@ -132,6 +147,36 @@
         "fix": "Replace the unsafe construct with a constrained, validated alternative.",
         "test": "Add a focused regression test covering this confirmed failure mode.",
         "confidence": 0.7
+      },
+      {
+        "rule_id": "CWE-502",
+        "severity": "high",
+        "match": "yaml.load(",
+        "ignore_case": false,
+        "include_paths": [],
+        "exclude_paths": [
+          "tests/"
+        ],
+        "title": "Confirmed CWE-502 family finding (self-evolved)",
+        "explanation": "Validation confirmed this CWE family; match a standard unsafe primitive from the static CWE ontology.",
+        "fix": "Replace unsafe deserialization with a constrained safe loader.",
+        "test": "Add regression tests for supported unsafe primitives in this CWE family.",
+        "confidence": 0.7
+      },
+      {
+        "rule_id": "CWE-532",
+        "severity": "low",
+        "match": "print(value",
+        "ignore_case": false,
+        "include_paths": [],
+        "exclude_paths": [
+          "tests/"
+        ],
+        "title": "Confirmed CWE-532 finding (self-evolved)",
+        "explanation": "A confirmed CWE-532 was introduced on an added line; mined from repeated Validation false negatives.",
+        "fix": "Replace the unsafe construct with a constrained, validated alternative.",
+        "test": "Add a focused regression test covering this confirmed failure mode.",
+        "confidence": 0.9
       },
       {
         "rule_id": "CWE-614",
@@ -174,21 +219,6 @@
         ],
         "title": "Confirmed CWE-682 finding (self-evolved)",
         "explanation": "A confirmed CWE-682 was introduced on an added line; mined from repeated Validation false negatives.",
-        "fix": "Replace the unsafe construct with a constrained, validated alternative.",
-        "test": "Add a focused regression test covering this confirmed failure mode.",
-        "confidence": 0.7
-      },
-      {
-        "rule_id": "CWE-835",
-        "severity": "medium",
-        "match": "while True:",
-        "ignore_case": false,
-        "include_paths": [],
-        "exclude_paths": [
-          "tests/"
-        ],
-        "title": "Confirmed CWE-835 finding (self-evolved)",
-        "explanation": "A confirmed CWE-835 was introduced on an added line; mined from repeated Validation false negatives.",
         "fix": "Replace the unsafe construct with a constrained, validated alternative.",
         "test": "Add a focused regression test covering this confirmed failure mode.",
         "confidence": 0.7

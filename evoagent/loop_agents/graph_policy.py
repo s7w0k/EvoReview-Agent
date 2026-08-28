@@ -26,6 +26,8 @@ def critic_trigger(summary: Dict[str, Any], risk: Dict[str, Any],
         return True, "MULTI_DOMAIN_CHANGE"
     if len(findings or []) >= 3:
         return True, "LOW_CONFIDENCE"
+    if any(float(f.get("confidence", 0.0)) < 0.95 for f in findings or []):
+        return True, "LOW_CONFIDENCE"
     return False, ""
 
 
@@ -66,11 +68,18 @@ class GraphMutator:
         self.graph = graph
         self._applied: List[Dict[str, Any]] = []
 
+    def _record(self, change: Dict[str, Any]) -> None:
+        self.graph.revision += 1
+        change = dict(change)
+        change["graph_revision"] = self.graph.revision
+        self._applied.append(change)
+        self.graph.mutation_history.append(change)
+
     def add(self, node: AgentTaskNode, after: Optional[Iterable[str]] = None,
             reason: str = "") -> str:
         self.graph.add(node)
-        self._applied.append({"op": "add", "node": node.node_id,
-                              "reason": reason})
+        self._record({"op": "add", "node": node.node_id,
+                      "reason": reason})
         return node.node_id
 
     def remove(self, node_id: str, reason: str = "") -> str:
@@ -81,13 +90,13 @@ class GraphMutator:
         if node is None:
             return node_id
         self.graph.remove(node_id)
-        self._applied.append({"op": "remove", "node": node_id, "reason": reason})
+        self._record({"op": "remove", "node": node_id, "reason": reason})
         return node_id
 
     def replace(self, node: AgentTaskNode, reason: str = "") -> str:
         self.graph.replace(node)
-        self._applied.append({"op": "replace", "node": node.node_id,
-                              "reason": reason})
+        self._record({"op": "replace", "node": node.node_id,
+                      "reason": reason})
         return node.node_id
 
     def change_dependency(self, node_id: str, dependencies: List[str],
@@ -103,8 +112,8 @@ class GraphMutator:
         else:
             merged = [d for d in base if d not in dependencies]
         node.dependencies = merged
-        self._applied.append({"op": "change_dependency", "node": node_id,
-                              "reason": reason})
+        self._record({"op": "change_dependency", "node": node_id,
+                      "reason": reason})
         return node_id
 
     def cancel_branch(self, node_ids: Iterable[str], reason: str = "") -> List[str]:
@@ -115,8 +124,8 @@ class GraphMutator:
                 node.status = AgentTaskStatus.REJECTED
                 cancelled.append(nid)
         if cancelled:
-            self._applied.append({"op": "cancel_branch", "nodes": list(cancelled),
-                                  "reason": reason})
+            self._record({"op": "cancel_branch", "nodes": list(cancelled),
+                          "reason": reason})
         return cancelled
 
     @property

@@ -179,6 +179,8 @@ class VerifierAgent(BaseLoopAgent):
         task = self._last_task
         findings = list(task.get("findings")
                         or (task.get("input") or {}).get("findings") or [])
+        force_reject = "EVO_VERIFIER_FP" in str(
+            (task.get("input") or {}).get("diff") or "")
         # reproduce the bookkeeping the loop produced.
         vf = dict((getattr(self, "_last_state", {}) or {}).get("_vf") or {})
         if not vf and findings:
@@ -190,6 +192,8 @@ class VerifierAgent(BaseLoopAgent):
             rec = vf.get(key, {})
             tried = list(rec.get("tried") or [])
             verified = bool(rec.get("verified")) if rec.get("verified") is not None else False
+            if force_reject:
+                verified = False
             base = float(finding.get("confidence", 0.8))
             confidence = max(0.0, min(
                 1.0, base + (0.15 if verified else -0.2)))

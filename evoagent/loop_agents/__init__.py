@@ -5,8 +5,6 @@ Reliability, Critic, Verifier, Fix) each with its own ``BaseLoopAgent`` loop, go
 :class:`Delegator` and the :class:`LoopAgentHost` that serves a ``BaseLoopAgent``
 over in-process or HTTP A2A.
 """
-import os
-
 from .attribution import attribute_failure, emit_attribution, explain
 from .base import BaseLoopAgent
 from .coordinator import CoordinatorAgent
@@ -16,12 +14,15 @@ from .deep_loop import (
     select_verifier_strategy_for,
 )
 from .delegator import Delegator
+from .decision import AgentDecision
+from .events import RuntimeGraphEvent
 from .failure_injection import FAILURE_CATALOG, FailureInjector, inject
 from .feature_flags import (
     MultiAgentFeatureFlags, ablation_variant, flags_from_dict,
 )
 from .fix import FixAgent
 from .graph_policy import GraphMutator
+from .invalidation import invalidate_downstream
 from .observability import build_trace_context
 from .replan import (
     CAPABILITY_AGENT, REASON_CODES, ReplanBudget, ReplanRequest,
@@ -29,10 +30,8 @@ from .replan import (
 )
 from .scheduler import ConcurrencyBudget, TaskGraphScheduler
 
-# Feature flag: enables the v2 Parallel TaskGraph Scheduler / Semantic Dynamic
-# Planner path in the Coordinator (plan §4, §6).  Disabled by default so the
-# production ``six-agent`` path is byte-for-byte unchanged.
-scheduling_enabled = os.getenv("EVOAGENT_V2_SCHEDULING", "0") == "1"
+# ``mode=v2`` is the explicit feature boundary; no hidden environment gate.
+scheduling_enabled = True
 from .models import (
     AgentPlanState,
     AgentTaskNode,
@@ -67,6 +66,7 @@ from .tools import (
 from .verifier import VerifierAgent
 
 __all__ = ["AgentPlanState",
+    "AgentDecision",
     "AgentTaskNode",
     "AgentTaskStatus",
     "AGENT_SPECS",
@@ -93,6 +93,7 @@ __all__ = ["AgentPlanState",
     "ReplanTargetResolver",
     "ReplanTracker",
     "ReliabilityAgent",
+    "RuntimeGraphEvent",
     "SecurityAgent",
     "STOP_CODES",
     "TASK_TYPES",
@@ -113,6 +114,7 @@ __all__ = ["AgentPlanState",
     "final_action",
     "finding_key",
     "inject",
+    "invalidate_downstream",
     "flags_from_dict",
     "last_observation",
     "last_tool",

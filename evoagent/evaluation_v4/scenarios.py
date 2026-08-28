@@ -20,11 +20,13 @@ FIXTURE_KINDS = (
 #: The six evaluation categories and their required corpus sizes (plan §4.5).
 CATEGORY_SIZES = {
     "planning": 15,
-    "replan": 10,
-    "collaboration": 10,
-    "deep_loop": 10,
+    "parallel": 8,
+    "deep_loop": 12,
+    "replan": 12,
+    "critic": 10,
+    "verifier": 10,
     "fix": 5,
-    "failure": 10,
+    "failure": 8,
 }
 
 DEFAULT_FULL_CORPUS_FILE = "evaluation_data/multi_agent_scenarios.jsonl"
@@ -33,7 +35,8 @@ DEFAULT_FULL_CORPUS_FILE = "evaluation_data/multi_agent_scenarios.jsonl"
 #: corpus generator always emits.
 GOLD_KEYS = (
     "expected_agents", "expected_replan", "expected_replan_target",
-    "expected_findings", "expected_parallel_groups",
+    "expected_findings", "expected_parallel_groups", "allowed_agents",
+    "forbidden_agents", "required_graph_edges", "optional_graph_edges",
 )
 
 
@@ -215,10 +218,23 @@ def _make_scenario(category: str, kind: str, index: int, diff_id: str, *,
                    expected_replan_target: Optional[str] = None,
                    findings: Optional[List[str]] = None,
                    expected_parallel_groups: Optional[List[List[str]]] = None,
+                   required_graph_edges: Optional[List[List[str]]] = None,
                    ) -> Dict[str, Any]:
     """Assemble one gold-bearing scenario from a pool diff."""
     fname = "%s_%s_%d.py" % (category, kind, index)
     body = _DIFF_POOL[diff_id].format(file=fname)
+    if category == "replan":
+        target = "reliability" if expected_replan_target == "reliability-agent" \
+            else "security"
+        body += "+# EVO_EVIDENCE_GAP target=%s\n" % target
+    elif category == "critic":
+        body += "+# EVO_CRITIC_FP plausible-but-unsupported\n"
+    elif category == "verifier":
+        body += "+# EVO_VERIFIER_FP targeted-test-does-not-reproduce\n"
+    elif category == "deep_loop":
+        body += "+# EVO_DEEP_REQUIRED rule->semantic->evidence\n"
+    all_agents = {"security-agent", "reliability-agent", "critic-agent",
+                  "verifier-agent", "fix-agent"}
     return {
         "scenario_id": "%s-%03d" % (category, index),
         "category": category,
@@ -235,14 +251,19 @@ def _make_scenario(category: str, kind: str, index: int, diff_id: str, *,
         "expected_findings": [_finding(f, severity="high" if i == 0 else "medium")
                               for i, f in enumerate(findings or [])],
         "expected_parallel_groups": [list(g) for g in (expected_parallel_groups or [])],
+        "allowed_agents": list(expected_agents),
+        "forbidden_agents": sorted(all_agents - set(expected_agents)),
+        "required_graph_edges": [list(e) for e in (required_graph_edges or [])],
+        "optional_graph_edges": [],
     }
 
 
 def build_full_corpus() -> List[Dict[str, Any]]:
-    """Return the 60-case categorical corpus (plan §4.5).
+    """Return the 80-case mechanism-isolated corpus from the final plan.
 
     Categories and sizes:
-        planning 15, replan 10, collaboration 10, deep_loop 10, fix 5, failure 10.
+        planning 15, parallel 8, deep_loop 12, replan 12, critic 10,
+        verifier 10, fix 5, failure/recovery 8.
 
     Every scenario carries a gold block (:data:`GOLD_KEYS`) so a harness can
     assert routing / replan / parallel behaviour against ground truth.
@@ -296,18 +317,30 @@ def build_full_corpus() -> List[Dict[str, Any]]:
             expected_agents=["%s-agent" % _k, "critic-agent", "verifier-agent"],
             findings=[]))
 
-    # ---- replan (10): evidence gap -> targeted recheck --------------------
+    # ---- parallel (8): two independent READY specialists ------------------
+    for idx in range(1, 9):
+        corpus.append(_make_scenario(
+            "parallel", "parallel-ready", idx, "both-inject", risk="high",
+            expected_count=2,
+            expected_agents=["security-agent", "reliability-agent",
+                             "critic-agent", "verifier-agent"],
+            expected_parallel_groups=[["security-agent", "reliability-agent"]],
+            required_graph_edges=[]))
+
+    # ---- replan (12): evidence gap -> targeted recheck --------------------
     replan_specs = [
-        ("auth-timing", "missing-security-evidence", "security-agent", "high"),
         ("sql-injection", "missing-security-evidence", "security-agent", "high"),
-        ("path-traversal", "missing-security-evidence", "security-agent", "high"),
-        ("xss-escape", "missing-security-evidence", "security-agent", "high"),
-        ("race-guard", "missing-reliability-evidence", "reliability-agent", "high"),
-        ("broad-except", "missing-reliability-evidence", "reliability-agent", "medium"),
-        ("missing-timeout", "missing-reliability-evidence", "reliability-agent", "medium"),
-        ("unbounded-retry", "missing-reliability-evidence", "reliability-agent", "high"),
         ("command-injection", "missing-security-evidence", "security-agent", "high"),
         ("hardcoded-secret", "missing-security-evidence", "security-agent", "high"),
+        ("sql-injection", "missing-security-evidence-v2", "security-agent", "high"),
+        ("command-injection", "missing-security-evidence-v2", "security-agent", "high"),
+        ("hardcoded-secret", "missing-security-evidence-v2", "security-agent", "high"),
+        ("broad-except", "missing-reliability-evidence", "reliability-agent", "medium"),
+        ("both-inject", "missing-reliability-evidence", "reliability-agent", "high"),
+        ("broad-except", "missing-reliability-evidence-v2", "reliability-agent", "medium"),
+        ("both-inject", "missing-reliability-evidence-v2", "reliability-agent", "high"),
+        ("broad-except", "missing-reliability-evidence-v3", "reliability-agent", "medium"),
+        ("both-inject", "missing-reliability-evidence-v3", "reliability-agent", "high"),
     ]
     for idx, (diff_id, kind, target, risk) in enumerate(replan_specs, 1):
         corpus.append(_make_scenario(
@@ -316,33 +349,33 @@ def build_full_corpus() -> List[Dict[str, Any]]:
             expected_replan=True, expected_replan_target=target,
             findings=[]))
 
-    # ---- collaboration (10): critic gap / verifier conflict / both ---------
-    collab_specs = [
-        ("sql-injection", "critic-evidence-gap", "security-agent"),
-        ("path-traversal", "critic-evidence-gap", "security-agent"),
-        ("race-guard", "critic-evidence-gap", "reliability-agent"),
-        ("both-inject", "critic-evidence-gap", "security-agent"),
-        ("command-injection", "verifier-conflict", "security-agent"),
-        ("xss-escape", "verifier-conflict", "security-agent"),
-        ("missing-timeout", "verifier-conflict", "reliability-agent"),
-        ("auth-timing", "verifier-conflict", "security-agent"),
-        ("unbounded-retry", "collaboration-both", "reliability-agent"),
-        ("hardcoded-secret", "collaboration-both", "security-agent"),
-    ]
-    for idx, (diff_id, kind, target) in enumerate(collab_specs, 1):
-        risks = {"security-agent": "high", "reliability-agent": "medium"}
+    # ---- critic (10): plausible specialist FP must be suppressed ----------
+    critic_specs = ["sql-injection", "command-injection", "hardcoded-secret",
+                    "broad-except", "both-inject"] * 2
+    for idx, diff_id in enumerate(critic_specs, 1):
+        target = ("reliability-agent" if diff_id == "broad-except"
+                  else "security-agent")
         corpus.append(_make_scenario(
-            "collaboration", kind, idx, diff_id, risk=risks[target],
-            expected_count=1,
-            expected_agents=[target, "critic-agent", "verifier-agent"],
-            expected_parallel_groups=[["critic-agent", "verifier-agent"]]
-            if "conflict" in kind else []))
+            "critic", "plausible-fp", idx, diff_id, risk="high",
+            expected_count=0, expected_agents=[target, "critic-agent"]))
 
-    # ---- deep_loop (10): deepen-until-converged high risk ------------------
+    # ---- verifier (10): high-confidence FP fails independent reproduction --
+    verifier_specs = ["sql-injection", "command-injection", "hardcoded-secret",
+                      "broad-except", "both-inject"] * 2
+    for idx, diff_id in enumerate(verifier_specs, 1):
+        target = ("reliability-agent" if diff_id == "broad-except"
+                  else "security-agent")
+        corpus.append(_make_scenario(
+            "verifier", "targeted-test-fp", idx, diff_id, risk="high",
+            expected_count=0,
+            expected_agents=[target, "critic-agent", "verifier-agent"]))
+
+    # ---- deep_loop (12): deepen-until-converged hard cases -----------------
     deep_specs = [
         "sql-injection", "command-injection", "path-traversal", "xss-escape",
         "hardcoded-secret", "auth-timing", "both-inject", "race-guard",
         "unbounded-retry", "missing-timeout",
+        "sql-injection", "broad-except",
     ]
     for idx, diff_id in enumerate(deep_specs, 1):
         corpus.append(_make_scenario(
@@ -371,7 +404,7 @@ def build_full_corpus() -> List[Dict[str, Any]]:
                              "critic-agent", "verifier-agent", "fix-agent"],
             expected_parallel_groups=[]))
 
-    # ---- failure (10): broken / undermining code paths ---------------------
+    # ---- failure/recovery (8) ---------------------------------------------
     failure_specs = [
         ("broad-except", "swallowed-exception", "reliability-agent"),
         ("race-guard", "unsafe-concurrency", "reliability-agent"),
@@ -381,8 +414,6 @@ def build_full_corpus() -> List[Dict[str, Any]]:
         ("command-injection", "code-execution", "security-agent"),
         ("xss-escape", "dom-xss", "security-agent"),
         ("auth-timing", "timing-oracle", "security-agent"),
-        ("both-inject", "compound-failure", "security-agent"),
-        ("hardcoded-secret", "credential-leak", "security-agent"),
     ]
     for idx, (diff_id, kind, target) in enumerate(failure_specs, 1):
         risk = "high" if target == "security-agent" else "medium"
@@ -397,7 +428,7 @@ def build_full_corpus() -> List[Dict[str, Any]]:
 
 
 def write_full_corpus(path: str) -> int:
-    """Persist the 60-case categorical corpus as JSON-lines."""
+    """Persist the 80-case categorical corpus as JSON-lines."""
     items = build_full_corpus()
     with open(path, "w", encoding="utf-8") as handle:
         for item in items:

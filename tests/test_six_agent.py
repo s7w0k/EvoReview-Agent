@@ -159,7 +159,11 @@ class CalculatorTest(unittest.TestCase):
             inproc = {f.rule_id for f in ip.review(DIFF, _parsed())}
         finally:
             ip.close()
-        http = build_six_agent_reviewer("http")
+        # The stdlib HTTP transport executes each specialist synchronously, so
+        # under a loaded CI the default 10s request deadline can be exceeded and
+        # turn a transient slow response into a false mismatch.  Use a budget
+        # that exceeds the specialists' own loop timeout.
+        http = build_six_agent_reviewer("http", http_timeout_seconds=120)
         try:
             via_http = {f.rule_id for f in http.review(DIFF, _parsed())}
         finally:

@@ -140,6 +140,7 @@ class LoopAgentHost:
                 "stop_reason": outcome.get("stop_reason", "final"),
                 "steps": outcome.get("steps", 0),
                 "plan_versions": len(outcome.get("plan") or []),
+                "decision_count": len(outcome.get("decisions") or []),
                 "correlation_id": obj.correlation_id,
             },
         )

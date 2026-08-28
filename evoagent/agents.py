@@ -487,17 +487,31 @@ class MultiAgentCoordinator(Reviewer):
                 selected = list(self.agents)
             else:
                 by_name = {item.name: item for item in self.agents}
+                # Baseline policies persisted before the V4 naming cleanup use
+                # the short names below. Resolve them as compatibility aliases
+                # so a durable control-plane row cannot silently disable every
+                # built-in specialist after an upgrade.
+                aliases = {
+                    "security": "security-agent",
+                    "reliability": "reliability-agent",
+                    "semantic": "semantic-agent",
+                }
                 selected = []
                 for name in enabled:
-                    agent = by_name.get(name)
+                    agent = by_name.get(name) or by_name.get(aliases.get(name, ""))
                     if agent is not None and agent not in selected:
                         selected.append(agent)
-                if selected:
-                    pass
-                else:
-                    for item in self.agents:
-                        if item.name not in selected and item not in selected:
-                            selected.append(item)
+                # AgentPolicy routes built-in specialists.  Installed and
+                # evolved declarative skills are additive capabilities; they
+                # remain active even though their dynamic names are not baked
+                # into the static policy document.
+                core_agents = {
+                    "security-agent", "reliability-agent", "semantic-agent",
+                    "composite-semantic",
+                }
+                for item in self.agents:
+                    if item.name not in core_agents and item not in selected:
+                        selected.append(item)
                 if not selected:
                     selected = list(self.agents)
         if self.agent_registry is not None:

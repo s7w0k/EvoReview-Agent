@@ -1,88 +1,93 @@
-"""Evaluation V4 metrics (plan §9.5).
-
-Scoring is deterministic over a normalised outcome record so it can be applied
-to a single run (event emit) or aggregated across a scenario corpus.  Five
-dimensions are reported: Planning Quality, Replan Quality, Collaboration
-Quality, Loop Quality, Efficiency.
-"""
+"""Mechanism-specific Evaluation V4 metrics derived from real runtime traces."""
 from typing import Any, Dict, List
 
 
+QUALITY_DIMS = (
+    "detection_quality", "planning_quality", "replan_quality",
+    "collaboration_quality", "loop_quality",
+)
+
+
 def load_outcome(record: Dict[str, Any]) -> Dict[str, Any]:
-    """Normalise one run outcome into the fields the metrics read."""
     artifact = record.get("artifact") or {}
-    decision = record.get("decision") or {}
     return {
-        "planning_rationale_codes": list(artifact.get("rationale_codes") or []),
-        "graph_revision": int(artifact.get("graph_revision") or decision.get(
-            "graph_revision") or 1),
-        "replan_count": int(artifact.get("replan_count") or decision.get(
-            "replan_count") or 0),
-        "collaborations": list(record.get("collaborations")
-                               or artifact.get("collaborations") or []),
-        "loop_steps": int(artifact.get("steps") or record.get("steps") or 0),
+        "accepted_count": int(artifact.get("count") or 0),
+        "expected_count": int(record.get("expected_count") or 0),
+        "called_agents": list(artifact.get("called_agents")
+                              or record.get("collaborations") or []),
+        "expected_agents": list(record.get("expected_agents") or []),
+        "forbidden_agents": list(record.get("forbidden_agents") or []),
+        "replan_count": int(artifact.get("replan_count") or 0),
+        "replan_targets": list(artifact.get("replan_targets") or []),
+        "expected_replan": bool(record.get("expected_replan")),
+        "expected_replan_target": record.get("expected_replan_target"),
+        "graph_shapes": list(artifact.get("graph_shapes") or []),
+        "required_graph_edges": list(record.get("required_graph_edges") or []),
+        "loop_steps": dict(artifact.get("loop_steps_by_agent") or {}),
+        "parallel_batches": list(artifact.get("parallel_batches") or []),
+        "duration_ms": float(record.get("duration_ms") or 0.0),
         "tool_calls": int(record.get("tool_calls") or 0),
         "a2a_calls": int(record.get("a2a_calls") or 0),
-        "accepted_count": int(artifact.get("count") or 0),
-        "expected_count": int(decision.get("expected_count") or record.get(
-            "expected_count") or 0),
-        "graph_mutations": list(record.get("graph_mutations") or []),
-        "loop_sizes": list(record.get("loop_sizes") or []),
-        "delegated_tasks": int(artifact.get("delegated_tasks") or 0),
+        "category": str(record.get("category") or ""),
     }
 
 
-def _ratio(numerator: float, denominator: float) -> float:
-    return round(numerator / denominator, 4) if denominator else 0.0
+def _f1(tp: int, fp: int, fn: int) -> float:
+    precision = tp / float(tp + fp) if tp + fp else 1.0
+    recall = tp / float(tp + fn) if tp + fn else 1.0
+    return (2 * precision * recall / (precision + recall)
+            if precision + recall else 0.0)
 
 
 def evaluate_run(record: Dict[str, Any]) -> Dict[str, float]:
-    """Compute the five V4 quality dimensions for one outcome record."""
     o = load_outcome(record)
+    detection = float(o["accepted_count"] == o["expected_count"])
+    called, expected = set(o["called_agents"]), set(o["expected_agents"])
+    forbidden = set(o["forbidden_agents"])
+    planning = _f1(len(called & expected), len(called & forbidden),
+                   len(expected - called))
 
-    # Planning quality: structured rationale density + a validated graph.
-    planning = _ratio(float(len(o["planning_rationale_codes"])), 1.0)
-    planning = min(1.0, planning / 3.0)
+    if o["expected_replan"]:
+        target_ok = (not o["expected_replan_target"] or
+                     o["expected_replan_target"] in o["replan_targets"])
+        replan = float(o["replan_count"] > 0 and target_ok and detection == 1.0)
+    else:
+        replan = float(o["replan_count"] == 0)
 
-    # Replan quality: target precision + low request volume.
-    expected = max(1, o["expected_count"])
-    replan = 1.0 - min(1.0, float(o["replan_count"]) / max(2, expected))
+    actual_edges = {(dep, node["node_id"]) for node in o["graph_shapes"]
+                    for dep in node.get("dependencies") or []}
+    required = {tuple(edge) for edge in o["required_graph_edges"]}
+    edges_ok = not required or required <= actual_edges
+    collaboration = float(edges_ok and expected <= called)
 
-    # Collaboration quality: evidence that downstream stages ran (mutations +
-    # collaborations) normalised.
-    collab_coverage = _ratio(float(len(o["collaborations"])), float(expected))
-    collab = min(1.0, collab_coverage + _ratio(float(len(o["graph_mutations"])), float(expected)))
-
-    # Loop quality: agents converge within a reasonable loop size.
-    loop_sizes = o["loop_sizes"] or [1]
-    avg_loop = sum(loop_sizes) / float(len(loop_sizes)) if loop_sizes else 1.0
-    loop_quality = 1.0 - min(1.0, max(0.0, avg_loop - 2.0) / 6.0)
-
-    # Efficiency: fewer A2A round-trips relative to expected tasks.
-    efficiency = _ratio(float(expected), float(max(1, expected + o["a2a_calls"])))
+    specialist_steps = [steps for agent, steps in o["loop_steps"].items()
+                        if agent in ("security-agent", "reliability-agent")]
+    if o["category"] == "deep_loop":
+        loop_quality = float(detection == 1.0 and specialist_steps
+                             and max(specialist_steps) >= 3)
+    else:
+        loop_quality = float(bool(o["loop_steps"]) or not expected)
 
     return {
-        "planning_quality": planning,
-        "replan_quality": replan,
-        "collaboration_quality": collab,
-        "loop_quality": loop_quality,
-        "efficiency": efficiency,
+        "detection_quality": round(detection, 4),
+        "planning_quality": round(planning, 4),
+        "replan_quality": round(replan, 4),
+        "collaboration_quality": round(collaboration, 4),
+        "loop_quality": round(loop_quality, 4),
+        "latency_ms": round(o["duration_ms"], 4),
+        "tool_calls": float(o["tool_calls"]),
+        "a2a_calls": float(o["a2a_calls"]),
     }
 
 
 def aggregate_metrics(scores: List[Dict[str, float]]) -> Dict[str, Any]:
-    """Average the per-run dimension scores."""
-    dims = ("planning_quality", "replan_quality", "collaboration_quality",
-            "loop_quality", "efficiency")
-    sums: Dict[str, float] = {d: 0.0 for d in dims}
-    for score in scores:
-        for d in dims:
-            sums[d] += score.get(d, 0.0)
     n = max(1, len(scores))
-    averaged = {d: round(sums[d] / n, 4) for d in dims}
-    averaged["overall"] = round(sum(sums[d] for d in dims) / (n * len(dims)), 4)
+    averaged = {key: round(sum(s.get(key, 0.0) for s in scores) / n, 4)
+                for key in QUALITY_DIMS + ("latency_ms", "tool_calls", "a2a_calls")}
+    averaged["overall"] = round(
+        sum(averaged[d] for d in QUALITY_DIMS) / len(QUALITY_DIMS), 4)
     averaged["runs"] = len(scores)
     return averaged
 
 
-__all__ = ["load_outcome", "evaluate_run", "aggregate_metrics"]
+__all__ = ["QUALITY_DIMS", "load_outcome", "evaluate_run", "aggregate_metrics"]

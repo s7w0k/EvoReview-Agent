@@ -15,9 +15,11 @@ from .models import (
     VerificationPolicy,
 )
 
-AGENT_RELIABILITY = "reliability"
-AGENT_SEMANTIC = "semantic"
-AGENT_SECURITY = "security"
+# Runtime policy identifiers must match Reviewer.name exactly; otherwise
+# MultiAgentCoordinator falls back to all agents and routing flags are inert.
+AGENT_RELIABILITY = "reliability-agent"
+AGENT_SEMANTIC = "semantic-agent"
+AGENT_SECURITY = "security-agent"
 
 # Tools that every policy must be able to execute.  Tighter allow-lists can be
 # layered per tenant / repository / task by the resolver.
@@ -76,7 +78,8 @@ DEFAULT_POLICIES = {
                     retryable_failures={"MODEL_TIMEOUT", "MODEL_RATE_LIMIT", "TOOL_TIMEOUT"}),
         VerificationPolicy(critic_required=True, evidence_required=False,
                            verifier_required=True),
-        AgentPolicy(enabled_agents=[AGENT_RELIABILITY, AGENT_SEMANTIC], max_parallel_agents=2,
+        AgentPolicy(enabled_agents=[AGENT_SECURITY, AGENT_RELIABILITY, AGENT_SEMANTIC],
+                    max_parallel_agents=3,
                     fallback_agents=[AGENT_RELIABILITY]),
     ),
     "high": _policy(

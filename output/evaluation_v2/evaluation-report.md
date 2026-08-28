@@ -8,31 +8,31 @@
 
 | Metric | Single Agent | Legacy Multi-Agent | Current Harness | Self-Evolved |
 |---|---|---|---|---|
-| Precision | 83.3% | 82.5% | 83.3% | 87.5% |
-| Recall | 62.5% | 82.5% | 62.5% | 87.5% |
-| F1 | 71.4% | 82.5% | 71.4% | 87.5% |
-| High-risk Recall | 84.2% | 94.7% | 84.2% | 94.7% |
-| Clean Accuracy | 91.7% | 91.7% | 91.7% | 91.7% |
+| Precision | 83.3% | 82.5% | 0.0% | 100.0% |
+| Recall | 62.5% | 82.5% | 0.0% | 35.0% |
+| F1 | 71.4% | 82.5% | 0.0% | 51.8% |
+| High-risk Recall | 84.2% | 94.7% | 0.0% | 15.8% |
+| Clean Accuracy | 91.7% | 91.7% | 100.0% | 100.0% |
 | Execution Success | 100.0% | 100.0% | 100.0% | 100.0% |
-| Critical Misses | 3 | 1 | 3 | 1 |
-| P95 Latency (ms) | — | 0.5 | 267.1 | 269.1 |
+| Critical Misses | 3 | 1 | 19 | 16 |
+| P95 Latency (ms) | — | 0.6 | 324.9 | 247.3 |
 
 ## Generalization (Holdout, unseen repositories)
 
 | Metric | Stable Validation | Evolved Validation | Stable Holdout | Evolved Holdout |
 |---|---|---|---|---|
-| Precision | 81.5% | 86.5% | 100.0% | 100.0% |
-| Recall | 68.8% | 100.0% | 37.5% | 37.5% |
-| F1 | 74.6% | 92.8% | 54.5% | 54.5% |
-| High-risk Recall | 87.5% | 100.0% | 66.7% | 66.7% |
-| Clean Accuracy | 89.6% | 89.6% | 100.0% | 100.0% |
-| Critical Misses | 2 | 0 | 1 | 1 |
+| Precision | 0.0% | 100.0% | 0.0% | 100.0% |
+| Recall | 0.0% | 40.6% | 0.0% | 12.5% |
+| F1 | 0.0% | 57.8% | 0.0% | 22.2% |
+| High-risk Recall | 0.0% | 12.5% | 0.0% | 33.3% |
+| Clean Accuracy | 100.0% | 100.0% | 100.0% | 100.0% |
+| Critical Misses | 16 | 14 | 3 | 2 |
 
 ### Holdout Deltas
 
-- **Holdout F1**: 54.5% → 54.5%（+0.0 pp）
-- **Holdout High-risk Recall**: 66.7% → 66.7%（+0.0 pp）
-- **Critical Misses**: 1 → 1
+- **Holdout F1**: 0.0% → 22.2%（+22.2 pp）
+- **Holdout High-risk Recall**: 0.0% → 33.3%（+33.3 pp）
+- **Critical Misses**: 3 → 2
 
 ## Harness Engineering
 
@@ -41,14 +41,14 @@
 | Execution Success Rate | 100.0% | 100.0% |
 | Recovery Success Rate | — | — |
 | Multi-Agent DAG Executed | 100.0% | 100.0% |
-| Specialist Agents Active | security-agent, reliability-agent, code-quality | evolved-review@1, security-agent, reliability-agent, code-quality |
+| Specialist Agents Active | code-quality | evolved-review@1, code-quality |
 | Collaboration Rounds (avg) | 0.40 | 0.40 |
-| Collaboration Messages (avg) | 11.64 | 14.68 |
+| Collaboration Messages (avg) | 5.00 | 8.08 |
 | Avg Agent Tool-Steps | 0.00 | 0.00 |
 | Avg Tool Calls | 0.00 | 0.00 |
 | Tool Denials | 0 | 0 |
-| P50 Latency (ms) | 205.41 | 210.14 |
-| P95 Latency (ms) | 267.11 | 269.09 |
+| P50 Latency (ms) | 224.87 | 204.30 |
+| P95 Latency (ms) | 324.85 | 247.28 |
 | Trace Coverage | 100.0% | 100.0% |
 | Replay Snapshot Coverage | 100.0% | 100.0% |
 
@@ -56,10 +56,10 @@
 
 | Gate | Result |
 |---:|---|
-| Validation Improvement | **PASS** · candidate F1 0.9276 >= stable F1 0.7458 |
-| High-risk Non-regression | **PASS** · candidate HR-Recall 1.0000 >= stable 0.8750 |
-| Critical Miss Non-regression | **PASS** · candidate critical hits 16 >= stable 14 |
-| Clean Accuracy Non-regression | **PASS** · candidate clean 0.8958 >= stable 0.8958 - 0.02 |
+| Validation Improvement | **PASS** · candidate F1 0.5777 >= stable F1 0.0000 |
+| High-risk Non-regression | **PASS** · candidate HR-Recall 0.1250 >= stable 0.0000 |
+| Critical Miss Non-regression | **PASS** · candidate critical hits 2 >= stable 0 |
+| Clean Accuracy Non-regression | **PASS** · candidate clean 1.0000 >= stable 1.0000 - 0.02 |
 | Catastrophic Forgetting | **PASS** · no high-risk recall drop beyond threshold |
 | Runtime Safety | **PASS** · candidate execution success 1.0000 >= 0.99 |
 

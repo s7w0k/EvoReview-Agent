@@ -81,10 +81,15 @@ class RemoteAgentClient:
                 )
             )
         content: Dict[str, Any] = {}
+        metadata: List[Dict[str, Any]] = []
         for artifact in result.artifacts:
             if artifact_type and artifact.artifact_type != artifact_type:
                 continue
             content.update(artifact.content)
+            metadata.append(dict(artifact.metadata or {}))
+        # Runtime orchestration needs the real remote loop step count and stop
+        # reason.  Preserve transport metadata beside (not inside) findings.
+        content["_a2a_metadata"] = metadata
         return content
 
 

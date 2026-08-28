@@ -85,46 +85,10 @@ class SemanticPlanner:
             ))
             index += 1
 
-        # -- critic (conditional, plan §8.2) --------------------------------
-        high_risk = (level == "high")
-        want_critic = high_risk or self._want_critic(summary, risk)
-        critic_id: str = ""
-        if want_critic and len(specialist_ids) > 0 and _has_agent(ctx, "critic-agent"):
-            critic_id = TaskID("critic")
-            nodes.append(PlannedTask(
-                task_id=critic_id, agent_id="critic-agent",
-                task_type="critique.findings",
-                objective="challenge and reflect on the collected findings",
-                dependencies=list(specialist_ids), priority=8,
-                critical=high_risk,
-            ))
-
-        # -- verifier (conditional) -----------------------------------------
-        verifier_deps = [critic_id] if critic_id else list(specialist_ids)
-        want_verifier = high_risk or bool(
-            summary.get("expected_findings") or new_inputs) or len(specialist_ids) > 0
-        verifier_id: str = ""
-        if want_verifier and verifier_deps and _has_agent(ctx, "verifier-agent"):
-            verifier_id = TaskID("verifier")
-            nodes.append(PlannedTask(
-                task_id=verifier_id, agent_id="verifier-agent",
-                task_type="verify.findings",
-                objective="independently verify the findings",
-                dependencies=verifier_deps, priority=6,
-                critical=high_risk,
-            ))
-
-        # -- fix (only when remediation is allowed) -------------------------
-        fix_allowed = bool((ctx.execution_policy or {}).get("remediation")
-                           or (ctx.execution_policy or {}).get("fix_policy"))
-        if fix_allowed and verifier_id and _has_agent(ctx, "fix-agent"):
-            nodes.append(PlannedTask(
-                task_id=TaskID("fix"), agent_id="fix-agent",
-                task_type="fix.generate",
-                objective="generate a verified repair for the findings",
-                dependencies=[verifier_id], priority=4, serial=True,
-                critical=False,
-            ))
+        # The initial graph is deliberately minimal.  Critic, Verifier and Fix
+        # are inserted only after real specialist artifacts are observed by the
+        # runtime GraphPolicy.  Planning them here would make the feature look
+        # dynamic while preserving a static specialists->critic->verifier->fix DAG.
 
         return PlanningDecision(
             tasks=nodes, rationale_codes=rationale,

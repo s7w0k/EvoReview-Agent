@@ -60,6 +60,8 @@ class Delegator:
         self._futures: Dict[str, Future] = {}
         self._started: Dict[str, float] = {}
         self._latency: Dict[str, float] = {}
+        self.batch_traces: List[Dict[str, Any]] = []
+        self._batch_seq = 0
 
     def add_agent(self, agent_id: str, card: dict, transport, task_type: str):
         self.registry.register(dict(card))
@@ -178,6 +180,7 @@ class Delegator:
         return result
 
     def submit_batch(self, tasks: List[Dict[str, Any]]) -> List[DelegationHandle]:
+        self._batch_seq += 1
         handles = []
         for task in tasks:
             handles.append(self.submit(
@@ -188,7 +191,8 @@ class Delegator:
 
     def collect_batch(self, handles: List[DelegationHandle],
                       timeout: Optional[float] = None) -> Dict[str, Any]:
-        started = time.monotonic()
+        started = min((self._started.get(h.task_id, time.monotonic())
+                       for h in handles), default=time.monotonic())
         completed, failed = [], []
         for handle in handles:
             result = self.collect(handle)
@@ -196,9 +200,23 @@ class Delegator:
                 completed.append(result)
             else:
                 failed.append(result)
-        latency_ms = (time.monotonic() - started) * 1000.0
+        finished = time.monotonic()
+        latency_ms = (finished - started) * 1000.0
+        branch_ms = [self._latency.get(h.task_id, 0.0) for h in handles]
+        trace = {
+            "batch_id": "batch-%d" % self._batch_seq,
+            "parallel_width": len(handles), "started_at": started,
+            "finished_at": finished,
+            "agent_ids": [h.agent_id for h in handles],
+            "success_count": len(completed), "failure_count": len(failed),
+            "duration_ms": round(latency_ms, 4),
+            "branch_duration_ms": [round(v, 4) for v in branch_ms],
+            "speedup_ratio": round(sum(branch_ms) / latency_ms, 4)
+            if latency_ms else 1.0,
+        }
+        self.batch_traces.append(trace)
         return {"completed": completed, "failed": failed,
-                "latency_ms": round(latency_ms, 2)}
+                "latency_ms": round(latency_ms, 2), "batch_trace": trace}
 
     # -- blocking API (compatibility) ---------------------------------------
     def delegate(
@@ -216,7 +234,21 @@ class Delegator:
             diff=diff, context_refs=context_refs)
         if correlation_id:
             handle.correlation_id = correlation_id
-        return self.collect(handle)
+        result = self.collect(handle)
+        started = self._started.get(handle.task_id, time.monotonic())
+        finished = time.monotonic()
+        self._batch_seq += 1
+        self.batch_traces.append({
+            "batch_id": "batch-%d" % self._batch_seq,
+            "parallel_width": 1, "started_at": started,
+            "finished_at": finished, "agent_ids": [agent_id],
+            "success_count": int(result.get("status") == "completed"),
+            "failure_count": int(result.get("status") != "completed"),
+            "duration_ms": round((finished - started) * 1000.0, 4),
+            "branch_duration_ms": [round(self._latency.get(handle.task_id, 0.0), 4)],
+            "speedup_ratio": 1.0,
+        })
+        return result
 
     # -- aggregation helpers -------------------------------------------------
     def specialist_findings(self, task_types: Optional[List[str]] = None) -> List[Dict[str, Any]]:

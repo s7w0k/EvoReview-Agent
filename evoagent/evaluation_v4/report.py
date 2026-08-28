@@ -4,6 +4,7 @@ from typing import Any, Dict, List
 
 from .ablation import build_ablation_matrix
 from .metrics import aggregate_metrics, evaluate_run
+from .gates import evaluate_hard_gates
 
 
 def _score_row(records: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -41,21 +42,26 @@ def build_report(results: Dict[str, List[Dict[str, Any]]]) -> Dict[str, Any]:
             base_flat = baseline["metrics"]
             deltas[variant] = {
                 dim: round(flat.get(dim, 0.0) - base_flat.get(dim, 0.0), 4)
-                for dim in ("planning_quality", "replan_quality",
-                            "collaboration_quality", "loop_quality", "efficiency")
+                for dim in ("detection_quality", "planning_quality",
+                            "replan_quality", "collaboration_quality",
+                            "loop_quality", "latency_ms", "tool_calls",
+                            "a2a_calls")
             }
     return {
         "variants": [per_variant[v] for v in order],
         "order": order,
         "baseline_variant": "A",
         "ablation_deltas": deltas,
+        "hard_gates": evaluate_hard_gates(results),
+        "runtime_records": results,
     }
 
 
 def render_markdown(report: Dict[str, Any]) -> str:
     lines = ["# Multi-Agent Value Evaluation V4", ""]
-    dims = ("planning_quality", "replan_quality", "collaboration_quality",
-            "loop_quality", "efficiency", "overall")
+    dims = ("detection_quality", "planning_quality", "replan_quality",
+            "collaboration_quality", "loop_quality", "latency_ms",
+            "tool_calls", "a2a_calls", "overall")
     header = "| Variant | " + " | ".join(dims) + " |"
     sep = "|" + "---|" * (len(dims) + 1)
     lines += [header, sep]
@@ -69,6 +75,15 @@ def render_markdown(report: Dict[str, Any]) -> str:
                                  key=lambda kv: kv[0]):
         overall = sum(delta.values()) / len(delta) if delta else 0.0
         lines.append("| %s | %.4f |" % (variant, round(overall, 4)))
+    lines += ["", "## CI Hard Gates", "",
+              "| Gate | Result | Value | Threshold |",
+              "|---|---:|---:|---:|"]
+    for name, gate in report.get("hard_gates", {}).get("gates", {}).items():
+        lines.append("| %s | %s | %s | %s |" % (
+            name, "PASS" if gate.get("passed") else "FAIL",
+            gate.get("value"), gate.get("threshold")))
+    lines += ["", "**Overall Hard Gate: %s**" % (
+        "PASS" if report.get("hard_gates", {}).get("passed") else "FAIL")]
     lines += ["", "## Evolution Attribution (plan §12)", ""]
     for row in report["variants"]:
         attrs = row.get("attributions") or {}

@@ -23,7 +23,6 @@ Multi-Agent 6-item optimization plan
 
 v1 keeps the original behaviour (``legacy``/``six-agent`` path).
 """
-import os
 import uuid
 from typing import Any, Dict, List, Optional
 
@@ -38,6 +37,13 @@ from .replan import (
     ReplanRequest, ReplanTargetResolver, ReplanTracker,
 )
 from .feature_flags import MultiAgentFeatureFlags
+from .events import (
+    AGENT_COMPLETED, AGENT_FAILED, ARTIFACT_SUPERSEDED,
+    CRITIQUE_EMITTED, FINDING_UPDATED, FINDINGS_EMITTED,
+    FIX_COMPLETED, FIX_REQUESTED, GRAPH_MUTATED, REPLAN_REQUESTED,
+    VERIFICATION_COMPLETED, RuntimeGraphEvent,
+)
+from .invalidation import invalidate_downstream
 from .scheduler import ConcurrencyBudget, TaskGraphScheduler
 from .stepper import (
     PlanTracker, final_action, observations, tool_action, tool_results,
@@ -83,7 +89,9 @@ class CoordinatorAgent(BaseLoopAgent):
                  feature_flags: Optional[MultiAgentFeatureFlags] = None):
         super().__init__(
             max_steps or 16, timeout_seconds or 60,
-            execution_policy=execution_policy, tools=tools, bus=bus,
+            execution_policy=(execution_policy if hasattr(
+                execution_policy, "budget") else None),
+            tools=tools, bus=bus,
         )
         self.delegator = delegator
         self.max_replans = max(0, max_replans)
@@ -105,8 +113,10 @@ class CoordinatorAgent(BaseLoopAgent):
     # -- DAG validation helper (only when the scheduler is enabled) ----------
     @property
     def _v2(self) -> bool:
-        enabled = os.getenv("EVOAGENT_V2_SCHEDULING", "0") == "1"
-        return self.mode == "v2" and enabled
+        # ``mode=v2`` is authoritative.  A second environment gate previously
+        # made Evaluation V4 silently execute v1 even when the v2 architecture
+        # was requested, producing identical ablation traces.
+        return self.mode == "v2"
 
     # -- task tool binding ---------------------------------------------------
     def prepare(self, task: Dict[str, Any]):
@@ -138,6 +148,14 @@ class CoordinatorAgent(BaseLoopAgent):
         state["_replan_checked"] = False
         state["_replan_count"] = 0
         state["_graph_plan"] = {}
+        state["_processed_artifacts"] = []
+        state["_runtime_artifacts"] = {}
+        state["_runtime_events"] = []
+        state["_processed_replans"] = []
+        state["_finding_versions"] = {}
+        state["_verification_version"] = 0
+        state["_fix_stale_inputs"] = 0
+        state["feature_flags_snapshot"] = self.flags.to_dict()
         return state
 
     # -- graph construction (v1: keyword risk driven) -------------------------
@@ -220,13 +238,8 @@ class CoordinatorAgent(BaseLoopAgent):
                 graph = build_graph_from_tasks(
                     decision.tasks, gid + "_fb")
 
-        # apply the conditional collaboration-graph policy on top (plan §8)
-        mutator = graph_policy.GraphMutator(graph)
-        self._add_plan_policy(mutator, graph)
-
-        # ablation flags: critic / verifier off => remove those stages entirely
-        # (plan §4.4) so the flag genuinely changes which agents run.
-        self._apply_stage_flags(graph)
+        # Planner creates specialists only.  Critic/Verifier/Fix are inserted
+        # from observed artifacts by ``_apply_runtime_graph_policy``.
         return graph
 
     def _apply_stage_flags(self, graph: CoordinatorTaskGraph) -> None:
@@ -309,6 +322,8 @@ class CoordinatorAgent(BaseLoopAgent):
             risk_results = tool_results(state, "profile_risk")
             summary = dict(summary_results[-1]) if summary_results else {}
             risk = dict(risk_results[-1]) if risk_results else {}
+            state["_semantic_summary"] = summary
+            state["_risk_profile"] = risk
             graph = self._build_graph_v2(state, summary, risk)
             state["task_graph"] = graph
             state["_graph_plan"] = {
@@ -322,6 +337,8 @@ class CoordinatorAgent(BaseLoopAgent):
             max_parallel_agents=self.flags.effective_max_parallel)
         scheduler = TaskGraphScheduler(graph, budget=budget)
         scheduler.reconcile()
+        runtime_events = self._sync_runtime_results(state, graph)
+        self._apply_runtime_graph_policy(state, graph, runtime_events)
         batch = state.get("_batch") or scheduler.next_batch()
         if batch:
             state["_batch"] = []
@@ -329,7 +346,8 @@ class CoordinatorAgent(BaseLoopAgent):
                 return self._delegate_batch(state, graph, batch, plan)
             return self._delegate(state, graph.nodes[batch[0]], plan)
 
-        # Phase C: finalize / targeted replan.
+        # Phase C: graph is terminal only after runtime policy has had a chance
+        # to insert downstream or replan nodes from the latest artifacts.
         return self._finalize_v2(state, graph, plan)
 
     # -- v1 loop (unchanged contract) ---------------------------------------
@@ -372,7 +390,17 @@ class CoordinatorAgent(BaseLoopAgent):
         plan.begin("task:" + node.task_type)
         objective = str(node.objective)
         if node.task_type in ("critique.findings", "verify.findings", "fix.generate"):
-            findings = self.delegator.specialist_findings() if self.delegator else []
+            findings = self._findings_for_downstream(state) if self._v2 else (
+                self.delegator.specialist_findings() if self.delegator else [])
+            if node.task_type == "fix.generate":
+                findings = [dict(f, **{
+                    "verification_artifact_id": node.metadata.get(
+                        "verification_artifact_id", ""),
+                    "verification_version": node.metadata.get(
+                        "verification_version", 0),
+                    "latest_finding_version": node.metadata.get(
+                        "finding_versions", {}).get(_finding_key(f), 1),
+                }) for f in findings]
         else:
             findings = []
         return tool_action("delegate_agent", {
@@ -392,7 +420,8 @@ class CoordinatorAgent(BaseLoopAgent):
             plan.begin("task:" + node.task_type)
             if node.task_type in ("critique.findings", "verify.findings",
                                   "fix.generate"):
-                findings = self.delegator.specialist_findings() if self.delegator else []
+                findings = self._findings_for_downstream(state) if self._v2 else (
+                    self.delegator.specialist_findings() if self.delegator else [])
             else:
                 findings = []
             tasks.append({
@@ -428,24 +457,267 @@ class CoordinatorAgent(BaseLoopAgent):
 
     # -- finalize (v2) ------------------------------------------------------
     def _finalize_v2(self, state, graph, plan) -> Dict[str, Any]:
-        if not state.get("_replan_checked"):
-            state["_replan_checked"] = True
-            request = None
-            if self.flags.targeted_replan:
-                request = self._pick_replan_request(state, graph)
-            if request is not None and state.get("_replan_count", 0) < self.max_replans:
-                state["_replan_count"] = state.get("_replan_count", 0) + 1
-                mutator = graph_policy.GraphMutator(graph)
-                new_node = self._insert_recheck(mutator, graph, request)
-                plan.revise(
-                    ["insert targeted recheck for %s" % new_node.node_id],
-                    request.reason_summary)
-                state["pending"] = [new_node.node_id]
-                return self._delegate(state, new_node, plan)
         self._replan_count = int(state.get("_replan_count", 0))
         self._graph_revision = int(getattr(graph, "revision", 1))
+        self._runtime_state = state
+        self._runtime_graph = graph
         plan.complete("replan on evidence gaps").complete("finalize")
         return final_action(agent_id=self.agent_id)
+
+    # -- result -> event -> runtime graph policy ---------------------------
+    def _sync_runtime_results(self, state, graph) -> List[RuntimeGraphEvent]:
+        """Attach newly returned A2A artifacts to graph nodes and version them."""
+        if self.delegator is None:
+            return []
+        processed = set(state.get("_processed_artifacts") or [])
+        runtime_artifacts = state.setdefault("_runtime_artifacts", {})
+        events: List[RuntimeGraphEvent] = []
+        candidates = [
+            (task_id, record) for task_id, record in self.delegator.artifacts.items()
+            if task_id not in processed
+        ]
+        for task_id, record in candidates:
+            node = next((n for n in graph.nodes.values()
+                         if not n.artifact_ids
+                         and n.agent_id == record.get("agent_id")
+                         and n.task_type == record.get("task_type")
+                         and n.status in (AgentTaskStatus.RUNNING,
+                                          AgentTaskStatus.COMPLETED)), None)
+            if node is None:
+                continue
+            node.status = (AgentTaskStatus.COMPLETED
+                           if record.get("status") == "completed"
+                           else AgentTaskStatus.FAILED)
+            node.artifact_ids.append(task_id)
+            content = record.get("content") or {}
+            inputs = [aid for dep in node.dependencies
+                      for aid in graph.nodes.get(dep, AgentTaskNode('', '', '')).artifact_ids]
+            artifact = {
+                "artifact_id": task_id, "producer_node": node.node_id,
+                "agent_id": node.agent_id, "task_type": node.task_type,
+                "status": node.status, "artifact_version": 1,
+                "input_artifact_ids": inputs, "content": content,
+            }
+            if node.task_type.startswith("review."):
+                is_recheck = bool(node.metadata.get("replan_request_id"))
+                changed_old: List[str] = []
+                for finding in content.get("findings") or []:
+                    key = _finding_key(finding)
+                    current = int(state["_finding_versions"].get(key, 0))
+                    version = current + 1 if is_recheck else max(1, current)
+                    state["_finding_versions"][key] = version
+                    finding["finding_id"] = finding.get("finding_id") or key
+                    finding["finding_version"] = version
+                    finding["artifact_id"] = task_id
+                    if is_recheck:
+                        finding.setdefault("deep_evidence", {})["targeted_recheck"] = True
+                        for old in runtime_artifacts.values():
+                            if old.get("status") == AgentTaskStatus.SUPERSEDED:
+                                continue
+                            if old.get("task_type", "").startswith("review.") and any(
+                                _finding_key(item) == key for item in
+                                (old.get("content") or {}).get("findings") or []
+                            ):
+                                old["status"] = AgentTaskStatus.SUPERSEDED
+                                changed_old.append(old["artifact_id"])
+                                events.append(RuntimeGraphEvent(
+                                    ARTIFACT_SUPERSEDED,
+                                    node_id=str(old.get("producer_node") or ""),
+                                    artifact_id=old["artifact_id"],
+                                    detail={"replaced_by": task_id},
+                                ))
+                artifact["finding_versions"] = {
+                    _finding_key(f): int(f.get("finding_version", 1))
+                    for f in content.get("findings") or []
+                }
+                events.append(RuntimeGraphEvent(
+                    FINDING_UPDATED if is_recheck else FINDINGS_EMITTED,
+                    node.node_id, task_id,
+                    {"count": len(content.get("findings") or []),
+                     "recheck": is_recheck, "changed_artifact_ids": changed_old},
+                ))
+                if changed_old:
+                    events.extend(invalidate_downstream(
+                        graph, changed_old, runtime_artifacts))
+            elif node.task_type == "critique.findings":
+                events.append(RuntimeGraphEvent(
+                    CRITIQUE_EMITTED, node.node_id, task_id,
+                    {"replan_requests": len(content.get("replan_requests") or [])}))
+                for request in content.get("replan_requests") or []:
+                    detail = request.to_dict() if isinstance(request, ReplanRequest) else dict(request)
+                    events.append(RuntimeGraphEvent(
+                        REPLAN_REQUESTED, node.node_id, task_id, detail))
+            elif node.task_type == "verify.findings":
+                state["_verification_version"] += 1
+                artifact["verification_version"] = state["_verification_version"]
+                for decision in (content.get("decisions") or {}).values():
+                    decision["verification_version"] = state["_verification_version"]
+                    source = next((f for f in self._latest_specialist_findings(state)
+                                   if _finding_key(f) == decision.get("finding_id")), None)
+                    decision["finding_version"] = int(
+                        (source or {}).get("finding_version", 1))
+                events.append(RuntimeGraphEvent(
+                    VERIFICATION_COMPLETED, node.node_id, task_id,
+                    {"verification_version": state["_verification_version"]}))
+            elif node.task_type == "fix.generate":
+                events.append(RuntimeGraphEvent(
+                    FIX_COMPLETED, node.node_id, task_id,
+                    {"verification_artifact_id": node.metadata.get(
+                        "verification_artifact_id", "")}))
+            runtime_artifacts[task_id] = artifact
+            processed.add(task_id)
+            events.append(RuntimeGraphEvent(
+                AGENT_COMPLETED if node.status == AgentTaskStatus.COMPLETED
+                else AGENT_FAILED, node.node_id, task_id,
+                {"agent_id": node.agent_id, "task_type": node.task_type}))
+        state["_processed_artifacts"] = sorted(processed)
+        state["_runtime_events"].extend(event.to_dict() for event in events)
+        return events
+
+    @staticmethod
+    def _has_live_node(graph, task_type: str) -> bool:
+        return any(n.task_type == task_type and n.status != AgentTaskStatus.SUPERSEDED
+                   for n in graph.nodes.values())
+
+    @staticmethod
+    def _completed_nodes(graph, prefix: str) -> List[AgentTaskNode]:
+        return [n for n in graph.nodes.values()
+                if n.task_type.startswith(prefix)
+                and n.status == AgentTaskStatus.COMPLETED]
+
+    def _latest_specialist_findings(self, state) -> List[Dict[str, Any]]:
+        merged: Dict[str, Dict[str, Any]] = {}
+        for artifact in state.get("_runtime_artifacts", {}).values():
+            if artifact.get("status") != AgentTaskStatus.COMPLETED:
+                continue
+            if not str(artifact.get("task_type") or "").startswith("review."):
+                continue
+            for finding in (artifact.get("content") or {}).get("findings") or []:
+                key = _finding_key(finding)
+                current = merged.get(key)
+                if current is None or int(finding.get("finding_version", 1)) >= int(
+                        current.get("finding_version", 1)):
+                    merged[key] = finding
+        return list(merged.values())
+
+    def _findings_for_downstream(self, state) -> List[Dict[str, Any]]:
+        """Use the latest non-superseded Critic decision when one exists."""
+        critics = [a for a in state.get("_runtime_artifacts", {}).values()
+                   if a.get("task_type") == "critique.findings"
+                   and a.get("status") == AgentTaskStatus.COMPLETED]
+        if critics:
+            return list((critics[-1].get("content") or {}).get(
+                "accepted_findings") or [])
+        return self._latest_specialist_findings(state)
+
+    def _add_runtime_node(self, state, graph, node: AgentTaskNode,
+                          reason: str) -> AgentTaskNode:
+        mutator = graph_policy.GraphMutator(graph)
+        mutator.add(node, reason=reason)
+        state["_runtime_events"].append(RuntimeGraphEvent(
+            GRAPH_MUTATED, node.node_id, detail={
+                "op": "add", "reason": reason,
+                "graph_revision": graph.revision,
+            }).to_dict())
+        return node
+
+    def _apply_runtime_graph_policy(self, state, graph,
+                                    events: List[RuntimeGraphEvent]) -> None:
+        """Evaluate artifacts after every completed batch, before scheduling."""
+        findings = self._latest_specialist_findings(state)
+        summary = state.get("_semantic_summary") or {}
+        risk = state.get("_risk_profile") or {}
+
+        # Critic/Verifier replan requests are consumed immediately.  This path
+        # runs before any downstream verifier/fix insertion.
+        request = self._pick_replan_request(state, graph) \
+            if self.flags.targeted_replan else None
+        if request is not None and state.get("_replan_count", 0) < self.max_replans:
+            fingerprint = request.fingerprint()
+            if fingerprint not in state["_processed_replans"]:
+                state["_processed_replans"].append(fingerprint)
+                state["_replan_count"] += 1
+                mutator = graph_policy.GraphMutator(graph)
+                new_node = self._insert_recheck(mutator, graph, request)
+                state["_runtime_events"].append(RuntimeGraphEvent(
+                    GRAPH_MUTATED, new_node.node_id, detail={
+                        "op": "targeted_replan", "target": new_node.agent_id,
+                        "request_id": request.request_id,
+                        "graph_revision": graph.revision,
+                    }).to_dict())
+                return
+
+        review_nodes = [n for n in graph.nodes.values()
+                        if n.task_type.startswith("review.")]
+        initial_done = bool(review_nodes) and all(
+            n.status in (AgentTaskStatus.COMPLETED, AgentTaskStatus.SUPERSEDED)
+            for n in review_nodes if not n.metadata.get("replan_request_id"))
+        recheck_completed = any(
+            n.metadata.get("replan_request_id")
+            and n.status == AgentTaskStatus.COMPLETED for n in review_nodes)
+        critics = self._completed_nodes(graph, "critique.")
+        verifiers = self._completed_nodes(graph, "verify.")
+
+        if initial_done and not critics and not self._has_live_node(
+                graph, "critique.findings") and findings:
+            triggered, reason = graph_policy.critic_trigger(summary, risk, findings)
+            if self.flags.critic and triggered:
+                deps = [n.node_id for n in review_nodes
+                        if not n.metadata.get("replan_request_id")]
+                self._add_runtime_node(state, graph, AgentTaskNode(
+                    node_id="critic", task_type="critique.findings",
+                    objective="challenge current findings and evidence",
+                    dependencies=deps, agent_id="critic-agent"), reason)
+                return
+
+        latest_source = None
+        if recheck_completed:
+            latest_source = next(n for n in reversed(review_nodes)
+                                 if n.metadata.get("replan_request_id")
+                                 and n.status == AgentTaskStatus.COMPLETED)
+        elif critics:
+            latest_source = critics[-1]
+        elif initial_done:
+            latest_source = review_nodes[-1]
+
+        downstream_findings = self._findings_for_downstream(state)
+        if latest_source is not None and downstream_findings and self.flags.verifier \
+                and not self._has_live_node(graph, "verify.findings"):
+            triggered, reason = graph_policy.verifier_trigger(
+                summary, risk, len(downstream_findings), recheck_completed)
+            if triggered:
+                seq = 1 + sum(n.task_type == "verify.findings"
+                              for n in graph.nodes.values())
+                self._add_runtime_node(state, graph, AgentTaskNode(
+                    node_id="verifier-v%d" % seq,
+                    task_type="verify.findings",
+                    objective="verify latest finding versions",
+                    dependencies=[latest_source.node_id], agent_id="verifier-agent",
+                    metadata={"finding_versions": dict(state["_finding_versions"])}),
+                    reason)
+                return
+
+        if verifiers and not self._has_live_node(graph, "fix.generate"):
+            accepted, _ = self._arbitrate(state)
+            base_policy = (self.execution_policy.to_dict()
+                           if getattr(self.execution_policy, "to_dict", None)
+                           else self.execution_policy) or {}
+            triggered, reason = graph_policy.fix_trigger(accepted, base_policy)
+            if triggered:
+                latest = verifiers[-1]
+                verification_id = latest.artifact_ids[-1] if latest.artifact_ids else ""
+                metadata = {
+                    "verification_artifact_id": verification_id,
+                    "verification_version": state["_verification_version"],
+                    "finding_versions": dict(state["_finding_versions"]),
+                }
+                state["_runtime_events"].append(RuntimeGraphEvent(
+                    FIX_REQUESTED, latest.node_id, verification_id, metadata).to_dict())
+                self._add_runtime_node(state, graph, AgentTaskNode(
+                    node_id="fix-v%d" % state["_verification_version"],
+                    task_type="fix.generate", objective="fix latest verified finding",
+                    dependencies=[latest.node_id], agent_id="fix-agent",
+                    serial=True, metadata=metadata), reason)
 
     def _pick_replan_request(self, state, graph) -> Optional[ReplanRequest]:
         """Resolve the highest-priority critic request to a new node."""
@@ -481,22 +753,23 @@ class CoordinatorAgent(BaseLoopAgent):
             node_id = "%s-%d" % (base_id, seq)
             seq += 1
         target_task = _AGENT_TASK_TYPE.get(request.target_agent or "", "review.reliability")
+        source_node = next((n.node_id for n in reversed(list(graph.nodes.values()))
+                            if n.task_type in ("critique.findings",
+                                               "verify.findings")
+                            and n.status == AgentTaskStatus.COMPLETED), "")
         new_node = AgentTaskNode(
             node_id=node_id, task_type=target_task,
             objective="re-check %s: %s" % (request.finding_id or "", request.reason_summary),
-            dependencies=[d for d in graph.nodes if d != node_id],
+            dependencies=[source_node] if source_node else [],
             agent_id=request.target_agent,
-            status=AgentTaskStatus.PENDING)
+            status=AgentTaskStatus.PENDING,
+            metadata={
+                "replan_request_id": request.request_id,
+                "finding_id": request.finding_id or "",
+                "requested_action": request.requested_action,
+            })
         new_node.target_capabilities = [d for d in [request.target_capability] if d]
-        # point consumers (critic/verifier) at the new evidence node
         mutator.add(new_node, reason=request.reason_code)
-        for node in graph.nodes.values():
-            if node.node_id == node_id:
-                continue
-            if node.task_type in ("critique.findings", "verify.findings",
-                                  "fix.generate") and not node.dependencies:
-                mutator.change_dependency(node.node_id, [node_id], reason="replan-evidence")
-        graph.revision += 1
         return new_node
 
     # -- gather structured replan requests ----------------------------------
@@ -549,29 +822,57 @@ class CoordinatorAgent(BaseLoopAgent):
         return decisions
 
     # -- deterministic FindingArbiter (plan §25) ------------------------------
-    def _arbitrate(self) -> tuple:
+    def _arbitrate(self, state=None) -> tuple:
         if self.delegator is None:
             return [], []
-        specialists = self.delegator.specialist_findings()
-        decisions = self._verifier_decisions()
+        state = state or getattr(self, "_runtime_state", None)
+        specialists = (self._findings_for_downstream(state)
+                       if state is not None else self.delegator.specialist_findings())
+        decisions: Dict[str, Any] = {}
+        if state is not None:
+            active_verifiers = [a for a in state.get("_runtime_artifacts", {}).values()
+                                if a.get("task_type") == "verify.findings"
+                                and a.get("status") == AgentTaskStatus.COMPLETED]
+            if active_verifiers:
+                latest = max(active_verifiers,
+                             key=lambda a: int(a.get("verification_version", 0)))
+                decisions.update((latest.get("content") or {}).get("decisions") or {})
+        else:
+            decisions = self._verifier_decisions()
         accepted: List[Dict[str, Any]] = []
         rejected: List[Dict[str, Any]] = []
         for finding in specialists:
             decision = decisions.get(_finding_key(finding))
-            if decision is not None and decision.get("verified"):
+            # When verification is disabled by policy/ablation, deterministic
+            # arbitration preserves specialist findings.  Once a verifier ran,
+            # only its latest-version decision is authoritative.
+            if not decisions or (decision is not None and decision.get("verified")):
                 accepted.append(finding)
             else:
                 rejected.append(finding)
         return accepted, rejected
 
     def build_artifact(self, result) -> Dict[str, Any]:
-        accepted, rejected = self._arbitrate()
+        state = getattr(self, "_runtime_state", None)
+        graph = getattr(self, "_runtime_graph", None)
+        accepted, rejected = self._arbitrate(state)
         collaborations: List[str] = []
         if self.delegator is not None:
             for record in self.delegator.artifacts.values():
                 agent_id = record.get("agent_id") or ""
                 if agent_id and agent_id not in collaborations:
                     collaborations.append(agent_id)
+        loop_steps: Dict[str, int] = {}
+        if self.delegator is not None:
+            for record in self.delegator.artifacts.values():
+                metadata = (record.get("content") or {}).get("_a2a_metadata") or []
+                if metadata:
+                    loop_steps[record.get("agent_id") or ""] = (
+                        loop_steps.get(record.get("agent_id") or "", 0)
+                        + int(metadata[-1].get("steps") or 0))
+        runtime_artifacts = (state or {}).get("_runtime_artifacts", {})
+        superseded = [a["artifact_id"] for a in runtime_artifacts.values()
+                      if a.get("status") == AgentTaskStatus.SUPERSEDED]
         return {
             "task_type": self.task_type,
             "agent_id": self.agent_id,
@@ -586,6 +887,32 @@ class CoordinatorAgent(BaseLoopAgent):
             "rationale_codes": list(self._last_rationale),
             "collaborations": collaborations,
             "graph_mutations": list(getattr(self, "_graph_mutations", [])),
+            "task_graph": graph.to_dict() if graph is not None else {},
+            "graph_shapes": [
+                {"node_id": n.node_id, "task_type": n.task_type,
+                 "dependencies": list(n.dependencies), "status": n.status,
+                 "artifact_ids": list(n.artifact_ids),
+                 "metadata": dict(n.metadata)}
+                for n in graph.nodes.values()
+            ] if graph is not None else [],
+            "runtime_events": list((state or {}).get("_runtime_events", [])),
+            "runtime_artifacts": list(runtime_artifacts.values()),
+            "superseded_artifacts": superseded,
+            "feature_flags_snapshot": self.flags.to_dict(),
+            "parallel_batches": list(getattr(self.delegator, "batch_traces", []))
+            if self.delegator is not None else [],
+            "loop_steps_by_agent": loop_steps,
+            "tool_calls_by_agent": loop_steps,
+            "called_agents": collaborations,
+            "replan_targets": [
+                e.get("detail", {}).get("target") for e in
+                (state or {}).get("_runtime_events", [])
+                if e.get("detail", {}).get("op") == "targeted_replan"
+            ],
+            "verification_version": int((state or {}).get(
+                "_verification_version", 0)),
+            "finding_versions": dict((state or {}).get("_finding_versions", {})),
+            "fix_stale_inputs": int((state or {}).get("_fix_stale_inputs", 0)),
         }
 
 

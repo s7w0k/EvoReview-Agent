@@ -161,26 +161,41 @@ jobs:
       - run: python -m pytest tests/multi_agent/test_parallel_execution.py -q
       # 2. deep loop gates: specialists actually drive observation -> tool.
       - run: python -m pytest tests/test_multi_agent_v2.py -k "deep_loop" -q
-      # 3. targeted replan correctness: resolver + budget-loop + fix loop.
-      - run: python -m pytest tests/test_multi_agent_v2.py -k "replan or fix_full_loop" -q
+      # 3. targeted replan correctness + latest-version invalidation.
+      - run: python -m pytest tests/multi_agent/test_replan_closed_loop.py tests/multi_agent/test_stale_artifact.py -q
       # 4. dynamic graph safety: validator rejects cycles; mutator is history-safe.
       - run: python -m pytest tests/test_multi_agent_v2.py -k "validator or graph_mutator or trigger or coordinator_v2" -q
+      - run: python -m pytest tests/multi_agent/test_dynamic_graph_and_flags.py -q
       # 5 + 6. real runtime ablation smoke over a corpus slice (default matches
       # the published CLI: --runner runtime, non-synthetic by default).
       - run: python -m pytest tests/test_multi_agent_v2.py -k "v4_runtime or v4_ablation or corpus" -q
-      - name: Real runtime ablation smoke (default runner)
+      - name: Real runtime 80-case ablation and JSON hard gates
         run: |
-          python -m evoagent.evaluation_v4 --runner runtime --scenarios 8 --out evaluation_v4_closure.md
-          test -f evaluation_v4_closure.md
+          python -m evoagent.evaluation_v4 --runner runtime \
+            --out evaluation_v4_real.md --json-out evaluation_v4_real.json \
+            --enforce-gates
+          test -f evaluation_v4_real.json
           python - <<'PY'
-          text = open("evaluation_v4_closure.md", encoding="utf-8").read()
-          assert "Evolution Attribution" in text, "attribution missing from report"
-          print("[gate] runtime ablation + attribution report rendered")
+          import json
+          report = json.load(open("evaluation_v4_real.json", encoding="utf-8"))
+          gates = report["hard_gates"]
+          assert gates["passed"], {k: v for k, v in gates["gates"].items()
+                                   if not v["passed"]}
+          required = {
+              "planner_routing_recall", "replan_correct_target_rate",
+              "parallel_speedup", "deep_loop_advantage", "critic_fp",
+              "verifier_fp", "graph_cycles", "graph_self_cycles",
+              "fix_stale_inputs", "fix_after_verifier",
+          }
+          assert required <= set(gates["gates"])
+          print("[gate] all Multi-Agent JSON hard assertions PASS")
           PY
       - uses: actions/upload-artifact@v4
         with:
           name: multi-agent-closure-artifacts
-          path: evaluation_v4_closure.md
+          path: |
+            evaluation_v4_real.json
+            evaluation_v4_real.md
 
   # Evaluation Harness V2 regression (plan Phase 13). Deterministic, no LLM cost:
   # verify the frozen dataset SHA, reproduce the 4 systems, evaluate the safety

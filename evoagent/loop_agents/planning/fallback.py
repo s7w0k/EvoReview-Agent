@@ -52,29 +52,9 @@ class FallbackPlanner:
         specialist_ids.append("spec%d" % index)
         rationale.append("RUNTIME_RELIABILITY" if not security else "CLEAN_BASELINE")
 
-        high_risk = security or str(risk.get("level")) == "high"
-        critic_id = ""
-        if high_risk:
-            critic_id = "critic"
-            nodes.append(PlannedTask(
-                task_id=critic_id, agent_id="critic-agent",
-                task_type="critique.findings",
-                objective="challenge findings", dependencies=list(specialist_ids),
-                priority=8, critical=True))
-        verifier_deps = [critic_id] if critic_id else list(specialist_ids)
-        verifier_id = "verifier"
-        nodes.append(PlannedTask(
-            task_id=verifier_id, agent_id="verifier-agent",
-            task_type="verify.findings", objective="verify findings",
-            dependencies=list(verifier_deps), priority=6, critical=high_risk))
-        rationale.append("HIGH_RISK_VERIFY" if high_risk else "CLEAN")
-
-        if (ctx.execution_policy or {}).get("fix_policy"):
-            nodes.append(PlannedTask(
-                task_id="fix", agent_id="fix-agent", task_type="fix.generate",
-                objective="generate verified repair", dependencies=[verifier_id],
-                priority=4, serial=True))
-            rationale.append("VERIFIED_FIX")
+        # Downstream control nodes are result-driven runtime insertions.  The
+        # fallback differs from SemanticPlanner by intentionally over-routing
+        # specialists, which gives the Planner ablation a measurable cost/FP.
 
         return PlanningDecision(tasks=nodes, rationale_codes=rationale,
                                 confidence=0.8)
