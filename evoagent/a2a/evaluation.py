@@ -105,11 +105,18 @@ class LocalModeAdapter:
 
 
 class RemoteModeAdapter:
-    """Runs a :class:`RemoteReviewerAdapter` + collects A2A telemetry."""
+    """Runs a :class:`RemoteReviewerAdapter` + collects A2A telemetry.
+
+    The wrapped adapter may sit over any transport (in-process or real HTTP).
+    When a metrics collector or trace bus is available (either passed in or
+    already attached to the adapter), the aggregated report includes real retry
+    / fallback rates, latency percentiles and trace coverage.
+    """
 
     def __init__(
         self, adapter: RemoteReviewerAdapter,
         sanitizer: Optional[ArtifactSanitizer] = None,
+        bus=None, metrics=None,
     ):
         self.adapter = adapter
         self.sanitizer = sanitizer or ArtifactSanitizer()
@@ -117,6 +124,20 @@ class RemoteModeAdapter:
         self._executions: List[bool] = []
         self._errors: List[str] = []
         self._schema_valid = True
+        transport = getattr(adapter, "transport", None)
+        attached = getattr(transport, "metrics", None)
+        if metrics is not None:
+            transport.metrics = metrics
+            self.metrics = metrics
+        elif attached is not None:
+            self.metrics = attached
+        else:
+            from .telemetry import A2AMetrics
+            self.metrics = A2AMetrics(mirror=False)
+            transport.metrics = self.metrics
+        if bus is not None and getattr(adapter, "bus", None) is None:
+            adapter.bus = bus
+        self.bus = getattr(adapter, "bus", None)
 
     def run_case(self, case: dict) -> RemoteExecutionResult:
         parsed = parse_unified_diff(case["diff"])
@@ -138,25 +159,80 @@ class RemoteModeAdapter:
                 findings=[], success=False, latency_ms=latency, error=str(exc)[:1000],
             )
 
+    def _count(self, counter) -> int:
+        if self.metrics is None:
+            return 0
+        value = getattr(self.metrics, counter, None)
+        if isinstance(value, dict):
+            return sum(value.values())
+        return int(value or 0)
+
+    def _trace_events(self) -> int:
+        if self.bus is None:
+            return 0
+        return sum(1 for message in getattr(self.bus, "messages", [])
+                   if str(message.kind).startswith("remote_"))
+
     @property
     def a2a_metrics(self) -> Dict[str, Any]:
         total = len(self._executions)
         successes = sum(self._executions)
+        requests = self._count("requests") or max(total, 0)
+        retries = self._count("retries")
+        fallbacks = self._count("fallbacks")
+        # Plan section 14.2 "trace coverage": fraction of the expected remote
+        # trace events (submit -> running -> artifact, 3 per case) observed.
+        expected_trace = 3 * total
+        trace_events = self._trace_events()
         return {
             "remote_task_success": _safe_div(successes, total),
             "remote_timeout_rate": _safe_div(
                 sum(1 for e in self._errors if "timed out" in e), total),
-            "remote_retry_rate": 0.0,
-            "fallback_rate": _safe_div(
-                sum(1 for e in self._errors if "fallback" in e or "local" in e), total),
+            "remote_retry_rate": _safe_div(retries, requests),
+            "fallback_rate": _safe_div(fallbacks, requests),
+            "fallback_success": min(1.0, _safe_div(successes, fallbacks)) if fallbacks else 0.0,
             "p50_latency_ms": _percentile(self._latencies, 0.50),
             "p95_latency_ms": _percentile(self._latencies, 0.95),
+            "p99_latency_ms": _percentile(self._latencies, 0.99),
+            "e2e_p95_latency_ms": _percentile(self._latencies, 0.95),
             "execution_success_rate": _safe_div(successes, total),
             "artifact_schema_validity": 1.0 if self._schema_valid else 0.0,
+            "trace_coverage": _safe_div(trace_events, expected_trace),
+            "requests_total": requests,
         }
 
     def close(self) -> None:
         pass
+
+
+class HttpRemoteModeAdapter(RemoteModeAdapter):
+    """V3 RemoteModeAdapter backed by a real HTTP A2A endpoint.
+
+    Discovers the endpoint to build a :class:`RemoteReviewerAdapter` over an
+    HTTP transport, attaches trace + metric collectors, then exposes the same
+    V3 comparison / benchmark surface as the in-process adapter.
+    """
+
+    def __init__(
+        self, endpoint: str, *, token: str = "", timeout_seconds: float = 10.0,
+        local_fallback=None,
+    ):
+        from ..agents import CollaborationBus
+        from .telemetry import A2AMetrics
+
+        from .factory import build_remote_reviewers_typed
+
+        reviewers, _registry = build_remote_reviewers_typed(
+            [endpoint], token=token, timeout_seconds=timeout_seconds,
+        )
+        adapter = reviewers[0]
+        if local_fallback is not None:
+            adapter.local_fallback = local_fallback
+        bus = CollaborationBus("a2a-http-benchmark")
+        adapter.bus = bus
+        metrics = A2AMetrics(mirror=False)
+        adapter.transport.metrics = metrics
+        super().__init__(adapter, bus=bus, metrics=metrics)
 
 
 def _detection_summary(results: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -244,8 +320,111 @@ def compare_detection_local_remote(
     }
 
 
+#: Small frozen validation dataset for the real HTTP benchmark (plan section
+#: 14.2 needs repeatable, dependency-free baseline numbers).
+FROZEN_CASES: List[dict] = [
+    {
+        "id": "case-frozen-secret", "repository": "repo", "pull_request": 1,
+        "split": "validation",
+        "diff": "@@ -0 +1 @@\n+password = \"hunter2\"\n",
+        "expected_findings": [{"path": "unknown", "line": 1, "severity": "high"}],
+    },
+    {
+        "id": "case-frozen-clean", "repository": "repo", "pull_request": 2,
+        "split": "validation",
+        "diff": "@@ -0 +1 @@\n+# comment only\n",
+        "expected_findings": [],
+    },
+]
+
+
+def run_http_benchmark(
+    endpoints: List[str], *, token: str = "", timeout_seconds: float = 10.0,
+    cases: Optional[List[dict]] = None, local_fallback=None,
+) -> Dict[str, Any]:
+    """Real-HTTP Remote benchmark: local vs discovered A2A agents on ``cases``.
+
+    Discovers each endpoint over the HTTP transport, runs the frozen
+    ``cases`` in local and remote modes, and returns one V3 comparison report
+    per Remote Agent.
+    """
+    from ..agents import CollaborationBus
+    from .factory import build_remote_reviewers_typed
+    from .registry import AgentRegistry
+    from .telemetry import A2AMetrics
+
+    cases = list(cases or FROZEN_CASES)
+    reviewers, _registry = build_remote_reviewers_typed(
+        endpoints, token=token, timeout_seconds=timeout_seconds,
+        registry=AgentRegistry(),
+    )
+    local = LocalModeAdapter(local_fallback or _default_local_reviewer())
+    reports = {}
+    for adapter in reviewers:
+        bus = CollaborationBus("a2a-http-benchmark")
+        adapter.bus = bus
+        metrics = A2AMetrics(mirror=False)
+        adapter.transport.metrics = metrics
+        remote = RemoteModeAdapter(adapter, bus=bus, metrics=metrics)
+        reports[adapter.agent_id] = compare_local_remote(cases, local, remote)
+        reports[adapter.agent_id]["endpoint"] = adapter.endpoint
+    return {"cases": [case.get("id") for case in cases], "agents": reports}
+
+
+def _default_local_reviewer():
+    from ..reviewer import CompositeReviewer, ReliabilityRuleReviewer, SecurityRuleReviewer
+    return CompositeReviewer([SecurityRuleReviewer(), ReliabilityRuleReviewer()])
+
+
+def main(argv: Optional[List[str]] = None) -> int:
+    """``python -m evoagent.a2a.evaluation`` CLI for the HTTP Remote benchmark.
+
+    Endpoints come from ``--endpoints`` (repeatable) or
+    ``EVOAGENT_A2A_ENDPOINTS`` (comma-separated).  Prints a compact V3 report
+    as JSON lines, one per discovered Remote Agent.
+    """
+    import argparse
+    import json
+
+    from .factory import a2a_endpoints_from_env
+
+    parser = argparse.ArgumentParser(
+        prog="python -m evoagent.a2a.evaluation",
+        description="Run the A2A V3 Evaluation against real HTTP endpoints.",
+    )
+    parser.add_argument("--endpoints", action="append", default=None,
+                        metavar="URL", help="A2A endpoint (repeatable)")
+    parser.add_argument("--token", default="", help="A2A bearer token")
+    parser.add_argument("--timeout", type=float, default=10.0,
+                        help="per-request timeout in seconds")
+    parser.add_argument("--pretty", action="store_true",
+                        help="pretty-print the report instead of JSON lines")
+    args = parser.parse_args(argv)
+    endpoints = list(args.endpoints) if args.endpoints else a2a_endpoints_from_env()
+    if not endpoints:
+        parser.error(
+            "no A2A endpoints configured: pass --endpoints or set "
+            "EVOAGENT_A2A_ENDPOINTS"
+        )
+    report = run_http_benchmark(
+        endpoints, token=args.token, timeout_seconds=args.timeout)
+    if args.pretty:
+        print(json.dumps(report, indent=2, ensure_ascii=False, default=str))
+    else:
+        for agent_id, item in report["agents"].items():
+            line = {"agent": agent_id, "endpoint": item.get("endpoint"),
+                    "modes": item.get("modes")}
+            print(json.dumps(line, ensure_ascii=False, default=str))
+    return 0
+
+
 __all__ = [
     "RemoteExecutionResult", "LocalModeAdapter", "RemoteModeAdapter",
+    "HttpRemoteModeAdapter", "FROZEN_CASES", "run_http_benchmark",
     "compare_local_remote", "compare_detection_local_remote",
     "RemoteReviewerAdapter",
 ]
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

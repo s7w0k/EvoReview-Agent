@@ -90,6 +90,40 @@ def build_remote_reviewers(
     return reviewers, registry
 
 
+def build_remote_reviewers_typed(
+    endpoints: List[str], *, token: str = "", timeout_seconds: float = 10.0,
+    registry: Optional[AgentRegistry] = None, discover: bool = True,
+    local_fallbacks: Optional[dict] = None,
+) -> list:
+    """Build remote reviewers with a per-agent local fallback.
+
+    Unlike :func:`build_remote_reviewers` (which accepts a single
+    ``local_fallback``), this accepts ``local_fallbacks`` keyed by ``agent_id``
+    so each remote specialist can fall back to its own domain reviewer.  The
+    adapter's ``name`` is pinned to its ``agent_id`` (``security-agent`` /
+    ``reliability-agent``) so the coordinator route and registry health lookup
+    match even when the endpoint advertises a friendly display name.
+
+    Returns ``(reviewers, registry)``.
+    """
+    from .adapters import RemoteReviewerAdapter  # local import avoids cycle
+
+    registry = registry or AgentRegistry()
+    transport = build_http_transport(token, timeout_seconds)
+    fallbacks = local_fallbacks or {}
+    reviewers = []
+    for endpoint in endpoints:
+        meta = _card_from_endpoint(endpoint, token, timeout_seconds, discover)
+        agent_id = str(meta.get("agent_id") or meta.get("name", "remote-agent"))
+        meta["name"] = agent_id  # coordinator route + registry health by agent_id
+        registry.register(meta)
+        reviewers.append(RemoteReviewerAdapter(
+            meta, transport, local_fallback=fallbacks.get(agent_id),
+            task_type="review-assignment", timeout_seconds=timeout_seconds,
+        ))
+    return reviewers, registry
+
+
 def build_inprocess_reviewers(
     hosts: list, *, registry: Optional[AgentRegistry] = None, local_fallback=None,
 ) -> list:
@@ -129,6 +163,7 @@ def a2a_endpoints_from_env() -> List[str]:
 
 __all__ = [
     "build_agent_card", "build_http_transport", "build_remote_reviewers",
-    "build_inprocess_reviewers", "a2a_endpoints_from_env", "known_agent_meta",
+    "build_remote_reviewers_typed", "build_inprocess_reviewers",
+    "a2a_endpoints_from_env", "known_agent_meta",
     "build_a2a_task",
 ]

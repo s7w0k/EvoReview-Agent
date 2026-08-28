@@ -6,6 +6,7 @@ wraps any concrete transport with retry / circuit breaker / timeout and, on
 demand, falls over to a backup transport -- while mirroring everything into
 ``evoagent.metrics.metrics`` for the decision trace.
 """
+import time
 from typing import List, Optional
 
 from .errors import A2ACircuitOpenError, A2AError
@@ -64,16 +65,20 @@ class ResilientTransport(A2ATransport):
 
     # -- helpers -----------------------------------------------------------
     def _invoke(self, method: str, task_id: str, func):
+        started = time.monotonic()
+
         def guarded():
             return self.breaker.call(func)
 
         try:
             value = self.retry.run(guarded, on_retry=self._on_retry)
             if self.metrics is not None:
+                self.metrics.record_latency(method, time.monotonic() - started)
                 self.metrics.record_request(method, task_id or "", "success")
             return value
         except A2ACircuitOpenError:
             if self.metrics is not None:
+                self.metrics.record_latency(method, time.monotonic() - started)
                 self.metrics.record_circuit_open(task_id or "")
             if self.backup is not None:
                 if self.metrics is not None:
@@ -82,6 +87,7 @@ class ResilientTransport(A2ATransport):
             raise
         except Exception as exc:  # noqa: BLE001
             if self.metrics is not None:
+                self.metrics.record_latency(method, time.monotonic() - started)
                 self.metrics.record_failure(task_id or "", type(exc).__name__)
                 if isinstance(exc, A2AError) and getattr(exc, "retryable", False):
                     self.metrics.record_timeout(task_id or "")

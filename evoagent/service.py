@@ -36,6 +36,7 @@ from .rollout import ReleaseManager
 from .skill_curator import SkillCurator
 from .semantic_reviewer import build_semantic_reviewer
 from .confidence import parse_buckets
+from .a2a.factory import build_remote_reviewers_typed
 from .policy import PolicyResolver, RiskProfiler
 from .policy.codec import policy_from_dict, policy_to_dict
 from .policy.defaults import default_policy
@@ -155,12 +156,18 @@ class ReviewService:
             settings.skill_memory_mb, settings.skill_signing_key,
             settings.skill_container_image,
         )
+        # A2A production integration (plan Phase 4): when endpoints are
+        # configured the specialists run as Remote Agents with a local fallback;
+        # otherwise they stay purely local and behavior is unchanged.
+        a2a_specialists = self._build_a2a_reviewers()
+        security_reviewer = a2a_specialists.get("security-agent") or SecurityRuleReviewer()
+        reliability_reviewer = a2a_specialists.get("reliability-agent") or ReliabilityRuleReviewer()
         self.registry.register(
-            "security-review", SecurityRuleReviewer(),
+            "security-review", security_reviewer,
             "1.0.0", "Security, injection and secret detection",
         )
         self.registry.register(
-            "reliability-review", ReliabilityRuleReviewer(),
+            "reliability-review", reliability_reviewer,
             "1.0.0", "Reliability and observability review",
         )
         semantic = build_semantic_reviewer(settings.static_analyzer)
@@ -248,6 +255,36 @@ class ReviewService:
         )
         self.evolution_controller.start_scanner()
 
+    def _build_a2a_reviewers(self) -> dict:
+        """Build remote A2A specialist reviewers from ``EVOAGENT_A2A_ENDPOINTS``.
+
+        Returns ``{agent_id: Reviewer}``.  Off by default: with no endpoints it
+        returns ``{}`` and leaves ``self.agent_registry`` as ``None`` so the
+        coordinator keeps the pre-A2A behavior exactly.  When configured, each
+        discovered Remote Agent is given its own local domain reviewer as the
+        fallback, and the registry is attached so unhealthy Remote Agents are
+        dropped from routing.
+        """
+        endpoints = [
+            item.strip()
+            for item in self.settings.a2a_endpoints.split(",")
+            if item.strip()
+        ]
+        if not endpoints:
+            self.agent_registry = None
+            return {}
+        reviewers, registry = build_remote_reviewers_typed(
+            endpoints,
+            token=self.settings.a2a_token,
+            timeout_seconds=self.settings.a2a_timeout_seconds,
+            local_fallbacks={
+                "security-agent": SecurityRuleReviewer(),
+                "reliability-agent": ReliabilityRuleReviewer(),
+            },
+        )
+        self.agent_registry = registry
+        return {reviewer.agent_id: reviewer for reviewer in reviewers}
+
     def _build_llm_reviewer(self, prompt: str = "") -> OpenAICompatibleReviewer:
         if not self.llm_config:
             raise RuntimeError("no LLM provider is configured")
@@ -270,6 +307,7 @@ class ReviewService:
             agent_loop_max_steps=self.settings.agent_loop_max_steps,
             agent_loop_timeout_seconds=self.settings.agent_loop_timeout_seconds,
             execution_policy=execution_policy,
+            agent_registry=self.agent_registry,
         )
 
     def _build_harness(self, reviewer, execution_policy=None,

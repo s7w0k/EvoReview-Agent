@@ -30,6 +30,7 @@ class A2AMetrics:
         self.artifacts = defaultdict(int)         # (ver, artifact_type)
         self.latency_sum = defaultdict(float)     # (ver, method)
         self.latency_count = defaultdict(int)     # (ver, method)
+        self.latency_samples: list = []           # raw per-request latencies (s)
         self._mirror = mirror
 
     # -- recorders ---------------------------------------------------------
@@ -42,6 +43,7 @@ class A2AMetrics:
         with self._lock:
             self.latency_sum[key] += elapsed
             self.latency_count[key] += 1
+            self.latency_samples.append(float(elapsed))
 
     def record_failure(self, target: str, error_class: str) -> None:
         with self._lock:
@@ -88,6 +90,19 @@ class A2AMetrics:
                     self.latency_sum[key] / count, 6
                 ) if count else 0
         return values
+
+    def latency_percentiles(self, fractions=(0.50, 0.95, 0.99)) -> Dict[float, float]:
+        """Raw per-request latency percentiles in seconds (empty when no samples)."""
+        with self._lock:
+            samples = list(self.latency_samples)
+        if not samples:
+            return {}
+        ordered = sorted(samples)
+        result: Dict[float, float] = {}
+        for fraction in fractions:
+            index = min(len(ordered) - 1, int(fraction * len(ordered)))
+            result[float(fraction)] = round(ordered[index], 6)
+        return result
 
     def prometheus(self) -> str:
         values = self._memo()

@@ -194,6 +194,11 @@ class Settings:
     evolution_lease_seconds: int = 60
     # Work Package 3: enforce forgetting/generalization/production-source gates.
     evolution_quality_gates_enabled: bool = False
+    # A2A remote reviewing (Phase 3/4 production integration).  Off by default:
+    # an empty ``a2a_endpoints`` keeps the service on the local specialists.
+    a2a_endpoints: str = ""
+    a2a_token: str = ""
+    a2a_timeout_seconds: float = 10.0
 
     def resolved_llm(self) -> Dict[str, object]:
         """Resolve a named provider to the existing OpenAI-compatible transport."""
@@ -370,6 +375,8 @@ class Settings:
             raise ValueError("EVOAGENT_EVOLUTION_JOB_MAX_RETRIES cannot be negative")
         if self.evolution_lease_seconds < 1:
             raise ValueError("EVOAGENT_EVOLUTION_LEASE_SECONDS must be at least 1")
+        if self.a2a_timeout_seconds <= 0:
+            raise ValueError("EVOAGENT_A2A_TIMEOUT_SECONDS must be positive")
         self.validate_production_profile()
 
     def validate_production_profile(self) -> None:
@@ -552,5 +559,10 @@ class Settings:
             evolution_lease_seconds=_int("EVOAGENT_EVOLUTION_LEASE_SECONDS", 60),
             evolution_quality_gates_enabled=_bool(
                 "EVOAGENT_EVOLUTION_QUALITY_GATES_ENABLED", False
+            ),
+            a2a_endpoints=os.getenv("EVOAGENT_A2A_ENDPOINTS", "").strip(),
+            a2a_token=os.getenv("EVOAGENT_A2A_TOKEN", ""),
+            a2a_timeout_seconds=float(
+                os.getenv("EVOAGENT_A2A_TIMEOUT_SECONDS", "10")
             ),
         )
