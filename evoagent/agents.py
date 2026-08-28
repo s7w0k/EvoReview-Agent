@@ -401,9 +401,11 @@ class MultiAgentCoordinator(Reviewer):
         memory_manager: Optional[MemoryManager] = None,
         agent_loop_max_steps: int = 4, agent_loop_timeout_seconds: int = 45,
         execution_policy=None,
+        agent_registry=None,
     ):
         self.agents = agents
         self.execution_policy = execution_policy
+        self.agent_registry = agent_registry
         self.max_workers = max_workers
         self.store = store
         self.agent_retries = max(0, agent_retries)
@@ -472,24 +474,48 @@ class MultiAgentCoordinator(Reviewer):
         return nodes
 
     def _enabled_agents(self) -> List[Reviewer]:
-        """Dynamic agent routing: only the policy's enabled agents take part."""
+        """Dynamic agent routing: only the policy's enabled agents take part.
+
+        When an ``agent_registry`` is attached, agents registered as unhealthy
+        are dropped so a failed Remote Agent never participates in routing.
+        """
         if self.execution_policy is None:
-            return list(self.agents)
-        enabled = self.execution_policy.agents.enabled_agents
-        if not enabled:
-            return list(self.agents)
-        by_name = {item.name: item for item in self.agents}
-        selected = []
-        for name in enabled:
-            agent = by_name.get(name)
-            if agent is not None and agent not in selected:
-                selected.append(agent)
-        if selected:
-            return selected
-        for item in self.agents:  # ensure at least the fallback exists
-            if item.name not in selected and item not in selected:
-                selected.append(item)
-        return selected or list(self.agents)
+            selected = list(self.agents)
+        else:
+            enabled = self.execution_policy.agents.enabled_agents
+            if not enabled:
+                selected = list(self.agents)
+            else:
+                by_name = {item.name: item for item in self.agents}
+                selected = []
+                for name in enabled:
+                    agent = by_name.get(name)
+                    if agent is not None and agent not in selected:
+                        selected.append(agent)
+                if selected:
+                    pass
+                else:
+                    for item in self.agents:
+                        if item.name not in selected and item not in selected:
+                            selected.append(item)
+                if not selected:
+                    selected = list(self.agents)
+        if self.agent_registry is not None:
+            selected = [
+                item for item in selected
+                if self._registry_healthy(item.name)
+            ] or selected
+        return selected
+
+    def _registry_healthy(self, agent_name: str) -> bool:
+        """Ask the registry (if attached) whether ``agent_name`` is healthy."""
+        if self.agent_registry is None:
+            return True
+        # A registry entry may be keyed by agent_id or by the adapter name.
+        card = self.agent_registry.get(agent_name)
+        if card is None:
+            return True
+        return str(card.get("health_status", "healthy")).lower() != "unhealthy"
 
     def collaboration_summary(self, task_id: str) -> dict:
         with self._summary_lock:
