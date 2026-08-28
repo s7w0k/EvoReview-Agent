@@ -89,12 +89,14 @@ class ArtifactSanitizer:
                 if key in entry and isinstance(entry[key], str):
                     entry[key] = self._clean(entry[key])
             cleaned.append(entry)
+        content = dict(artifact.content or {})
+        content["findings"] = cleaned
         return A2AArtifact(
             artifact_id=artifact.artifact_id,
             task_id=artifact.task_id,
             artifact_type=artifact.artifact_type,
             producer=artifact.producer,
-            content={"findings": cleaned},
+            content=content,
             metadata=dict(artifact.metadata or {}),
         )
 

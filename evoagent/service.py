@@ -37,6 +37,7 @@ from .skill_curator import SkillCurator
 from .semantic_reviewer import build_semantic_reviewer
 from .confidence import parse_buckets
 from .a2a.factory import build_remote_reviewers_typed
+from .loop_agents.reviewer import build_six_agent_reviewer
 from .policy import PolicyResolver, RiskProfiler
 from .policy.codec import policy_from_dict, policy_to_dict
 from .policy.defaults import default_policy
@@ -184,8 +185,7 @@ class ReviewService:
                 "1.0.0", "Context-aware AI code review via %s" % self.llm_config["provider"],
             )
         self.registry.reload()
-        coordinator = self._build_coordinator(self.registry.reviewers())
-        self.reviewer = coordinator
+        self.reviewer = self._build_leader(self.registry.reviewers())
         self.harness = self._build_harness(self.reviewer)
         self.github = GitHubClient(settings.github_token)
         self.fixer = SafeFixer(RepairVerifier(
@@ -309,6 +309,23 @@ class ReviewService:
             execution_policy=execution_policy,
             agent_registry=self.agent_registry,
         )
+
+    def _build_leader(self, reviewers: list, execution_policy=None):
+        """Select the top-level reviewer (plan §11, §20).
+
+        ``legacy`` keeps the staged :class:`MultiAgentCoordinator` behaviour
+        unchanged; ``six-agent`` runs the loop-based Coordinator over the five
+        specialist loop agents.  The regressed specialist catalog is still
+        registered above, but the six-agent pipeline drives its Coordinator
+        through A2A delegation rather than the staged workflow.
+        """
+        if self.settings.agent_architecture == "six-agent":
+            coordinator_kwargs = {}
+            if execution_policy is not None:
+                coordinator_kwargs["execution_policy"] = execution_policy
+            return build_six_agent_reviewer(
+                "inprocess", coordinator_kwargs=coordinator_kwargs)
+        return self._build_coordinator(reviewers, execution_policy=execution_policy)
 
     def _build_harness(self, reviewer, execution_policy=None,
                        context=None) -> ReviewHarness:
@@ -682,7 +699,7 @@ class ReviewService:
         ):
             candidate = self._candidate_reviewer(tenant_id)
             if candidate:
-                canary_reviewer = self._build_coordinator([
+                canary_reviewer = self._build_leader([
                     item for item in self.registry.reviewers()
                     if not isinstance(item, OpenAICompatibleReviewer)
                 ] + evolved + [candidate],
@@ -691,7 +708,7 @@ class ReviewService:
                     canary_reviewer, context.execution_policy, context)
                 report = harness.run(task_id, repository, pull_request, diff, tenant_id)
         if report is None and evolved:
-            tenant_reviewer = self._build_coordinator(
+            tenant_reviewer = self._build_leader(
                 self.registry.reviewers() + evolved,
                 execution_policy=context.execution_policy,
             )
@@ -699,7 +716,7 @@ class ReviewService:
                 tenant_reviewer, context.execution_policy, context)
             report = harness.run(task_id, repository, pull_request, diff, tenant_id)
         if report is None:
-            default_reviewer = self._build_coordinator(
+            default_reviewer = self._build_leader(
                 self.registry.reviewers(),
                 execution_policy=context.execution_policy,
             )
@@ -894,7 +911,7 @@ class ReviewService:
             )
         self.registry.reload()
         skills = self.registry.list()
-        self.reviewer = self._build_coordinator(self.registry.reviewers())
+        self.reviewer = self._build_leader(self.registry.reviewers())
         self.harness = self._build_harness(self.reviewer)
         return skills
 

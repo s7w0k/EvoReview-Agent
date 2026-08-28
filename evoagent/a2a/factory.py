@@ -28,6 +28,24 @@ _KNOWN = {
         "domains": ["reliability", "correctness", "regression"],
         "task_type": "review-assignment",
     },
+    "critic-agent": {
+        "name": "Critic Review Agent",
+        "capabilities": ["finding-critique", "conflict-detection", "review-reflection"],
+        "domains": ["quality"],
+        "task_type": "critique.findings",
+    },
+    "verifier-agent": {
+        "name": "Verifier Review Agent",
+        "capabilities": ["finding-verification", "evidence-validation"],
+        "domains": ["verification"],
+        "task_type": "verify.findings",
+    },
+    "fix-agent": {
+        "name": "Fix Agent",
+        "capabilities": ["patch-generation", "repair-verification", "safe-fix"],
+        "domains": ["remediation"],
+        "task_type": "fix.generate",
+    },
 }
 
 

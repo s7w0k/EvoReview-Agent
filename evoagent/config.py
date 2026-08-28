@@ -199,6 +199,10 @@ class Settings:
     a2a_endpoints: str = ""
     a2a_token: str = ""
     a2a_timeout_seconds: float = 10.0
+    # Six-core-agent architecture switch (plan Phase 0).  ``legacy`` keeps the
+    # staged Multi-AgentCoordinator behaviour unchanged; ``six-agent`` enables
+    # the loop-based Coordinator + five specialist agents.
+    agent_architecture: str = "legacy"
 
     def resolved_llm(self) -> Dict[str, object]:
         """Resolve a named provider to the existing OpenAI-compatible transport."""
@@ -377,6 +381,10 @@ class Settings:
             raise ValueError("EVOAGENT_EVOLUTION_LEASE_SECONDS must be at least 1")
         if self.a2a_timeout_seconds <= 0:
             raise ValueError("EVOAGENT_A2A_TIMEOUT_SECONDS must be positive")
+        if self.agent_architecture not in {"legacy", "six-agent"}:
+            raise ValueError(
+                "EVOAGENT_AGENT_ARCHITECTURE must be one of: legacy, six-agent"
+            )
         self.validate_production_profile()
 
     def validate_production_profile(self) -> None:
@@ -565,4 +573,7 @@ class Settings:
             a2a_timeout_seconds=float(
                 os.getenv("EVOAGENT_A2A_TIMEOUT_SECONDS", "10")
             ),
+            agent_architecture=os.getenv(
+                "EVOAGENT_AGENT_ARCHITECTURE", "legacy"
+            ).strip().lower(),
         )

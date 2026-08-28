@@ -36,6 +36,8 @@ from .errors import (
     A2ACircuitOpenError,
 )
 from .transport import A2ATransport
+from .client import RemoteAgentClient
+from .adapters import RemoteReviewerAdapter
 
 __all__ = [
     "A2AArtifact",
@@ -51,4 +53,6 @@ __all__ = [
     "A2AUnauthorizedError",
     "A2ACircuitOpenError",
     "A2ATransport",
+    "RemoteAgentClient",
+    "RemoteReviewerAdapter",
 ]
