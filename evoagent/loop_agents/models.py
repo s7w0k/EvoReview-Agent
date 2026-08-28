@@ -58,6 +58,8 @@ class AgentTaskNode:
     # Optional override of which agent performs this node (empty = coordinator
     # resolves from capabilities).
     agent_id: str = ""
+    #: whether the node runs at concurrency 1 (e.g. Fix).
+    serial: bool = False
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -74,6 +76,7 @@ class AgentTaskNode:
             attempt=int(value.get("attempt", 0)),
             artifact_ids=list(value.get("artifact_ids", [])),
             agent_id=str(value.get("agent_id", "")),
+            serial=bool(value.get("serial", False)),
         )
 
 

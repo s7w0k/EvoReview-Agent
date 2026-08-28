@@ -319,12 +319,13 @@ class ReviewService:
         registered above, but the six-agent pipeline drives its Coordinator
         through A2A delegation rather than the staged workflow.
         """
-        if self.settings.agent_architecture == "six-agent":
+        if self.settings.agent_architecture in ("six-agent", "six-agent-v1", "six-agent-v2"):
             coordinator_kwargs = {}
             if execution_policy is not None:
                 coordinator_kwargs["execution_policy"] = execution_policy
             return build_six_agent_reviewer(
-                "inprocess", coordinator_kwargs=coordinator_kwargs)
+                "inprocess", coordinator_kwargs=coordinator_kwargs,
+                architecture=self.settings.agent_architecture)
         return self._build_coordinator(reviewers, execution_policy=execution_policy)
 
     def _build_harness(self, reviewer, execution_policy=None,

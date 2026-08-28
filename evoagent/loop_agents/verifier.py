@@ -8,6 +8,7 @@ depends on step 1's semantic observation.
 from typing import Any, Dict, List
 
 from .base import BaseLoopAgent
+from .deep_loop import select_verifier_strategy_for
 from .stepper import (
     PlanTracker, final_action, observations, result_findings, tool_action,
     tool_results,
@@ -58,6 +59,9 @@ class VerifierAgent(BaseLoopAgent):
         findings = list(task.get("findings")
                         or (task.get("input") or {}).get("findings") or [])
         semantic = result_findings(tool_results(state, "semantic_scan")) or []
+        # Deeper local loop (plan §7): pick the strongest verification strategy
+        # per finding so the decision records *which* method produced evidence.
+        strategies = select_verifier_strategy_for(findings)
         reproduced = {
             "%s:%s" % (item.get("path"), item.get("line")) for item in semantic
         }
@@ -67,6 +71,7 @@ class VerifierAgent(BaseLoopAgent):
             evidence = str(finding.get("evidence") or "")
             rule_id = str(finding.get("rule_id") or "")
             signature = rule_id.startswith(_RULE_PREFIXES)
+            strategy = strategies.get(key, "context_inspection")
             loc = "%s:%s" % (finding.get("path"), finding.get("line"))
             reproduced_here = loc in reproduced
             reasons = []
@@ -74,6 +79,8 @@ class VerifierAgent(BaseLoopAgent):
                 reasons.append("missing evidence")
             if not signature and not reproduced_here:
                 reasons.append("independent evidence could not reproduce the claim")
+            if not reproduced_here and strategy == "semantic_reproduction":
+                reasons.append("chosen semantic reproduction strategy produced no overlap")
             verified = bool(evidence) and (signature or reproduced_here)
             base = float(finding.get("confidence", 0.8))
             confidence = max(0.0, min(1.0, base + (0.1 if reproduced_here else -0.05)))
@@ -81,7 +88,9 @@ class VerifierAgent(BaseLoopAgent):
                 "finding_id": str(finding.get("id") or key),
                 "verified": verified,
                 "evidence": evidence,
-                "verification_method": "rule-signature+semantic" if verified else "none",
+                "verification_method": "%s+%s" % (strategy, "evidence") if verified
+                else "none",
+                "verification_strategy": strategy,
                 "confidence": round(confidence, 2),
                 "failure_reason": "; ".join(reasons) if not verified else "",
             }

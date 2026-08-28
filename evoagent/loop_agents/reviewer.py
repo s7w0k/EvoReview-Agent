@@ -56,16 +56,22 @@ class SixAgentReviewer(Reviewer):
         *,
         specialists: Optional[List[BaseLoopAgent]] = None,
         coordinator_kwargs: Optional[Dict[str, Any]] = None,
+        architecture: str = "six-agent",
         http_timeout_seconds: float = 10.0,
         http_token: str = "",
     ):
         self.mode = (mode or "inprocess").strip().lower()
+        self.architecture = architecture
         self.specialists = list(specialists) if specialists else [
             ctor() for ctor in _SPECIALISTS
         ]
         if len(self.specialists) < 5:
             raise ValueError("six-agent reviewer requires all five specialists")
         self.coordinator_kwargs = dict(coordinator_kwargs or {})
+        if architecture not in ("six-agent", "six-agent-v1", "six-agent-v2"):
+            architecture = "six-agent"
+        if architecture == "six-agent-v2":
+            self.coordinator_kwargs.setdefault("mode", "v2")
         self.http_timeout_seconds = http_timeout_seconds
         self.http_token = http_token
         self._servers: List[Any] = []
@@ -169,6 +175,7 @@ def build_six_agent_reviewer(
     mode: str = "inprocess", *,
     specialists: Optional[List[BaseLoopAgent]] = None,
     coordinator_kwargs: Optional[Dict[str, Any]] = None,
+    architecture: str = "six-agent",
     http_timeout_seconds: float = 10.0,
     http_token: str = "",
 ) -> Reviewer:
@@ -176,6 +183,7 @@ def build_six_agent_reviewer(
     return SixAgentReviewer(
         mode, specialists=specialists,
         coordinator_kwargs=coordinator_kwargs,
+        architecture=architecture,
         http_timeout_seconds=http_timeout_seconds,
         http_token=http_token,
     )

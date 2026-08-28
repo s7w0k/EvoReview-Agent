@@ -8,6 +8,7 @@ through the Coordinator's replan loop).
 from typing import Any, Dict, List
 
 from .base import BaseLoopAgent
+from .replan import emit_replan_request
 from .stepper import PlanTracker, final_action, observations, tool_action
 
 _DANGEROUS_TTL = ("disable validation", "ignore error", "catch all")
@@ -71,20 +72,27 @@ class CriticAgent(BaseLoopAgent):
         rejected: List[Dict[str, Any]] = []
         questions: List[str] = []
         missing_evidence: List[str] = []
-        replan_requests: List[Dict[str, Any]] = []
+        replan_requests: List[Any] = []
 
         for finding in findings:
             appraisal = _reflect(finding)
             rule_id = str(finding.get("rule_id") or "?")
-            key = "%s:%s:%s" % (rule_id, finding.get("path"), finding.get("line"))
+            path = finding.get("path")
+            line = finding.get("line")
+            key = "%s:%s:%s" % (rule_id, path, line)
+            finding_id = finding.get("finding_id") or key
             if appraisal["accepted"]:
                 accepted.append(finding)
                 if appraisal["missing_evidence"]:
                     missing_evidence.append(key)
-                    replan_requests.append({
-                        "node": "verify.findings",
-                        "rule_id": rule_id, "reason": "insufficient evidence",
-                    })
+                    replan_requests.append(emit_replan_request(
+                        source_agent=self.agent_id, target_capability="verification",
+                        finding_id=finding_id, finding=finding,
+                        reason_code="INSUFFICIENT_EXPLANATION",
+                        reason_summary="insufficient evidence to verify %s" % rule_id,
+                        requested_action="verification",
+                        required_evidence=["rule signature", "evidence on changed line"],
+                    ))
                 if not appraisal["actionable_fix"]:
                     questions.append(key)
             else:

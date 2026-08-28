@@ -200,8 +200,10 @@ class Settings:
     a2a_token: str = ""
     a2a_timeout_seconds: float = 10.0
     # Six-core-agent architecture switch (plan Phase 0).  ``legacy`` keeps the
-    # staged Multi-AgentCoordinator behaviour unchanged; ``six-agent`` enables
-    # the loop-based Coordinator + five specialist agents.
+    # staged Multi-AgentCoordinator behaviour unchanged; ``six-agent`` is the
+    # loop-based Coordinator + five specialist agents baseline, and
+    # ``six-agent-v2`` enables the Multi-Agent deepening plan (Semantic Planner
+    # + Targeted Replan + Parallel Scheduler + Deep Local Loops + Dynamic Graph).
     agent_architecture: str = "legacy"
 
     def resolved_llm(self) -> Dict[str, object]:
@@ -381,9 +383,10 @@ class Settings:
             raise ValueError("EVOAGENT_EVOLUTION_LEASE_SECONDS must be at least 1")
         if self.a2a_timeout_seconds <= 0:
             raise ValueError("EVOAGENT_A2A_TIMEOUT_SECONDS must be positive")
-        if self.agent_architecture not in {"legacy", "six-agent"}:
+        if self.agent_architecture not in {"legacy", "six-agent", "six-agent-v1", "six-agent-v2"}:
             raise ValueError(
-                "EVOAGENT_AGENT_ARCHITECTURE must be one of: legacy, six-agent"
+                "EVOAGENT_AGENT_ARCHITECTURE must be one of: "
+                "legacy, six-agent, six-agent-v1, six-agent-v2"
             )
         self.validate_production_profile()
 

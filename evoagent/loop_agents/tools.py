@@ -269,6 +269,80 @@ def build_expert_definitions(ctx: ExpertContext):
             agents = ["reliability-agent"]
         return {"level": level, "agents": agents}
 
+    def semantic_change_summary():
+        """Produce a structured semantic change summary (plan §4.3).
+
+        Unlike :func:`profile_risk` (a coarse keyword sniff) this inspects the
+        parsed diff deltas (changed file paths + added source lines) and emits
+        the machine-readable fields the SemanticPlanner consumes:
+        change_types / sensitive_paths / new_external_inputs /
+        control_flow_changes / test_changes / estimated_risk /
+        expected_findings.
+        """
+        files = list(ctx.parsed.files or [])
+        lowered_paths = [str(f).lower() for f in files]
+        added_lines: List[str] = []
+        for item in ctx.added_lines():
+            text = str(getattr(item, "content", "") or "")
+            added_lines.append(text)
+        blob = "\n".join(added_lines).lower() + " " + ctx.diff.lower()
+
+        change_types: List[str] = []
+        sensitive_paths: List[str] = []
+        # path-based signals
+        if any(("security" in p or "auth" in p) for p in lowered_paths):
+            change_types.append("security")
+            sensitive_paths.append("auth")
+        if any("db" in p or "sql" in p for p in lowered_paths):
+            change_types.append("database")
+        if any(p.endswith("_test.py") or p.endswith("test_.py")
+               or "/tests/" in p for p in lowered_paths):
+            change_types.append("test")
+        # keyword-based signals over the added source lines
+        if "sql" in blob or "cursor.execute" in blob or "db." in blob:
+            change_types.append("sql")
+        if "eval(" in blob or "exec(" in blob or "shell=True" in blob:
+            change_types.append("security")
+        if any(k in blob for k in ("except", "exceptexception", "try:", "error-handling")):
+            change_types.append("exception")
+        if any(k in blob for k in ("thread", "async ", "await ", "asyncio", "lock", "semaphore")):
+            change_types.append("concurrency")
+        if any(k in blob for k in ("resource", "conn.close", "with open", "io.", "tmpfile")):
+            change_types.append("resource")
+        if any(k in blob for k in ("elif", "else:", "switch", "match ")):
+            change_types.append("control-flow")
+        # control_flow documented only when a dispatcher/branching change appears
+        control_flow_changes = bool(
+            (set(change_types) & {"control-flow"})
+            or (blob.count(" if ") >= 1)
+        )
+        # NEW_EXTERNAL_INPUT: request body, cli args, stdin, env uploads
+        new_external_inputs = any(
+            k in blob for k in ("request", "args", "sys.argv", "input", "stdin", "upload")
+        )
+        test_changes = "test" in change_types
+        security_hits = bool(
+            {"security", "sql", "authentication"} & set(change_types)) or new_external_inputs
+        reliability_hits = bool(
+            {"exception", "concurrency", "resource", "control-flow"} & set(change_types))
+        if security_hits and reliability_hits:
+            estimated_risk = "high"
+        elif security_hits or reliability_hits:
+            estimated_risk = "medium"
+        else:
+            estimated_risk = "low"
+        return {
+            "changed_files": files,
+            "change_types": sorted(change_types),
+            "sensitive_paths": sorted(sensitive_paths),
+            "new_external_inputs": bool(new_external_inputs),
+            "control_flow_changes": control_flow_changes,
+            "test_changes": bool(test_changes),
+            "estimated_risk": estimated_risk,
+            "expected_findings": sum([
+                security_hits, reliability_hits]),
+        }
+
     def evaluate_coverage(nodes: list):
         total = max(1, int(len(nodes or [])))
         done = sum(1 for n in nodes if n.get("status") == "completed")
@@ -288,6 +362,10 @@ def build_expert_definitions(ctx: ExpertContext):
                 "Determine the task risk level and suggested specialist agents.",
                 {"type": "object", "properties": {}, "additionalProperties": False},
                 profile_risk, risk="low"),
+        _define("semantic_change_summary",
+                "Produce a structured semantic change summary for planning (§4.3).",
+                {"type": "object", "properties": {}, "additionalProperties": False},
+                semantic_change_summary, risk="low"),
         _define("security_rule_scan",
                 "Run deterministic security rules over the added lines.",
                 {"type": "object", "properties": {}, "additionalProperties": False},
@@ -517,7 +595,8 @@ AGENT_SPECS = {
     },
     "coordinator": {
         "allowed_tools": [
-            "inspect_diff", "profile_risk", "discover_agents", "delegate_agent",
+            "inspect_diff", "profile_risk", "semantic_change_summary",
+            "discover_agents", "delegate_agent",
             "get_agent_artifacts", "cancel_agent_task", "evaluate_coverage",
             "compare_findings",
         ],
