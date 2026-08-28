@@ -43,15 +43,23 @@
       "recovery_success_rate": 0.0,
       "avg_agent_steps": 0.0,
       "avg_tool_calls": 0.0,
-      "p50_latency_ms": 205.4115,
-      "p95_latency_ms": 228.7685,
+      "p50_latency_ms": 166.0381,
+      "p95_latency_ms": 192.1706,
       "tool_denials": 0,
       "timeouts": 0,
       "side_effect_blocks": 0,
       "circuit_breaker_trips": 0,
       "decision_trace_coverage": 1.0,
       "replay_snapshot_coverage": 1.0,
-      "avg_policy_version": 1
+      "avg_policy_version": 1,
+      "collaboration_rounds": 0.15,
+      "collaboration_messages": 11.4,
+      "activated_agents": [
+        "security-agent",
+        "reliability-agent",
+        "code-quality"
+      ],
+      "collaboration_detected": 1.0
     },
     "by_split": {
       "holdout": {
@@ -87,20 +95,28 @@
           "recovery_success_rate": 0.0,
           "avg_agent_steps": 0.0,
           "avg_tool_calls": 0.0,
-          "p50_latency_ms": 205.4115,
-          "p95_latency_ms": 228.7685,
+          "p50_latency_ms": 166.0381,
+          "p95_latency_ms": 192.1706,
           "tool_denials": 0,
           "timeouts": 0,
           "side_effect_blocks": 0,
           "circuit_breaker_trips": 0,
           "decision_trace_coverage": 1.0,
           "replay_snapshot_coverage": 1.0,
-          "avg_policy_version": 1
+          "avg_policy_version": 1,
+          "collaboration_rounds": 0.15,
+          "collaboration_messages": 11.4,
+          "activated_agents": [
+            "security-agent",
+            "reliability-agent",
+            "code-quality"
+          ],
+          "collaboration_detected": 1.0
         }
       }
     }
   },
-  "duration_seconds": 4.4033,
+  "duration_seconds": 3.6593,
   "case_results": [
     {
       "id": "pr-0081",
@@ -120,7 +136,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 220.15190000001894,
+      "latency_ms": 186.4190000005692,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -131,7 +147,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 12,
+      "trace_event_count": 15,
       "policy_id": "baseline-medium",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -152,6 +168,66 @@
         }
       },
       "error": null,
+      "collaboration": {
+        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
+        "roles": [
+          "planner-agent",
+          "specialists",
+          "critic-agent",
+          "reflection-agent",
+          "evidence-agent",
+          "verifier-agent",
+          "arbiter-agent"
+        ],
+        "planned_assignments": 3,
+        "dialogue_rounds": 1,
+        "messages": 15,
+        "retries": 0,
+        "handoffs": 0,
+        "agents": [
+          {
+            "agent": "security-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "reliability-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "code-quality",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          }
+        ],
+        "agent_loop_steps": 0,
+        "context_compressions": 0,
+        "memories_recalled": 0,
+        "proposed_findings": 1,
+        "approved_findings": 1,
+        "rejected_findings": 0,
+        "finding_sources": {
+          "61da20a872394fc0": [
+            "security-agent"
+          ]
+        }
+      },
       "matches": [
         {
           "expected_index": 0,
@@ -178,7 +254,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 191.67680000009568,
+      "latency_ms": 191.58969999989495,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -189,7 +265,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 12,
+      "trace_event_count": 15,
       "policy_id": "baseline-medium",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -210,6 +286,62 @@
         }
       },
       "error": null,
+      "collaboration": {
+        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
+        "roles": [
+          "planner-agent",
+          "specialists",
+          "critic-agent",
+          "reflection-agent",
+          "evidence-agent",
+          "verifier-agent",
+          "arbiter-agent"
+        ],
+        "planned_assignments": 3,
+        "dialogue_rounds": 1,
+        "messages": 11,
+        "retries": 0,
+        "handoffs": 0,
+        "agents": [
+          {
+            "agent": "security-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "reliability-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "code-quality",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          }
+        ],
+        "agent_loop_steps": 0,
+        "context_compressions": 0,
+        "memories_recalled": 0,
+        "proposed_findings": 0,
+        "approved_findings": 0,
+        "rejected_findings": 0,
+        "finding_sources": {}
+      },
       "matches": []
     },
     {
@@ -230,7 +362,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 194.28489999972953,
+      "latency_ms": 161.7524000002959,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -241,7 +373,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 12,
+      "trace_event_count": 15,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -261,6 +393,62 @@
         }
       },
       "error": null,
+      "collaboration": {
+        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
+        "roles": [
+          "planner-agent",
+          "specialists",
+          "critic-agent",
+          "reflection-agent",
+          "evidence-agent",
+          "verifier-agent",
+          "arbiter-agent"
+        ],
+        "planned_assignments": 3,
+        "dialogue_rounds": 0,
+        "messages": 11,
+        "retries": 0,
+        "handoffs": 0,
+        "agents": [
+          {
+            "agent": "security-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "reliability-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "code-quality",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          }
+        ],
+        "agent_loop_steps": 0,
+        "context_compressions": 0,
+        "memories_recalled": 0,
+        "proposed_findings": 0,
+        "approved_findings": 0,
+        "rejected_findings": 0,
+        "finding_sources": {}
+      },
       "matches": []
     },
     {
@@ -281,7 +469,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 192.78899999972055,
+      "latency_ms": 163.84459999972023,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -292,7 +480,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 12,
+      "trace_event_count": 15,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -312,6 +500,62 @@
         }
       },
       "error": null,
+      "collaboration": {
+        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
+        "roles": [
+          "planner-agent",
+          "specialists",
+          "critic-agent",
+          "reflection-agent",
+          "evidence-agent",
+          "verifier-agent",
+          "arbiter-agent"
+        ],
+        "planned_assignments": 3,
+        "dialogue_rounds": 0,
+        "messages": 11,
+        "retries": 0,
+        "handoffs": 0,
+        "agents": [
+          {
+            "agent": "security-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "reliability-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "code-quality",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          }
+        ],
+        "agent_loop_steps": 0,
+        "context_compressions": 0,
+        "memories_recalled": 0,
+        "proposed_findings": 0,
+        "approved_findings": 0,
+        "rejected_findings": 0,
+        "finding_sources": {}
+      },
       "matches": []
     },
     {
@@ -332,7 +576,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 196.1750000000393,
+      "latency_ms": 168.97080000035203,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -343,7 +587,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 12,
+      "trace_event_count": 15,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -363,6 +607,62 @@
         }
       },
       "error": null,
+      "collaboration": {
+        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
+        "roles": [
+          "planner-agent",
+          "specialists",
+          "critic-agent",
+          "reflection-agent",
+          "evidence-agent",
+          "verifier-agent",
+          "arbiter-agent"
+        ],
+        "planned_assignments": 3,
+        "dialogue_rounds": 0,
+        "messages": 11,
+        "retries": 0,
+        "handoffs": 0,
+        "agents": [
+          {
+            "agent": "security-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "reliability-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "code-quality",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          }
+        ],
+        "agent_loop_steps": 0,
+        "context_compressions": 0,
+        "memories_recalled": 0,
+        "proposed_findings": 0,
+        "approved_findings": 0,
+        "rejected_findings": 0,
+        "finding_sources": {}
+      },
       "matches": []
     },
     {
@@ -383,7 +683,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 199.38069999989239,
+      "latency_ms": 192.1706000002814,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -394,7 +694,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 12,
+      "trace_event_count": 15,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -414,6 +714,62 @@
         }
       },
       "error": null,
+      "collaboration": {
+        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
+        "roles": [
+          "planner-agent",
+          "specialists",
+          "critic-agent",
+          "reflection-agent",
+          "evidence-agent",
+          "verifier-agent",
+          "arbiter-agent"
+        ],
+        "planned_assignments": 3,
+        "dialogue_rounds": 0,
+        "messages": 11,
+        "retries": 0,
+        "handoffs": 0,
+        "agents": [
+          {
+            "agent": "security-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "reliability-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "code-quality",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          }
+        ],
+        "agent_loop_steps": 0,
+        "context_compressions": 0,
+        "memories_recalled": 0,
+        "proposed_findings": 0,
+        "approved_findings": 0,
+        "rejected_findings": 0,
+        "finding_sources": {}
+      },
       "matches": []
     },
     {
@@ -434,7 +790,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 206.5295000002152,
+      "latency_ms": 162.3781999996936,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -445,7 +801,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 12,
+      "trace_event_count": 15,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -465,6 +821,62 @@
         }
       },
       "error": null,
+      "collaboration": {
+        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
+        "roles": [
+          "planner-agent",
+          "specialists",
+          "critic-agent",
+          "reflection-agent",
+          "evidence-agent",
+          "verifier-agent",
+          "arbiter-agent"
+        ],
+        "planned_assignments": 3,
+        "dialogue_rounds": 0,
+        "messages": 11,
+        "retries": 0,
+        "handoffs": 0,
+        "agents": [
+          {
+            "agent": "security-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "reliability-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "code-quality",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          }
+        ],
+        "agent_loop_steps": 0,
+        "context_compressions": 0,
+        "memories_recalled": 0,
+        "proposed_findings": 0,
+        "approved_findings": 0,
+        "rejected_findings": 0,
+        "finding_sources": {}
+      },
       "matches": []
     },
     {
@@ -485,7 +897,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 207.83990000018093,
+      "latency_ms": 166.48609999992914,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -496,7 +908,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 12,
+      "trace_event_count": 15,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -516,6 +928,62 @@
         }
       },
       "error": null,
+      "collaboration": {
+        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
+        "roles": [
+          "planner-agent",
+          "specialists",
+          "critic-agent",
+          "reflection-agent",
+          "evidence-agent",
+          "verifier-agent",
+          "arbiter-agent"
+        ],
+        "planned_assignments": 3,
+        "dialogue_rounds": 0,
+        "messages": 11,
+        "retries": 0,
+        "handoffs": 0,
+        "agents": [
+          {
+            "agent": "security-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "reliability-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "code-quality",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          }
+        ],
+        "agent_loop_steps": 0,
+        "context_compressions": 0,
+        "memories_recalled": 0,
+        "proposed_findings": 0,
+        "approved_findings": 0,
+        "rejected_findings": 0,
+        "finding_sources": {}
+      },
       "matches": []
     },
     {
@@ -536,7 +1004,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 211.50970000053348,
+      "latency_ms": 163.81040000032954,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -547,7 +1015,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 12,
+      "trace_event_count": 15,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -567,6 +1035,62 @@
         }
       },
       "error": null,
+      "collaboration": {
+        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
+        "roles": [
+          "planner-agent",
+          "specialists",
+          "critic-agent",
+          "reflection-agent",
+          "evidence-agent",
+          "verifier-agent",
+          "arbiter-agent"
+        ],
+        "planned_assignments": 3,
+        "dialogue_rounds": 0,
+        "messages": 11,
+        "retries": 0,
+        "handoffs": 0,
+        "agents": [
+          {
+            "agent": "reliability-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "security-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "code-quality",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          }
+        ],
+        "agent_loop_steps": 0,
+        "context_compressions": 0,
+        "memories_recalled": 0,
+        "proposed_findings": 0,
+        "approved_findings": 0,
+        "rejected_findings": 0,
+        "finding_sources": {}
+      },
       "matches": []
     },
     {
@@ -587,7 +1111,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 202.85390000026382,
+      "latency_ms": 162.92730000077427,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -598,7 +1122,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 12,
+      "trace_event_count": 15,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -618,6 +1142,62 @@
         }
       },
       "error": null,
+      "collaboration": {
+        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
+        "roles": [
+          "planner-agent",
+          "specialists",
+          "critic-agent",
+          "reflection-agent",
+          "evidence-agent",
+          "verifier-agent",
+          "arbiter-agent"
+        ],
+        "planned_assignments": 3,
+        "dialogue_rounds": 0,
+        "messages": 11,
+        "retries": 0,
+        "handoffs": 0,
+        "agents": [
+          {
+            "agent": "security-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "reliability-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "code-quality",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          }
+        ],
+        "agent_loop_steps": 0,
+        "context_compressions": 0,
+        "memories_recalled": 0,
+        "proposed_findings": 0,
+        "approved_findings": 0,
+        "rejected_findings": 0,
+        "finding_sources": {}
+      },
       "matches": []
     },
     {
@@ -638,7 +1218,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 214.85159999974712,
+      "latency_ms": 173.90319999958592,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -649,7 +1229,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 12,
+      "trace_event_count": 15,
       "policy_id": "baseline-medium",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -670,6 +1250,66 @@
         }
       },
       "error": null,
+      "collaboration": {
+        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
+        "roles": [
+          "planner-agent",
+          "specialists",
+          "critic-agent",
+          "reflection-agent",
+          "evidence-agent",
+          "verifier-agent",
+          "arbiter-agent"
+        ],
+        "planned_assignments": 3,
+        "dialogue_rounds": 1,
+        "messages": 15,
+        "retries": 0,
+        "handoffs": 0,
+        "agents": [
+          {
+            "agent": "security-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "reliability-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "code-quality",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          }
+        ],
+        "agent_loop_steps": 0,
+        "context_compressions": 0,
+        "memories_recalled": 0,
+        "proposed_findings": 1,
+        "approved_findings": 1,
+        "rejected_findings": 0,
+        "finding_sources": {
+          "65c7124f17664f12": [
+            "security-agent"
+          ]
+        }
+      },
       "matches": [
         {
           "expected_index": 0,
@@ -696,7 +1336,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 206.065899999885,
+      "latency_ms": 164.42740000002232,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -707,7 +1347,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 12,
+      "trace_event_count": 15,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -727,6 +1367,66 @@
         }
       },
       "error": null,
+      "collaboration": {
+        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
+        "roles": [
+          "planner-agent",
+          "specialists",
+          "critic-agent",
+          "reflection-agent",
+          "evidence-agent",
+          "verifier-agent",
+          "arbiter-agent"
+        ],
+        "planned_assignments": 3,
+        "dialogue_rounds": 0,
+        "messages": 11,
+        "retries": 0,
+        "handoffs": 0,
+        "agents": [
+          {
+            "agent": "security-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "reliability-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "code-quality",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          }
+        ],
+        "agent_loop_steps": 0,
+        "context_compressions": 0,
+        "memories_recalled": 0,
+        "proposed_findings": 1,
+        "approved_findings": 0,
+        "rejected_findings": 0,
+        "finding_sources": {
+          "d76b4f461a2dd82f": [
+            "reliability-agent"
+          ]
+        }
+      },
       "matches": [
         {
           "expected_index": 0,
@@ -753,7 +1453,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 196.00239999999758,
+      "latency_ms": 162.40300000026764,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -764,7 +1464,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 12,
+      "trace_event_count": 15,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -784,6 +1484,62 @@
         }
       },
       "error": null,
+      "collaboration": {
+        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
+        "roles": [
+          "planner-agent",
+          "specialists",
+          "critic-agent",
+          "reflection-agent",
+          "evidence-agent",
+          "verifier-agent",
+          "arbiter-agent"
+        ],
+        "planned_assignments": 3,
+        "dialogue_rounds": 0,
+        "messages": 11,
+        "retries": 0,
+        "handoffs": 0,
+        "agents": [
+          {
+            "agent": "security-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "reliability-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "code-quality",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          }
+        ],
+        "agent_loop_steps": 0,
+        "context_compressions": 0,
+        "memories_recalled": 0,
+        "proposed_findings": 0,
+        "approved_findings": 0,
+        "rejected_findings": 0,
+        "finding_sources": {}
+      },
       "matches": []
     },
     {
@@ -804,7 +1560,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 198.92649999928835,
+      "latency_ms": 163.03489999972953,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -815,7 +1571,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 12,
+      "trace_event_count": 15,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -835,6 +1591,62 @@
         }
       },
       "error": null,
+      "collaboration": {
+        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
+        "roles": [
+          "planner-agent",
+          "specialists",
+          "critic-agent",
+          "reflection-agent",
+          "evidence-agent",
+          "verifier-agent",
+          "arbiter-agent"
+        ],
+        "planned_assignments": 3,
+        "dialogue_rounds": 0,
+        "messages": 11,
+        "retries": 0,
+        "handoffs": 0,
+        "agents": [
+          {
+            "agent": "security-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "reliability-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "code-quality",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          }
+        ],
+        "agent_loop_steps": 0,
+        "context_compressions": 0,
+        "memories_recalled": 0,
+        "proposed_findings": 0,
+        "approved_findings": 0,
+        "rejected_findings": 0,
+        "finding_sources": {}
+      },
       "matches": []
     },
     {
@@ -855,7 +1667,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 219.3876999999702,
+      "latency_ms": 164.76409999995667,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -866,7 +1678,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 12,
+      "trace_event_count": 15,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -886,6 +1698,62 @@
         }
       },
       "error": null,
+      "collaboration": {
+        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
+        "roles": [
+          "planner-agent",
+          "specialists",
+          "critic-agent",
+          "reflection-agent",
+          "evidence-agent",
+          "verifier-agent",
+          "arbiter-agent"
+        ],
+        "planned_assignments": 3,
+        "dialogue_rounds": 0,
+        "messages": 11,
+        "retries": 0,
+        "handoffs": 0,
+        "agents": [
+          {
+            "agent": "security-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "reliability-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "code-quality",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          }
+        ],
+        "agent_loop_steps": 0,
+        "context_compressions": 0,
+        "memories_recalled": 0,
+        "proposed_findings": 0,
+        "approved_findings": 0,
+        "rejected_findings": 0,
+        "finding_sources": {}
+      },
       "matches": []
     },
     {
@@ -906,7 +1774,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 228.76850000011473,
+      "latency_ms": 166.03810000015073,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -917,7 +1785,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 12,
+      "trace_event_count": 15,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -937,6 +1805,62 @@
         }
       },
       "error": null,
+      "collaboration": {
+        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
+        "roles": [
+          "planner-agent",
+          "specialists",
+          "critic-agent",
+          "reflection-agent",
+          "evidence-agent",
+          "verifier-agent",
+          "arbiter-agent"
+        ],
+        "planned_assignments": 3,
+        "dialogue_rounds": 0,
+        "messages": 11,
+        "retries": 0,
+        "handoffs": 0,
+        "agents": [
+          {
+            "agent": "security-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "reliability-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "code-quality",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          }
+        ],
+        "agent_loop_steps": 0,
+        "context_compressions": 0,
+        "memories_recalled": 0,
+        "proposed_findings": 0,
+        "approved_findings": 0,
+        "rejected_findings": 0,
+        "finding_sources": {}
+      },
       "matches": []
     },
     {
@@ -957,7 +1881,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 203.89059999979509,
+      "latency_ms": 174.21749999994063,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -968,7 +1892,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 12,
+      "trace_event_count": 15,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -988,6 +1912,62 @@
         }
       },
       "error": null,
+      "collaboration": {
+        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
+        "roles": [
+          "planner-agent",
+          "specialists",
+          "critic-agent",
+          "reflection-agent",
+          "evidence-agent",
+          "verifier-agent",
+          "arbiter-agent"
+        ],
+        "planned_assignments": 3,
+        "dialogue_rounds": 0,
+        "messages": 11,
+        "retries": 0,
+        "handoffs": 0,
+        "agents": [
+          {
+            "agent": "security-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "reliability-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "code-quality",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          }
+        ],
+        "agent_loop_steps": 0,
+        "context_compressions": 0,
+        "memories_recalled": 0,
+        "proposed_findings": 0,
+        "approved_findings": 0,
+        "rejected_findings": 0,
+        "finding_sources": {}
+      },
       "matches": []
     },
     {
@@ -1008,7 +1988,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 213.7393000002703,
+      "latency_ms": 165.3836000004958,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1019,7 +1999,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 12,
+      "trace_event_count": 15,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -1039,6 +2019,62 @@
         }
       },
       "error": null,
+      "collaboration": {
+        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
+        "roles": [
+          "planner-agent",
+          "specialists",
+          "critic-agent",
+          "reflection-agent",
+          "evidence-agent",
+          "verifier-agent",
+          "arbiter-agent"
+        ],
+        "planned_assignments": 3,
+        "dialogue_rounds": 0,
+        "messages": 11,
+        "retries": 0,
+        "handoffs": 0,
+        "agents": [
+          {
+            "agent": "security-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "reliability-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "code-quality",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          }
+        ],
+        "agent_loop_steps": 0,
+        "context_compressions": 0,
+        "memories_recalled": 0,
+        "proposed_findings": 0,
+        "approved_findings": 0,
+        "rejected_findings": 0,
+        "finding_sources": {}
+      },
       "matches": []
     },
     {
@@ -1059,7 +2095,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 191.52219999978115,
+      "latency_ms": 166.7299999999159,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1070,7 +2106,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 12,
+      "trace_event_count": 15,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -1090,6 +2126,62 @@
         }
       },
       "error": null,
+      "collaboration": {
+        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
+        "roles": [
+          "planner-agent",
+          "specialists",
+          "critic-agent",
+          "reflection-agent",
+          "evidence-agent",
+          "verifier-agent",
+          "arbiter-agent"
+        ],
+        "planned_assignments": 3,
+        "dialogue_rounds": 0,
+        "messages": 11,
+        "retries": 0,
+        "handoffs": 0,
+        "agents": [
+          {
+            "agent": "security-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "reliability-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "code-quality",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          }
+        ],
+        "agent_loop_steps": 0,
+        "context_compressions": 0,
+        "memories_recalled": 0,
+        "proposed_findings": 0,
+        "approved_findings": 0,
+        "rejected_findings": 0,
+        "finding_sources": {}
+      },
       "matches": []
     },
     {
@@ -1110,7 +2202,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 205.41149999917252,
+      "latency_ms": 166.53640000004089,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1121,7 +2213,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 12,
+      "trace_event_count": 15,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -1141,6 +2233,62 @@
         }
       },
       "error": null,
+      "collaboration": {
+        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
+        "roles": [
+          "planner-agent",
+          "specialists",
+          "critic-agent",
+          "reflection-agent",
+          "evidence-agent",
+          "verifier-agent",
+          "arbiter-agent"
+        ],
+        "planned_assignments": 3,
+        "dialogue_rounds": 0,
+        "messages": 11,
+        "retries": 0,
+        "handoffs": 0,
+        "agents": [
+          {
+            "agent": "security-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "reliability-agent",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          },
+          {
+            "agent": "code-quality",
+            "status": "completed",
+            "attempts": 1,
+            "substituted_for": "",
+            "loop_steps": 0,
+            "loop_stop_reason": "one-shot",
+            "context_compressed": false,
+            "memories_recalled": 0
+          }
+        ],
+        "agent_loop_steps": 0,
+        "context_compressions": 0,
+        "memories_recalled": 0,
+        "proposed_findings": 0,
+        "approved_findings": 0,
+        "rejected_findings": 0,
+        "finding_sources": {}
+      },
       "matches": []
     }
   ]

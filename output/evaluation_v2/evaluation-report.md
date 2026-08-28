@@ -15,7 +15,7 @@
 | Clean Accuracy | 91.7% | 91.7% | 91.7% | 91.7% |
 | Execution Success | 100.0% | 100.0% | 100.0% | 100.0% |
 | Critical Misses | 3 | 1 | 3 | 1 |
-| P95 Latency (ms) | — | 0.6 | 286.6 | 302.8 |
+| P95 Latency (ms) | — | 0.5 | 267.1 | 269.1 |
 
 ## Generalization (Holdout, unseen repositories)
 
@@ -40,11 +40,15 @@
 |---|---|---|
 | Execution Success Rate | 100.0% | 100.0% |
 | Recovery Success Rate | — | — |
-| Avg Agent Steps | 0.00 | 0.00 |
+| Multi-Agent DAG Executed | 100.0% | 100.0% |
+| Specialist Agents Active | security-agent, reliability-agent, code-quality | evolved-review@1, security-agent, reliability-agent, code-quality |
+| Collaboration Rounds (avg) | 0.40 | 0.40 |
+| Collaboration Messages (avg) | 11.64 | 14.68 |
+| Avg Agent Tool-Steps | 0.00 | 0.00 |
 | Avg Tool Calls | 0.00 | 0.00 |
 | Tool Denials | 0 | 0 |
-| P50 Latency (ms) | 213.22 | 230.97 |
-| P95 Latency (ms) | 286.60 | 302.79 |
+| P50 Latency (ms) | 205.41 | 210.14 |
+| P95 Latency (ms) | 267.11 | 269.09 |
 | Trace Coverage | 100.0% | 100.0% |
 | Replay Snapshot Coverage | 100.0% | 100.0% |
 

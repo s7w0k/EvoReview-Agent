@@ -1,0 +1,343 @@
+{
+  "schema_version": 1,
+  "meta": {
+    "holdout_cases": 20,
+    "stable": {
+      "f1": 0.5455,
+      "high_risk_recall": 0.6667,
+      "clean_accuracy": 1.0,
+      "critical_misses": 1
+    },
+    "evolved": {
+      "f1": 0.5455,
+      "high_risk_recall": 0.6667,
+      "clean_accuracy": 1.0,
+      "critical_misses": 1
+    },
+    "delta_f1_pp": 0.0,
+    "new_catches": 0,
+    "regressions": 0
+  },
+  "cases": [
+    {
+      "id": "pr-0081",
+      "repository": "acme/service-09",
+      "expected": 1,
+      "stable": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0
+      },
+      "evolved": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0
+      },
+      "delta_tp": 0
+    },
+    {
+      "id": "pr-0082",
+      "repository": "acme/service-09",
+      "expected": 1,
+      "stable": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1
+      },
+      "evolved": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1
+      },
+      "delta_tp": 0
+    },
+    {
+      "id": "pr-0083",
+      "repository": "acme/service-09",
+      "expected": 1,
+      "stable": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1
+      },
+      "evolved": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1
+      },
+      "delta_tp": 0
+    },
+    {
+      "id": "pr-0084",
+      "repository": "acme/service-09",
+      "expected": 1,
+      "stable": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1
+      },
+      "evolved": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1
+      },
+      "delta_tp": 0
+    },
+    {
+      "id": "pr-0085",
+      "repository": "acme/service-09",
+      "expected": 0,
+      "stable": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "evolved": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "delta_tp": 0
+    },
+    {
+      "id": "pr-0086",
+      "repository": "acme/service-09",
+      "expected": 0,
+      "stable": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "evolved": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "delta_tp": 0
+    },
+    {
+      "id": "pr-0087",
+      "repository": "acme/service-09",
+      "expected": 0,
+      "stable": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "evolved": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "delta_tp": 0
+    },
+    {
+      "id": "pr-0088",
+      "repository": "acme/service-09",
+      "expected": 0,
+      "stable": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "evolved": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "delta_tp": 0
+    },
+    {
+      "id": "pr-0089",
+      "repository": "acme/service-09",
+      "expected": 0,
+      "stable": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "evolved": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "delta_tp": 0
+    },
+    {
+      "id": "pr-0090",
+      "repository": "acme/service-09",
+      "expected": 0,
+      "stable": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "evolved": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "delta_tp": 0
+    },
+    {
+      "id": "pr-0091",
+      "repository": "acme/service-10",
+      "expected": 1,
+      "stable": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0
+      },
+      "evolved": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0
+      },
+      "delta_tp": 0
+    },
+    {
+      "id": "pr-0092",
+      "repository": "acme/service-10",
+      "expected": 1,
+      "stable": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0
+      },
+      "evolved": {
+        "tp": 1,
+        "fp": 0,
+        "fn": 0
+      },
+      "delta_tp": 0
+    },
+    {
+      "id": "pr-0093",
+      "repository": "acme/service-10",
+      "expected": 1,
+      "stable": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1
+      },
+      "evolved": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1
+      },
+      "delta_tp": 0
+    },
+    {
+      "id": "pr-0094",
+      "repository": "acme/service-10",
+      "expected": 1,
+      "stable": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1
+      },
+      "evolved": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 1
+      },
+      "delta_tp": 0
+    },
+    {
+      "id": "pr-0095",
+      "repository": "acme/service-10",
+      "expected": 0,
+      "stable": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "evolved": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "delta_tp": 0
+    },
+    {
+      "id": "pr-0096",
+      "repository": "acme/service-10",
+      "expected": 0,
+      "stable": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "evolved": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "delta_tp": 0
+    },
+    {
+      "id": "pr-0097",
+      "repository": "acme/service-10",
+      "expected": 0,
+      "stable": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "evolved": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "delta_tp": 0
+    },
+    {
+      "id": "pr-0098",
+      "repository": "acme/service-10",
+      "expected": 0,
+      "stable": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "evolved": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "delta_tp": 0
+    },
+    {
+      "id": "pr-0099",
+      "repository": "acme/service-10",
+      "expected": 0,
+      "stable": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "evolved": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "delta_tp": 0
+    },
+    {
+      "id": "pr-0100",
+      "repository": "acme/service-10",
+      "expected": 0,
+      "stable": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "evolved": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0
+      },
+      "delta_tp": 0
+    }
+  ]
+}

@@ -55,6 +55,15 @@ def _int(value: Optional[int]) -> str:
     return "—" if value is None else str(int(value))
 
 
+def _list_agents(value) -> str:
+    """Render a list of specialist agent names compactly."""
+    if not value:
+        return "—"
+    if isinstance(value, list):
+        return ", ".join(str(item) for item in value)
+    return str(value)
+
+
 def _fmt_harness_cell(system_result, runtime: Dict[str, Any], key: str,
                       fmt) -> str:
     """Render one Harness-Engineering cell, tolerating absent systems.
@@ -226,7 +235,11 @@ def render_markdown(report: Dict[str, Any], dataset_label: str = "") -> str:
         rows_def = (
             ("execution_success_rate", "Execution Success Rate", _pct),
             ("recovery_success_rate", "Recovery Success Rate", _pct),
-            ("avg_agent_steps", "Avg Agent Steps", _num),
+            ("collaboration_detected", "Multi-Agent DAG Executed", _pct),
+            ("activated_agents", "Specialist Agents Active", _list_agents),
+            ("collaboration_rounds", "Collaboration Rounds (avg)", _num),
+            ("collaboration_messages", "Collaboration Messages (avg)", _num),
+            ("avg_agent_steps", "Avg Agent Tool-Steps", _num),
             ("avg_tool_calls", "Avg Tool Calls", _num),
             ("tool_denials", "Tool Denials", _int),
             ("p50_latency_ms", "P50 Latency (ms)", _num),

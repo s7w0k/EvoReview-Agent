@@ -59,6 +59,10 @@ class EvaluationExecutionResult:
     trace_event_count: int = 0
     resolved_policy: Dict[str, Any] = field(default_factory=dict)
     error: Optional[str] = None
+    # Ground-truth signal that the multi-agent collaboration actually executed,
+    # sourced from the coordinator's collaboration_summary (not the harness
+    # decision-trace, which only carries harness-lifecycle events).
+    collaboration: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
         value: Dict[str, Any] = {
@@ -80,6 +84,7 @@ class EvaluationExecutionResult:
             "trace_event_count": self.trace_event_count,
             "resolved_policy": self.resolved_policy,
             "error": self.error,
+            "collaboration": self.collaboration,
         }
         value["findings"] = [
             {
@@ -185,6 +190,8 @@ class _HarnessAdapter(BaseEvaluationAdapter):
         findings: List[Finding] = []
         error: Optional[str] = None
         context = None
+        coordination: Dict[str, Any] = {}
+        coordinator = None
         try:
             context = svc._resolve_execution_context(
                 task_id, repository, pull_request, diff, EVAL_TENANT)
@@ -194,13 +201,22 @@ class _HarnessAdapter(BaseEvaluationAdapter):
                 coordinator, context.execution_policy, context)
             report = harness.run(task_id, repository, pull_request, diff, EVAL_TENANT)
             findings = list(report.findings)
+            # The coordinator records its collaboration transcript in-memory; the
+            # harness decision-trace only holds lifecycle events.  Capture the
+            # summary here so it is persisted as the proofs the DAG ran.
+            try:
+                coordination = coordinator.collaboration_summary(task_id) or {}
+            except Exception:  # noqa: BLE001
+                coordination = {}
         except Exception as exc:  # noqa: BLE001 - capture unmet execution success
             error = str(exc)[:1000]
         latency_ms = (time.monotonic() - started) * 1000.0
-        return self._telemetry(svc, task_id, findings, latency_ms, context, error)
+        return self._telemetry(
+            svc, task_id, findings, latency_ms, context, error, coordination)
 
     def _telemetry(self, svc: ReviewService, task_id: str, findings: List[Finding],
-                   latency_ms: float, context, error: Optional[str]) -> EvaluationExecutionResult:
+                   latency_ms: float, context, error: Optional[str],
+                   collaboration: Optional[Dict[str, Any]] = None) -> EvaluationExecutionResult:
         trace = None
         snapshots: List[Any] = []
         events: List[Any] = []
@@ -219,8 +235,11 @@ class _HarnessAdapter(BaseEvaluationAdapter):
             recovery_events = []
         if trace is not None:
             events = getattr(trace, "events", []) or []
+        # ``agent_actions`` is a *property* on DecisionTrace; one-shot rule
+        # specialists take no tool actions, so this is honestly 0 for the harness
+        # systems -- the multi-agent DAG is proven by ``collaboration`` instead.
         try:
-            agent_steps = len(trace.agent_actions()) if trace is not None else 0
+            agent_steps = len(trace.agent_actions) if trace is not None else 0
         except Exception:  # noqa: BLE001
             agent_steps = 0
         try:
@@ -273,6 +292,7 @@ class _HarnessAdapter(BaseEvaluationAdapter):
             trace_event_count=len(events),
             resolved_policy=policy_detail,
             error=error,
+            collaboration=dict(collaboration or {}),
         )
 
     def close(self) -> None:

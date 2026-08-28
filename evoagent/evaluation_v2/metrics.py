@@ -94,6 +94,8 @@ def score_case(case: dict, execution) -> Dict[str, Any]:
         "deployment_lane": _field(execution, "deployment_lane", ""),
         "resolved_policy": _field(execution, "resolved_policy", {}),
         "error": _field(execution, "error"),
+        # Multi-agent execution proof (harness systems only; empty for reviewers).
+        "collaboration": _field(execution, "collaboration", {}),
         "matches": [
             {
                 "expected_index": match.expected_index,
@@ -121,6 +123,33 @@ def _percentile(values: List[float], fraction: float) -> float:
     ordered = sorted(values)
     index = min(len(ordered) - 1, int(fraction * len(ordered)))
     return round(ordered[index], 4)
+
+
+def _collab(case_results: List[dict]) -> List[dict]:
+    return [
+        (r.get("collaboration") or {})
+        for r in case_results if isinstance(r.get("collaboration"), dict)
+    ]
+
+
+def _collab_avg(case_results: List[dict], key: str) -> float:
+    """Mean of a collaboration scalar across cases that report a collaboration."""
+    values = [
+        int(item.get(key) or 0)
+        for item in _collab(case_results) if item.get(key) is not None
+    ]
+    return round(statistics.mean(values), 2) if values else 0.0
+
+
+def _collab_agents(case_results: List[dict]) -> List[str]:
+    """Distinct specialist agents observed across the collaboration summaries."""
+    agents: List[str] = []
+    for item in _collab(case_results):
+        for agent in item.get("agents") or []:
+            name = agent.get("agent") if isinstance(agent, dict) else str(agent)
+            if name and name not in agents:
+                agents.append(name)
+    return agents
 
 
 def runtime_metrics(case_results: List[dict]) -> Dict[str, Any]:
@@ -159,6 +188,14 @@ def runtime_metrics(case_results: List[dict]) -> Dict[str, Any]:
                 [int(r.get("policy_version", 0)) for r in case_results if r.get("policy_version")]
             ), 4
         ) if any(r.get("policy_version") for r in case_results) else 0,
+        # Multi-agent DAG execution proof (harness systems only).  Averages over
+        # the harness cases -- not the plain reviewers, which have no collab.
+        "collaboration_rounds": _collab_avg(case_results, "dialogue_rounds"),
+        "collaboration_messages": _collab_avg(case_results, "messages"),
+        "activated_agents": _collab_agents(case_results),
+        "collaboration_detected": round(
+            sum(bool(r.get("collaboration")) for r in case_results) / total, 4
+        ) if total else 0.0,
     }
 
 

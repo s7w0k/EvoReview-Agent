@@ -43,15 +43,19 @@
       "recovery_success_rate": 0.0,
       "avg_agent_steps": 0.0,
       "avg_tool_calls": 0.0,
-      "p50_latency_ms": 0.3272,
-      "p95_latency_ms": 0.5801,
+      "p50_latency_ms": 0.2962,
+      "p95_latency_ms": 0.4602,
       "tool_denials": 0,
       "timeouts": 0,
       "side_effect_blocks": 0,
       "circuit_breaker_trips": 0,
       "decision_trace_coverage": 0.0,
       "replay_snapshot_coverage": 0.0,
-      "avg_policy_version": 0
+      "avg_policy_version": 0,
+      "collaboration_rounds": 0.0,
+      "collaboration_messages": 0.0,
+      "activated_agents": [],
+      "collaboration_detected": 0.0
     },
     "by_split": {
       "validation": {
@@ -87,15 +91,19 @@
           "recovery_success_rate": 0.0,
           "avg_agent_steps": 0.0,
           "avg_tool_calls": 0.0,
-          "p50_latency_ms": 0.3272,
-          "p95_latency_ms": 0.5876,
+          "p50_latency_ms": 0.3042,
+          "p95_latency_ms": 0.4602,
           "tool_denials": 0,
           "timeouts": 0,
           "side_effect_blocks": 0,
           "circuit_breaker_trips": 0,
           "decision_trace_coverage": 0.0,
           "replay_snapshot_coverage": 0.0,
-          "avg_policy_version": 0
+          "avg_policy_version": 0,
+          "collaboration_rounds": 0.0,
+          "collaboration_messages": 0.0,
+          "activated_agents": [],
+          "collaboration_detected": 0.0
         }
       },
       "holdout": {
@@ -131,20 +139,24 @@
           "recovery_success_rate": 0.0,
           "avg_agent_steps": 0.0,
           "avg_tool_calls": 0.0,
-          "p50_latency_ms": 0.3401,
-          "p95_latency_ms": 0.5551,
+          "p50_latency_ms": 0.2866,
+          "p95_latency_ms": 0.5101,
           "tool_denials": 0,
           "timeouts": 0,
           "side_effect_blocks": 0,
           "circuit_breaker_trips": 0,
           "decision_trace_coverage": 0.0,
           "replay_snapshot_coverage": 0.0,
-          "avg_policy_version": 0
+          "avg_policy_version": 0,
+          "collaboration_rounds": 0.0,
+          "collaboration_messages": 0.0,
+          "activated_agents": [],
+          "collaboration_detected": 0.0
         }
       }
     }
   },
-  "duration_seconds": 0.04,
+  "duration_seconds": 0.0368,
   "case_results": [
     {
       "id": "pr-0001",
@@ -164,7 +176,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 1.3414999993983656,
+      "latency_ms": 2.9114999997545965,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -183,6 +195,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -209,7 +222,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.5778000004283967,
+      "latency_ms": 0.36240000008547213,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -228,6 +241,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -254,7 +268,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.5876000004718662,
+      "latency_ms": 0.3077000001212582,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -273,6 +287,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -299,7 +314,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.7421000000249478,
+      "latency_ms": 0.36730000010720687,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -318,6 +333,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -344,7 +360,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.5049999999755528,
+      "latency_ms": 0.3631999998106039,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -363,6 +379,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -383,7 +400,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.31829999988985946,
+      "latency_ms": 0.23630000032426324,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -402,6 +419,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -422,7 +440,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.33910000001924345,
+      "latency_ms": 0.215099999877566,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -441,6 +459,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -461,7 +480,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.31060000037541613,
+      "latency_ms": 0.37460000021383166,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -480,6 +499,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -500,7 +520,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.26820000039151637,
+      "latency_ms": 0.2648999998200452,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -519,6 +539,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -539,7 +560,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.24599999960628338,
+      "latency_ms": 0.3778000000238535,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -558,6 +579,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -578,7 +600,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.31490000037592836,
+      "latency_ms": 0.3760999998121406,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -597,6 +619,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -623,7 +646,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.316400000883732,
+      "latency_ms": 0.4186000005574897,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -642,6 +665,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -668,7 +692,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.29600000016216654,
+      "latency_ms": 0.565199999982724,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -687,6 +711,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -713,7 +738,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.5800999997518375,
+      "latency_ms": 0.5012999999962631,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -732,6 +757,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -758,7 +784,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.6229999999050051,
+      "latency_ms": 0.3434999998717103,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -777,6 +803,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -797,7 +824,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.35519999983080197,
+      "latency_ms": 0.22459999945567688,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -816,6 +843,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -836,7 +864,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.4245999998602201,
+      "latency_ms": 0.21809999998367857,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -855,6 +883,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -875,7 +904,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.37030000021331944,
+      "latency_ms": 0.20339999991847435,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -894,6 +923,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -914,7 +944,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.299299999824143,
+      "latency_ms": 0.19969999993918464,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -933,6 +963,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -953,7 +984,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.28839999959018314,
+      "latency_ms": 0.2051999999821419,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -972,6 +1003,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -992,7 +1024,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.3251000007367111,
+      "latency_ms": 0.3366999999343534,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1011,6 +1043,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -1037,7 +1070,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.3096000000368804,
+      "latency_ms": 0.39259999994101236,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1056,6 +1089,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -1082,7 +1116,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.3026000003956142,
+      "latency_ms": 0.30950000018492574,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1101,6 +1135,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -1127,7 +1162,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.5657000001519918,
+      "latency_ms": 0.28019999990647193,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1146,6 +1181,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -1172,7 +1208,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.40079999962472357,
+      "latency_ms": 0.27239999963057926,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1191,6 +1227,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -1211,7 +1248,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.3279000002294197,
+      "latency_ms": 0.21269999979267595,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1230,6 +1267,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -1250,7 +1288,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.31349999972007936,
+      "latency_ms": 0.21319999996194383,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1269,6 +1307,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -1289,7 +1328,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.3272000003562425,
+      "latency_ms": 0.3738000004886999,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1308,6 +1347,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -1328,7 +1368,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.267100000201026,
+      "latency_ms": 0.38640000002487795,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1347,6 +1387,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -1367,7 +1408,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.2330999996047467,
+      "latency_ms": 0.27709999994840473,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1386,6 +1427,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -1406,7 +1448,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.3354999998919084,
+      "latency_ms": 0.3623999991759774,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1425,6 +1467,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -1451,7 +1494,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.3403999999136431,
+      "latency_ms": 0.3507000001263805,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1470,6 +1513,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -1496,7 +1540,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.29710000035265693,
+      "latency_ms": 0.3161999993608333,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1515,6 +1559,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -1541,7 +1586,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.3085999996983446,
+      "latency_ms": 0.28389999988576164,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1560,6 +1605,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -1586,7 +1632,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.28340000062598847,
+      "latency_ms": 0.3850999992209836,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1605,6 +1651,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -1625,7 +1672,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.5446999994092039,
+      "latency_ms": 0.29770000037387945,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1644,6 +1691,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -1664,7 +1712,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.3348000000187312,
+      "latency_ms": 0.29579999954876257,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1683,6 +1731,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -1703,7 +1752,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.33259999963775044,
+      "latency_ms": 0.35800000023300527,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1722,6 +1771,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -1742,7 +1792,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.3513999999995576,
+      "latency_ms": 0.3220999997211038,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1761,6 +1811,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -1781,7 +1832,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.35709999974642415,
+      "latency_ms": 0.28160000056232093,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1800,6 +1851,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -1820,7 +1872,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.39680000008956995,
+      "latency_ms": 0.30419999984587776,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1839,6 +1891,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -1865,7 +1918,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.3858999998556101,
+      "latency_ms": 0.43869999990420183,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1884,6 +1937,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -1910,7 +1964,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.39620000006834744,
+      "latency_ms": 0.46019999990676297,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1929,6 +1983,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -1955,7 +2010,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.3250999998272164,
+      "latency_ms": 0.3310000001874869,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -1974,6 +2029,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -1994,7 +2050,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.34609999966050964,
+      "latency_ms": 0.42049999956361717,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -2013,6 +2069,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -2033,7 +2090,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.5167999997865991,
+      "latency_ms": 0.27380000028642826,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -2052,6 +2109,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -2072,7 +2130,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.4152000001340639,
+      "latency_ms": 0.2365000000281725,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -2091,6 +2149,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -2111,7 +2170,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.3328000002511544,
+      "latency_ms": 0.29210000047896756,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -2130,6 +2189,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -2150,7 +2210,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.3701999994518701,
+      "latency_ms": 0.28079999992769444,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -2169,6 +2229,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -2189,7 +2250,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.2840999995896709,
+      "latency_ms": 0.31769999986863695,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -2208,6 +2269,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -2228,7 +2290,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.32559999999648426,
+      "latency_ms": 0.39589999960298883,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -2247,6 +2309,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -2273,7 +2336,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.3087999994022539,
+      "latency_ms": 0.39460000061808387,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -2292,6 +2355,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -2318,7 +2382,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.3483000000414904,
+      "latency_ms": 0.323999999636726,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -2337,6 +2401,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -2363,7 +2428,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.2601000005597598,
+      "latency_ms": 0.2506000000721542,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -2382,6 +2447,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -2402,7 +2468,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.28279999969527125,
+      "latency_ms": 0.22649999937129905,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -2421,6 +2487,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -2441,7 +2508,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.2918999998655636,
+      "latency_ms": 0.2054999995380058,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -2460,6 +2527,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -2480,7 +2548,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.38250000034167897,
+      "latency_ms": 0.20360000053187832,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -2499,6 +2567,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -2519,7 +2588,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.43480000022100285,
+      "latency_ms": 0.21130000004632166,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -2538,6 +2607,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -2558,7 +2628,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.3692999998747837,
+      "latency_ms": 0.22850000004837057,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -2577,6 +2647,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -2597,7 +2668,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.3085999996983446,
+      "latency_ms": 0.2044000002570101,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -2616,6 +2687,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -2636,7 +2708,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.3476000001683133,
+      "latency_ms": 0.38979999953880906,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -2655,6 +2727,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -2681,7 +2754,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.31209999997372506,
+      "latency_ms": 0.44319999960862333,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -2700,6 +2773,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -2726,7 +2800,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.29069999982311856,
+      "latency_ms": 0.4048999999213265,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -2745,6 +2819,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -2771,7 +2846,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.22739999985788018,
+      "latency_ms": 0.2688000004127389,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -2790,6 +2865,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -2810,7 +2886,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.22949999947741162,
+      "latency_ms": 0.27940000018134015,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -2829,6 +2905,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -2849,7 +2926,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.22189999981492292,
+      "latency_ms": 0.2990000002682791,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -2868,6 +2945,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -2888,7 +2966,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.224099999286409,
+      "latency_ms": 0.2871000006052782,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -2907,6 +2985,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -2927,7 +3006,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.29260000064823544,
+      "latency_ms": 0.25609999920561677,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -2946,6 +3025,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -2966,7 +3046,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.33540000003995374,
+      "latency_ms": 0.3224000001864624,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -2985,6 +3065,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -3005,7 +3086,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.41739999960554997,
+      "latency_ms": 0.3286000001025968,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -3024,6 +3105,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -3044,7 +3126,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.44009999965055613,
+      "latency_ms": 0.3059999999095453,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -3063,6 +3145,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -3089,7 +3172,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.5380000002332963,
+      "latency_ms": 0.2897000003940775,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -3108,6 +3191,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -3134,7 +3218,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.43589999950199854,
+      "latency_ms": 0.26479999996809056,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -3153,6 +3237,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -3179,7 +3264,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.27070000032836106,
+      "latency_ms": 0.2195999995819875,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -3198,6 +3283,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -3218,7 +3304,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.27260000024398323,
+      "latency_ms": 0.20419999964360613,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -3237,6 +3323,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -3257,7 +3344,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.2880000001823646,
+      "latency_ms": 0.20229999972798396,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -3276,6 +3363,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -3296,7 +3384,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.2857999998013838,
+      "latency_ms": 0.2844000000550295,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -3315,6 +3403,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -3335,7 +3424,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.2714000002015382,
+      "latency_ms": 0.331700000060664,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -3354,6 +3443,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -3374,7 +3464,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.2313999993930338,
+      "latency_ms": 0.3903999995600316,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -3393,6 +3483,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -3413,7 +3504,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.314799999614479,
+      "latency_ms": 0.2961999998660758,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -3432,6 +3523,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -3452,7 +3544,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.4943999992974568,
+      "latency_ms": 0.3884999996444094,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -3471,6 +3563,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -3497,7 +3590,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.5117000000609551,
+      "latency_ms": 0.2996000002895016,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -3516,6 +3609,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -3536,7 +3630,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.3982999996878789,
+      "latency_ms": 0.5100999997011968,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -3555,6 +3649,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -3581,7 +3676,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.32250000003841706,
+      "latency_ms": 0.2961999998660758,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -3600,6 +3695,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -3620,7 +3716,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.3401000003577792,
+      "latency_ms": 0.2868000001399196,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -3639,6 +3735,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -3659,7 +3756,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.3529999994498212,
+      "latency_ms": 0.22250000074564014,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -3678,6 +3775,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -3698,7 +3796,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.2569999996921979,
+      "latency_ms": 0.2044000002570101,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -3717,6 +3815,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -3737,7 +3836,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.23229999987961492,
+      "latency_ms": 0.28420000035112025,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -3756,6 +3855,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -3776,7 +3876,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.23400000009132782,
+      "latency_ms": 0.25300000015704427,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -3795,6 +3895,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -3815,7 +3916,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.2654000008988078,
+      "latency_ms": 0.22460000036517158,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -3834,6 +3935,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -3854,7 +3956,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.35400000069785165,
+      "latency_ms": 0.2865999995265156,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -3873,6 +3975,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -3899,7 +4002,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.5246999999144464,
+      "latency_ms": 0.26369999977760017,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -3918,6 +4021,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -3944,7 +4048,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.5550999994738959,
+      "latency_ms": 0.31829999988985946,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -3963,6 +4067,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": [
         {
           "expected_index": 0,
@@ -3989,7 +4094,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.36360000012791716,
+      "latency_ms": 0.2423999994789483,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -4008,6 +4113,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -4028,7 +4134,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.31969999963621376,
+      "latency_ms": 0.3274000000601518,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -4047,6 +4153,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -4067,7 +4174,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.3797999997914303,
+      "latency_ms": 0.31539999963570153,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -4086,6 +4193,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -4106,7 +4214,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.2684999999473803,
+      "latency_ms": 0.36949999957869295,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -4125,6 +4233,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -4145,7 +4254,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.23839999994379468,
+      "latency_ms": 0.2747999997154693,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -4164,6 +4273,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -4184,7 +4294,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.22340000032272656,
+      "latency_ms": 0.2623999998832005,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -4203,6 +4313,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     },
     {
@@ -4223,7 +4334,7 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 0.22280000030150404,
+      "latency_ms": 0.2382000002398854,
       "agent_steps": 0,
       "tool_calls": 0,
       "recovery_attempts": 0,
@@ -4242,6 +4353,7 @@
         "target": "legacy-reviewer"
       },
       "error": null,
+      "collaboration": {},
       "matches": []
     }
   ]
