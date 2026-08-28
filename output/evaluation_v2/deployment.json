@@ -1,0 +1,28 @@
+{
+  "canary": {
+    "promotion_success": true,
+    "stage_count": 5,
+    "exposure_count": 0,
+    "traffic_ladder": [
+      0.05,
+      0.1,
+      0.25,
+      0.5,
+      1.0
+    ],
+    "canary_verdict": "HOLD"
+  },
+  "rollback": {
+    "auto_rollback_success": true,
+    "traffic_share_after": 0.0,
+    "previous_good_restored": true,
+    "bad_verdict": "ROLLBACK",
+    "rollback_reasons": [
+      "failure_rate 0.200 >= ceiling 0.01",
+      "reliability 0.500 < floor 0.9",
+      "quality fell more than 0.02 vs baseline",
+      "high-risk recall fell more than 0.01 vs baseline",
+      "candidate introduced 3 critical miss(es)"
+    ]
+  }
+}

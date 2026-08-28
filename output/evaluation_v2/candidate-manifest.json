@@ -1,0 +1,198 @@
+{
+  "candidate_id": "eval-v2-evolved-review",
+  "parent_policy_id": "baseline-high",
+  "skill_versions": {
+    "evolved-review": 1
+  },
+  "runtime_policy_version": "stable",
+  "validation_dataset_sha256": "88831bb19264f9fc15433de7801b623aad38b80076f5d5b085d0299fd40cc115",
+  "created_from_split": "validation",
+  "gate_result": "PASS",
+  "gates": {
+    "passed": true,
+    "gates": {
+      "Validation Improvement": {
+        "passed": true,
+        "detail": "candidate F1 0.9276 >= stable F1 0.7458"
+      },
+      "High-risk Non-regression": {
+        "passed": true,
+        "detail": "candidate HR-Recall 1.0000 >= stable 0.8750"
+      },
+      "Critical Miss Non-regression": {
+        "passed": true,
+        "detail": "candidate critical hits 16 >= stable 14"
+      },
+      "Clean Accuracy Non-regression": {
+        "passed": true,
+        "detail": "candidate clean 0.8958 >= stable 0.8958 - 0.02"
+      },
+      "Catastrophic Forgetting": {
+        "passed": true,
+        "detail": "no high-risk recall drop beyond threshold"
+      },
+      "Runtime Safety": {
+        "passed": true,
+        "detail": "candidate execution success 1.0000 >= 0.99"
+      }
+    }
+  },
+  "artifact": {
+    "schema_version": 1,
+    "name": "evolved-review",
+    "description": "Replay-gated declarative rules learned from confirmed review feedback",
+    "permissions": [],
+    "rules": [
+      {
+        "rule_id": "CWE-22",
+        "severity": "high",
+        "match": "return open(base / user_path).read",
+        "ignore_case": false,
+        "include_paths": [],
+        "exclude_paths": [
+          "tests/"
+        ],
+        "title": "Confirmed CWE-22 finding (self-evolved)",
+        "explanation": "A confirmed CWE-22 was introduced on an added line; mined from repeated Validation false negatives.",
+        "fix": "Replace the unsafe construct with a constrained, validated alternative.",
+        "test": "Add a focused regression test covering this confirmed failure mode.",
+        "confidence": 0.7
+      },
+      {
+        "rule_id": "CWE-330",
+        "severity": "medium",
+        "match": "token = str(random.random",
+        "ignore_case": false,
+        "include_paths": [],
+        "exclude_paths": [
+          "tests/"
+        ],
+        "title": "Confirmed CWE-330 finding (self-evolved)",
+        "explanation": "A confirmed CWE-330 was introduced on an added line; mined from repeated Validation false negatives.",
+        "fix": "Replace the unsafe construct with a constrained, validated alternative.",
+        "test": "Add a focused regression test covering this confirmed failure mode.",
+        "confidence": 0.7
+      },
+      {
+        "rule_id": "CWE-362",
+        "severity": "medium",
+        "match": "open(\"state.json\", \"w\").write(value",
+        "ignore_case": false,
+        "include_paths": [],
+        "exclude_paths": [
+          "tests/"
+        ],
+        "title": "Confirmed CWE-362 finding (self-evolved)",
+        "explanation": "A confirmed CWE-362 was introduced on an added line; mined from repeated Validation false negatives.",
+        "fix": "Replace the unsafe construct with a constrained, validated alternative.",
+        "test": "Add a focused regression test covering this confirmed failure mode.",
+        "confidence": 0.7
+      },
+      {
+        "rule_id": "CWE-367",
+        "severity": "medium",
+        "match": "expires_at = datetime.now",
+        "ignore_case": false,
+        "include_paths": [],
+        "exclude_paths": [
+          "tests/"
+        ],
+        "title": "Confirmed CWE-367 finding (self-evolved)",
+        "explanation": "A confirmed CWE-367 was introduced on an added line; mined from repeated Validation false negatives.",
+        "fix": "Replace the unsafe construct with a constrained, validated alternative.",
+        "test": "Add a focused regression test covering this confirmed failure mode.",
+        "confidence": 0.7
+      },
+      {
+        "rule_id": "CWE-400",
+        "severity": "medium",
+        "match": "time.sleep(5",
+        "ignore_case": false,
+        "include_paths": [],
+        "exclude_paths": [
+          "tests/"
+        ],
+        "title": "Confirmed CWE-400 finding (self-evolved)",
+        "explanation": "A confirmed CWE-400 was introduced on an added line; mined from repeated Validation false negatives.",
+        "fix": "Replace the unsafe construct with a constrained, validated alternative.",
+        "test": "Add a focused regression test covering this confirmed failure mode.",
+        "confidence": 0.7
+      },
+      {
+        "rule_id": "CWE-502",
+        "severity": "high",
+        "match": "return yaml.load(value",
+        "ignore_case": false,
+        "include_paths": [],
+        "exclude_paths": [
+          "tests/"
+        ],
+        "title": "Confirmed CWE-502 finding (self-evolved)",
+        "explanation": "A confirmed CWE-502 was introduced on an added line; mined from repeated Validation false negatives.",
+        "fix": "Replace the unsafe construct with a constrained, validated alternative.",
+        "test": "Add a focused regression test covering this confirmed failure mode.",
+        "confidence": 0.7
+      },
+      {
+        "rule_id": "CWE-614",
+        "severity": "medium",
+        "match": "response.set_cookie(\"sid\", value, secure=False",
+        "ignore_case": false,
+        "include_paths": [],
+        "exclude_paths": [
+          "tests/"
+        ],
+        "title": "Confirmed CWE-614 finding (self-evolved)",
+        "explanation": "A confirmed CWE-614 was introduced on an added line; mined from repeated Validation false negatives.",
+        "fix": "Replace the unsafe construct with a constrained, validated alternative.",
+        "test": "Add a focused regression test covering this confirmed failure mode.",
+        "confidence": 0.7
+      },
+      {
+        "rule_id": "CWE-617",
+        "severity": "medium",
+        "match": "assert user.is_admin",
+        "ignore_case": false,
+        "include_paths": [],
+        "exclude_paths": [
+          "tests/"
+        ],
+        "title": "Confirmed CWE-617 finding (self-evolved)",
+        "explanation": "A confirmed CWE-617 was introduced on an added line; mined from repeated Validation false negatives.",
+        "fix": "Replace the unsafe construct with a constrained, validated alternative.",
+        "test": "Add a focused regression test covering this confirmed failure mode.",
+        "confidence": 0.7
+      },
+      {
+        "rule_id": "CWE-682",
+        "severity": "medium",
+        "match": "total = float(value) * 100",
+        "ignore_case": false,
+        "include_paths": [],
+        "exclude_paths": [
+          "tests/"
+        ],
+        "title": "Confirmed CWE-682 finding (self-evolved)",
+        "explanation": "A confirmed CWE-682 was introduced on an added line; mined from repeated Validation false negatives.",
+        "fix": "Replace the unsafe construct with a constrained, validated alternative.",
+        "test": "Add a focused regression test covering this confirmed failure mode.",
+        "confidence": 0.7
+      },
+      {
+        "rule_id": "CWE-835",
+        "severity": "medium",
+        "match": "while True:",
+        "ignore_case": false,
+        "include_paths": [],
+        "exclude_paths": [
+          "tests/"
+        ],
+        "title": "Confirmed CWE-835 finding (self-evolved)",
+        "explanation": "A confirmed CWE-835 was introduced on an added line; mined from repeated Validation false negatives.",
+        "fix": "Replace the unsafe construct with a constrained, validated alternative.",
+        "test": "Add a focused regression test covering this confirmed failure mode.",
+        "confidence": 0.7
+      }
+    ]
+  }
+}

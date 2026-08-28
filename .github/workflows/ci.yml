@@ -138,6 +138,43 @@ jobs:
           name: evolution-eval-artifacts
           path: artifacts/evolution_eval/*.json
 
+  # Evaluation Harness V2 regression (plan Phase 13). Deterministic, no LLM cost:
+  # verify the frozen dataset SHA, reproduce the 4 systems, evaluate the safety
+  # gates, and upload the reproducible report so CI parses the exact numbers.
+  evaluation-v2-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e ".[dev]"
+      # plan section 18 test suite.
+      - run: python -m unittest discover -s tests/evaluation_v2 -p "test_*.py"
+      # reproduce all four systems (dataset SHA is verified inside the runner);
+      # a fingerprint drift fails the job before any metric is trusted.
+      - run: python scripts/run_e2e_evaluation_v2.py --stage all
+      # fail the gate if the self-evolved candidate was rejected by any safety gate.
+      - name: Assert safety gates pass
+        run: |
+          python - <<'PY'
+          import json
+          report = json.load(open("output/evaluation_v2/evaluation-report.json", encoding="utf-8"))
+          gates = report.get("evolution", {}).get("safety_gates", {})
+          assert gates.get("passed"), "safety gates FAILED %s" % gates.get("gates")
+          systems = report.get("systems", {})
+          assert "evolved_candidate" in systems, "Self-Evolved column missing from report"
+          print("[gate] overall safety gate PASS for %s systems"
+                % ", ".join(systems.keys()))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: evaluation-v2-artifacts
+          path: |
+            output/evaluation_v2/*.json
+            output/evaluation_v2/*.md
+
   # 15.2 postgres-integration / redis-integration: exercise the extra adapters
   # against real services via the service containers.
   postgres-integration:

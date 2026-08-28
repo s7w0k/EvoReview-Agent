@@ -1,0 +1,10 @@
+{
+  "stable_f1": 0.5455,
+  "evolved_f1": 0.5455,
+  "stable_high_risk_recall": 0.6667,
+  "evolved_high_risk_recall": 0.6667,
+  "stable_critical_misses": 1,
+  "evolved_critical_misses": 1,
+  "f1_delta": 0.0,
+  "high_risk_recall_delta": 0.0
+}
