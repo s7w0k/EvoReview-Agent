@@ -29,6 +29,7 @@ from .reliability import ReliabilityAgent
 from .security import SecurityAgent
 from .service_host import LoopAgentHost
 from .verifier import VerifierAgent
+from .feature_flags import MultiAgentFeatureFlags
 
 #: (agent_id, instance) builders kept in plan order for the graph.
 _SPECIALISTS = (
@@ -59,11 +60,15 @@ class SixAgentReviewer(Reviewer):
         architecture: str = "six-agent",
         http_timeout_seconds: float = 10.0,
         http_token: str = "",
+        feature_flags: Optional[MultiAgentFeatureFlags] = None,
     ):
         self.mode = (mode or "inprocess").strip().lower()
         self.architecture = architecture
+        self.flags = feature_flags or MultiAgentFeatureFlags()
+        # build specialists honouring the runtime's loop-depth switch so a
+        # ``deep_loop=False`` reviewer genuinely runs a shallow stepper (§4.4)
         self.specialists = list(specialists) if specialists else [
-            ctor() for ctor in _SPECIALISTS
+            ctor(deep_loop=self.flags.deep_loop) for ctor in _SPECIALISTS
         ]
         if len(self.specialists) < 5:
             raise ValueError("six-agent reviewer requires all five specialists")
@@ -72,6 +77,8 @@ class SixAgentReviewer(Reviewer):
             architecture = "six-agent"
         if architecture == "six-agent-v2":
             self.coordinator_kwargs.setdefault("mode", "v2")
+        self.coordinator_kwargs.setdefault(
+            "feature_flags", self.flags)
         self.http_timeout_seconds = http_timeout_seconds
         self.http_token = http_token
         self._servers: List[Any] = []

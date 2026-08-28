@@ -17,6 +17,9 @@ from .deep_loop import (
 )
 from .delegator import Delegator
 from .failure_injection import FAILURE_CATALOG, FailureInjector, inject
+from .feature_flags import (
+    MultiAgentFeatureFlags, ablation_variant, flags_from_dict,
+)
 from .fix import FixAgent
 from .graph_policy import GraphMutator
 from .observability import build_trace_context
@@ -82,6 +85,7 @@ __all__ = ["AgentPlanState",
     "LoopAgentHost",
     "LoopTaskRecord",
     "LoopTaskStore",
+    "MultiAgentFeatureFlags",
     "PlanTracker",
     "REASON_CODES",
     "ReplanBudget",
@@ -95,6 +99,7 @@ __all__ = ["AgentPlanState",
     "TaskGraphScheduler",
     "VerifierAgent",
     "attribute_failure",
+    "ablation_variant",
     "build_agent_policy",
     "build_delegate_handlers",
     "build_expert_context",
@@ -108,6 +113,7 @@ __all__ = ["AgentPlanState",
     "final_action",
     "finding_key",
     "inject",
+    "flags_from_dict",
     "last_observation",
     "last_tool",
     "observations",

@@ -56,6 +56,13 @@ class TaskGraphValidator:
                         node.node_id, dep))
         return errors
 
+    def validate_no_self_dependency(self, graph: CoordinatorTaskGraph) -> List[str]:
+        errors: List[str] = []
+        for node in graph.nodes.values():
+            if node.node_id in node.dependencies:
+                errors.append("node %s: SELF_DEPENDENCY" % node.node_id)
+        return errors
+
     def validate_no_cycle(self, graph: CoordinatorTaskGraph) -> List[str]:
         # DFS cycle detection over the dependency edges.
         WHITE, GREY, BLACK = 0, 1, 2
@@ -96,6 +103,7 @@ class TaskGraphValidator:
         errors += self.validate_task_types(graph)
         errors += self.validate_agents_exist(graph)
         errors += self.validate_dependencies(graph)
+        errors += self.validate_no_self_dependency(graph)
         errors += self.validate_no_cycle(graph)
         errors += self.validate_budget(graph)
         return errors

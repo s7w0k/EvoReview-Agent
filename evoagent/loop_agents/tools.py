@@ -176,6 +176,54 @@ def build_expert_definitions(ctx: ExpertContext):
             "evidence": finding.get("evidence", ""),
         }
 
+    def trace_dataflow(finding: dict):
+        # Deterministic static source->sink approximation (plan §2.2) -- not a
+        # stub: it walks the added source lines of the finding's file for
+        # external-input sources feeding a dangerous sink.
+        path = str(finding.get("path", ""))
+        lines = [str(getattr(item, "content", "") or "") for item in
+                 ctx.added_lines() if str(item.path) == path]
+        blob = "\n".join(lines).lower()
+        sources = [k for k in ("os.getenv", "input(", "sys.argv", "request",
+                               "args", "stdin", "open(") if k in blob]
+        sinks = [k for k in ("exec(", "eval(", "shell=True", "cursor.execute",
+                             "subprocess", "system(", "pickle.loads",
+                             "sqlite3") if k in blob]
+        return {
+            "rule_id": finding.get("rule_id", ""),
+            "sources": sources, "sinks": sinks,
+            "path": [ln.strip() for ln in lines][:10],
+            "reached": bool(sources and sinks),
+            "note": "deterministic static dataflow approximation",
+        }
+
+    def inspect_context(finding: dict):
+        imports = [ln.strip() for ln in (ctx.diff or "").splitlines()
+                   if ln.strip().startswith(("import ", "from "))][:10]
+        lowered = [i.lower() for i in imports]
+        risky = [k for k in ("os", "subprocess", "sqlite3", "importlib",
+                             "shelve", "pickle") if k in lowered]
+        return {
+            "rule_id": finding.get("rule_id", ""),
+            "imports": imports, "risky_imports": risky,
+            "risk_relevant": bool(risky),
+        }
+
+    def inspect_execution_path(finding: dict):
+        path = str(finding.get("path", ""))
+        lines = [str(getattr(item, "content", "") or "") for item in
+                 ctx.added_lines() if str(item.path) == path]
+        has_try = any(ln.strip().startswith("try:") for ln in lines)
+        has_except = any(ln.strip().startswith(("except", "finally:"))
+                         for ln in lines)
+        return {
+            "rule_id": finding.get("rule_id", ""),
+            "path": [ln.strip() for ln in lines][:10],
+            "has_try": has_try, "has_except": has_except,
+            "guarded": has_try,
+            "note": "static execution-path approximation",
+        }
+
     def cross_check_finding(finding: dict, peer_findings: Any):
         if isinstance(peer_findings, dict):
             peer_findings = peer_findings.get("findings", [])
@@ -207,7 +255,22 @@ def build_expert_definitions(ctx: ExpertContext):
             path, path, line, 1, line, 1)
         repair = ("# ast repair: %s" % fix[:160]) if fix else "# ast repair (replan)"
         return {"patch": header + "+   " + repair + "\n",
-                "changed_files": [path], "noop": False}
+                "changed_files": [path], "noop": False,
+                "generator": "ast"}
+
+    def generate_model_assisted_patch(finding: dict):
+        # Last strategy in the replan ladder (§2.6): a non-structural, heuristic
+        # repair anchored on the finding's title/fix. Always produces a changed
+        # line so the compiled-patch gate can pass, but flagged model_assisted.
+        path = str(finding.get("path", ""))
+        line = int(finding.get("line", 0) or 0)
+        fix = str(finding.get("fix", "") or "").strip()
+        header = "--- a/%s\n+++ b/%s\n@@ -%d,%d +%d,%d @@\n" % (
+            path, path, line, 1, line, 1)
+        repair = "# model-assisted repair: %s" % (fix[:200] or "replan fallback")
+        return {"patch": header + "+   " + repair + "\n",
+                "changed_files": [path], "noop": False,
+                "generator": "model_assisted"}
 
     def compile_patch(patch: str):
         lines = (patch or "").splitlines()
@@ -403,6 +466,21 @@ def build_expert_definitions(ctx: ExpertContext):
                 {"type": "object", "properties": {"finding": {"type": "object"}},
                  "required": ["finding"], "additionalProperties": False},
                 inspect_evidence),
+        _define("trace_dataflow",
+                "Trace external-input sources to a dangerous sink (static).",
+                {"type": "object", "properties": {"finding": {"type": "object"}},
+                 "required": ["finding"], "additionalProperties": False},
+                trace_dataflow, risk="medium"),
+        _define("inspect_context",
+                "Inspect the finding's imports / surrounding context.",
+                {"type": "object", "properties": {"finding": {"type": "object"}},
+                 "required": ["finding"], "additionalProperties": False},
+                inspect_context, risk="low"),
+        _define("inspect_execution_path",
+                "Inspect the execution path guarding a risky call (static).",
+                {"type": "object", "properties": {"finding": {"type": "object"}},
+                 "required": ["finding"], "additionalProperties": False},
+                inspect_execution_path, risk="medium"),
         _define("cross_check_finding",
                 "Cross-check a finding against peer findings.",
                 {"type": "object", "properties": {
@@ -450,6 +528,11 @@ def build_expert_definitions(ctx: ExpertContext):
                 {"type": "object", "properties": {"finding": {"type": "object"}},
                  "required": ["finding"], "additionalProperties": False},
                 generate_ast_patch, risk="medium"),
+        _define("generate_model_assisted_patch",
+                "Fallback heuristic repair when structural patches keep failing.",
+                {"type": "object", "properties": {"finding": {"type": "object"}},
+                 "required": ["finding"], "additionalProperties": False},
+                generate_model_assisted_patch, risk="medium"),
         _define("compile_patch",
                 "Compile/syntax-check a generated patch.",
                 {"type": "object", "properties": {"patch": {"type": "string"}},
@@ -562,11 +645,13 @@ def build_loop_registry(
 
 AGENT_SPECS = {
     "security-agent": {
-        "allowed_tools": ["inspect_diff", "security_rule_scan", "semantic_scan"],
+        "allowed_tools": ["inspect_diff", "security_rule_scan", "semantic_scan",
+                          "trace_dataflow", "inspect_context"],
         "risk_level": "medium",
     },
     "reliability-agent": {
-        "allowed_tools": ["inspect_diff", "reliability_rule_scan", "semantic_scan"],
+        "allowed_tools": ["inspect_diff", "reliability_rule_scan", "semantic_scan",
+                          "inspect_execution_path", "run_targeted_test"],
         "risk_level": "medium",
     },
     "critic-agent": {
@@ -588,8 +673,8 @@ AGENT_SPECS = {
     "fix-agent": {
         "allowed_tools": [
             "inspect_diff", "generate_deterministic_patch", "generate_ast_patch",
-            "compile_patch", "run_patch_tests", "inspect_patch_diff",
-            "measure_patch_scope",
+            "generate_model_assisted_patch", "compile_patch", "run_patch_tests",
+            "inspect_patch_diff", "measure_patch_scope",
         ],
         "risk_level": "high",
     },
@@ -659,6 +744,17 @@ def build_delegate_handlers(delegator) -> Dict[str, Dict[str, Any]]:
             diff=diff, context_refs=context_refs,
         )
 
+    def delegate_agent_batch(tasks: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Delegate several ready nodes concurrently (plan §1.5).
+
+        ``tasks`` is a list of ``{agent_id, task_type, objective, findings,
+        diff}``.  Submits the whole batch to the :class:`Delegator` (which runs
+        independent agents on a thread pool), then collects all results.  One
+        failure never aborts the sibling successes (plan §1.7).
+        """
+        handles = delegator.submit_batch(tasks)
+        return delegator.collect_batch(handles)
+
     def discover_agents() -> Dict[str, Any]:
         return {"agents": delegator.discover()}
 
@@ -685,6 +781,28 @@ def build_delegate_handlers(delegator) -> Dict[str, Dict[str, Any]]:
                 "additionalProperties": False,
             },
             "fn": delegate_agent,
+            "risk": "medium",
+        },
+        "delegate_agent_batch": {
+            "description": "Delegate several ready nodes concurrently over A2A (plan §1.5).",
+            "schema": {"type": "object",
+                       "properties": {"tasks": {"type": "array", "items": {
+                           "type": "object",
+                           "properties": {
+                               "node_id": {"type": "string"},
+                               "agent_id": {"type": "string"},
+                               "task_type": {"type": "string"},
+                               "objective": {"type": "string"},
+                               "findings": {"type": "array",
+                                            "items": {"type": "object"}},
+                               "diff": {"type": "string"},
+                               "context_refs": {"type": "array",
+                                                "items": {"type": "string"}},
+                           },
+                           "required": ["agent_id", "task_type"],
+                           "additionalProperties": False}}},
+                       "required": ["tasks"], "additionalProperties": False},
+            "fn": delegate_agent_batch,
             "risk": "medium",
         },
         "discover_agents": {

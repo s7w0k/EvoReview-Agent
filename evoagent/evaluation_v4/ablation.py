@@ -45,7 +45,16 @@ class AblationRunner:
             variant = row["variant"]
             records: List[Dict[str, Any]] = []
             for scenario in scenarios:
-                config = {**row["enabled"], "kind": scenario.get("kind")}
+                config = {
+                    **row["enabled"],
+                    "kind": scenario.get("kind"),
+                    "expected_count": scenario.get("expected_count", 0),
+                    "risk": scenario.get("risk", "low"),
+                    "expected_replan": scenario.get("expected_replan", False),
+                    "expected_replan_target": scenario.get(
+                        "expected_replan_target"),
+                    "expected_agents": list(scenario.get("expected_agents", [])),
+                }
                 record = self.run_scenario(scenario.get("diff", ""), config)
                 record["expected_count"] = scenario.get("expected_count", 0)
                 record["scenario_id"] = scenario.get("scenario_id", "")

@@ -138,6 +138,50 @@ jobs:
           name: evolution-eval-artifacts
           path: artifacts/evolution_eval/*.json
 
+  # Real Multi-Agent closure (plan §5.3 / Phases 10-12). One job that enforces
+  # the six hard gates end-to-end on the real runtime stack:
+  #   1. true-parallel-execution      (WS1 timing gate)
+  #   2. deep-loop-observation-driven
+  #   3. targeted-replan-correctness
+  #   4. dynamic-graph-safety          (no cycle / no self-cycle / fix after verify)
+  #   5. runtime-eval-v4               (real six-agent runner, not synthetic)
+  #   6. ablation-smoke                (7-variant real ablation over a corpus slice)
+  # The CLI default stays on the runtime runner and never falls back to synthetic
+  # (plan §5.8); attribution (plan §12) is produced by the same run.
+  multi-agent-closure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e ".[dev]"
+      # 1. true parallel hard gate: two 200ms fake agents must overlap (<320ms).
+      - run: python -m pytest tests/multi_agent/test_parallel_execution.py -q
+      # 2. deep loop gates: specialists actually drive observation -> tool.
+      - run: python -m pytest tests/test_multi_agent_v2.py -k "deep_loop" -q
+      # 3. targeted replan correctness: resolver + budget-loop + fix loop.
+      - run: python -m pytest tests/test_multi_agent_v2.py -k "replan or fix_full_loop" -q
+      # 4. dynamic graph safety: validator rejects cycles; mutator is history-safe.
+      - run: python -m pytest tests/test_multi_agent_v2.py -k "validator or graph_mutator or trigger or coordinator_v2" -q
+      # 5 + 6. real runtime ablation smoke over a corpus slice (default matches
+      # the published CLI: --runner runtime, non-synthetic by default).
+      - run: python -m pytest tests/test_multi_agent_v2.py -k "v4_runtime or v4_ablation or corpus" -q
+      - name: Real runtime ablation smoke (default runner)
+        run: |
+          python -m evoagent.evaluation_v4 --runner runtime --scenarios 8 --out evaluation_v4_closure.md
+          test -f evaluation_v4_closure.md
+          python - <<'PY'
+          text = open("evaluation_v4_closure.md", encoding="utf-8").read()
+          assert "Evolution Attribution" in text, "attribution missing from report"
+          print("[gate] runtime ablation + attribution report rendered")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: multi-agent-closure-artifacts
+          path: evaluation_v4_closure.md
+
   # Evaluation Harness V2 regression (plan Phase 13). Deterministic, no LLM cost:
   # verify the frozen dataset SHA, reproduce the 4 systems, evaluate the safety
   # gates, and upload the reproducible report so CI parses the exact numbers.

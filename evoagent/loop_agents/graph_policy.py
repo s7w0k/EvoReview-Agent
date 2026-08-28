@@ -91,13 +91,18 @@ class GraphMutator:
         return node.node_id
 
     def change_dependency(self, node_id: str, dependencies: List[str],
-                          *, append: bool = True, reason: str = "") -> str:
+                      *, append: bool = True, reason: str = "") -> str:
         node = self.graph.nodes.get(node_id)
         if node is None:
             return node_id
-        base = list(node.dependencies)
-        node.dependencies = base + (list(dependencies) if append else [
-            d for d in base if d not in dependencies])
+        # A node can never depend on itself (plan §3.1 / SELF_DEPENDENCY).
+        additions = [d for d in dependencies if d and d != node_id]
+        base = [d for d in node.dependencies if d != node_id]
+        if append:
+            merged = base + [d for d in additions if d not in base]
+        else:
+            merged = [d for d in base if d not in dependencies]
+        node.dependencies = merged
         self._applied.append({"op": "change_dependency", "node": node_id,
                               "reason": reason})
         return node_id

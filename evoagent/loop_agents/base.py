@@ -34,6 +34,8 @@ class BaseLoopAgent:
         execution_policy=None,
         tools=None,
         bus=None,
+        *,
+        deep_loop: bool = True,
     ):
         self.agent_loop = AgentLoop(
             max_steps or 4, timeout_seconds or 45,
@@ -41,6 +43,7 @@ class BaseLoopAgent:
         )
         self.tools = tools  # GovernedToolRegistry or None
         self.bus = bus
+        self.deep_loop = deep_loop
         # Structured planning metadata only (never raw chain-of-thought).
         self._plan_records: List[Dict[str, Any]] = []
         # The most recent task so ``build_artifact`` can reference inputs the
@@ -115,8 +118,9 @@ class BaseLoopAgent:
         initial = self.build_initial_state(dict(task))
         task_id = str(task.get("task_id", ""))
         tools = self.prepare(dict(task)) or self.tools
+        step_fn = self._shallow_step if not self.deep_loop else self.agent_step
         result = self.agent_loop.run(
-            self.agent_step, tools, initial,
+            step_fn, tools, initial,
             agent_id=self.agent_id, task_id=task_id,
         )
         artifact = self.build_artifact(result)
@@ -128,6 +132,18 @@ class BaseLoopAgent:
             "plan": list(self._plan_records),
             "agent_id": self.agent_id,
         }
+
+    def _shallow_step(self, state: Dict[str, Any]) -> Dict[str, Any]:
+        """Shallow stepper (plan §4.4, ``deep_loop=False``).
+
+        Runs the agent's normal first gate once; as soon as any observation
+        exists the loop finalises instead of pursuing the observation-driven
+        deepen tools, so the shallow run genuinely changes tool selection.
+        """
+        if state.get("observations"):
+            self._last_state = state
+            return {"action": "final", "agent_id": self.agent_id}
+        return self.agent_step(state)
 
     # -- tool helpers --------------------------------------------------------
     def call_tool(self, name: str, arguments: Dict[str, Any], task_id: str = "") -> Any:

@@ -1,17 +1,35 @@
-"""Fix Agent = FixAgent + SafeFixer + RepairVerifier (plan §16).
+"""Fix Agent (plan §2.6, §16) -- genuine patch strategy replan.
 
-Demonstrates a genuine ``patch -> test -> failure -> replan -> patch`` loop: it
-generates a deterministic patch, runs the compile gate, and -- when the hunk
-carries no concrete change (e.g. the finding had no proposed fix) -- **replans**
-with an AST-anchored patch before finalising.  Publishing a draft is a separate,
-governed, approval-gated step that never runs implicitly.
+The loop is *observation-driven*: each observed outcome selects the next
+strategy instead of blindly walking a counter.  Strategies never repeat after
+they fail:
+
+    generate_deterministic_patch
+      -> compile fail?            -> generate_ast_patch
+      -> compile ok -> test fail? -> generate_ast_patch
+      -> test ok                  -> Final
+    generate_ast_patch
+      -> compile fail?            -> generate_model_assisted_patch
+      -> compile ok -> test fail? -> generate_model_assisted_patch
+      -> test ok                  -> Final
+    generate_model_assisted_patch
+      -> compile / test fail?     -> abort (exhausted)
+      -> ok                       -> Final
 """
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from .base import BaseLoopAgent
 from .stepper import (
     PlanTracker, final_action, observations, tool_action, tool_results,
 )
+
+# ordered ladder of patch strategies -- a strategy is never retried after it
+# has produced a patch (its observation already exists).
+_GENERATORS: List[str] = [
+    "generate_deterministic_patch",
+    "generate_ast_patch",
+    "generate_model_assisted_patch",
+]
 
 _DANGEROUS_TTL = ("disable validation", "ignore error", "catch all")
 
@@ -24,6 +42,72 @@ def _patch_of(results: List[Dict[str, Any]]) -> str:
     return ""
 
 
+def _used_generators(state: Dict[str, Any]) -> List[str]:
+    return [g for g in _GENERATORS if tool_results(state, g)]
+
+
+def _active_generator(state: Dict[str, Any]) -> Optional[str]:
+    used = _used_generators(state)
+    return used[-1] if used else None
+
+
+def _next_generator(state: Dict[str, Any]) -> Optional[str]:
+    used = set(_used_generators(state))
+    return next((g for g in _GENERATORS if g not in used), None)
+
+
+def _last_result(state: Dict[str, Any], tool: str) -> Optional[Dict[str, Any]]:
+    results = tool_results(state, tool)
+    return results[-1] if results else None
+
+
+def choose_fix_tool(state: Dict[str, Any],
+                    finding: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Return the next ``{tool, args}`` selected by the last observation."""
+    obs = observations(state)
+    # Nothing observed yet -> start the ladder.
+    if not obs:
+        return {"tool": "generate_deterministic_patch", "args": {"finding": finding}}
+
+    active = _active_generator(state)
+    last_name = obs[-1].get("tool")
+
+    # A generator just produced a patch -> gate it with the compile step.
+    if last_name in _GENERATORS:
+        return {"tool": "compile_patch", "args": {"patch": _patch_of(
+            tool_results(state, last_name))}}
+
+    # Compile gate observed -> route on compile_ok.
+    if last_name == "compile_patch":
+        compile_result = _last_result(state, "compile_patch")
+        compile_ok = bool(compile_result and compile_result.get("compile_ok"))
+        if compile_ok:
+            patch = _patch_of(tool_results(state, active)) if active else ""
+            return {"tool": "run_patch_tests", "args": {"patch": patch}}
+        # compile failed -> replan to the next strategy (never repeat).
+        nxt = _next_generator(state)
+        if nxt is None:
+            return None  # exhausted -> abort
+        return {"tool": nxt, "args": {"finding": finding}}
+
+    # Test gate observed -> route on pass/fail.
+    if last_name == "run_patch_tests":
+        test_result = _last_result(state, "run_patch_tests")
+        passed = bool(test_result is None or test_result.get("passed", True))
+        if passed:
+            return None  # verified -> final
+        nxt = _next_generator(state)
+        if nxt is None:
+            return None  # exhausted -> abort
+        return {"tool": nxt, "args": {"finding": finding}}
+
+    # Unknown / stale tail -> restart the ladder for a fresh patch.
+    if active is None:
+        return {"tool": "generate_deterministic_patch", "args": {"finding": finding}}
+    return {"tool": "compile_patch", "args": {"patch": _patch_of(
+        tool_results(state, active))}}
+
+
 class FixAgent(BaseLoopAgent):
     agent_id = "fix-agent"
     capabilities = ("patch-generation", "repair-verification", "safe-fix")
@@ -31,8 +115,8 @@ class FixAgent(BaseLoopAgent):
     artifact_type = "fix-patch"
     tool_allowlist = (
         "inspect_diff", "generate_deterministic_patch", "generate_ast_patch",
-        "compile_patch", "run_patch_tests", "inspect_patch_diff",
-        "measure_patch_scope",
+        "generate_model_assisted_patch", "compile_patch", "run_patch_tests",
+        "inspect_patch_diff", "measure_patch_scope",
     )
 
     def build_initial_state(self, task: Dict[str, Any]) -> Dict[str, Any]:
@@ -51,53 +135,30 @@ class FixAgent(BaseLoopAgent):
         return not any(token in text for token in _DANGEROUS_TTL)
 
     def agent_step(self, state: Dict[str, Any]) -> Dict[str, Any]:
+        self._last_state = state
         finding = state.get("finding") or {}
         plan = PlanTracker(
             state, str(state.get("objective")),
             ["generate patch", "compile", "test / replan"], confidence=0.8)
-        obs = observations(state)
 
-        if not obs:
-            plan.begin("generate_deterministic_patch")
-            return tool_action("generate_deterministic_patch", {"finding": finding})
-
-        if len(obs) == 1:
-            det = _patch_of(tool_results(state, "generate_deterministic_patch"))
-            state["_candidate_patch"] = det
-            return tool_action("compile_patch", {"patch": det})
-
-        if len(obs) == 2:
-            compiles = tool_results(state, "compile_patch")
-            ok = bool(compiles and compiles[-1].get("compile_ok"))
-            if ok:
-                state["_failed_once"] = False
-                return tool_action(
-                    "run_patch_tests", {"patch": state.get("_candidate_patch", "")})
-            state["_failed_once"] = True
-            plan.revise(["replan after compile failure", "regenerate a valid patch"],
-                        "compile gate rejected the deterministic hunk")
-            return tool_action("generate_ast_patch", {"finding": finding})
-
-        if len(obs) == 3:
-            if state.get("_failed_once"):
-                ast = _patch_of(tool_results(state, "generate_ast_patch"))
-                state["_replanned_patch"] = ast
-                return tool_action("compile_patch", {"patch": ast})
-            plan.complete("compile").complete("test / replan")
+        decision = choose_fix_tool(state, finding)
+        if decision is None:
+            active = _active_generator(state) or ""
+            used = _used_generators(state)
+            plan.complete("test / replan")
+            reached_test = any(tool_results(state, "run_patch_tests"))
             return final_action(
-                patch=state.get("_candidate_patch", ""),
-                failed_once=False, agent_id=self.agent_id)
-
-        if len(obs) == 4:
-            ast = state.get("_replanned_patch", "")
-            compiles = tool_results(state, "compile_patch")
-            ok = bool(compiles and compiles[-1].get("compile_ok"))
-            plan.complete("generate patch").complete("replan after compile failure")
-            return final_action(
-                patch=ast, failed_once=True, verified_replanned=ok,
+                patch=_patch_of(tool_results(state, active)) if active else "",
+                generator=active,
+                strategies_tried=used,
+                replanned=len(used) > 1,
+                verified=bool(reached_test and (
+                    _last_result(state, "run_patch_tests") or {}
+                ).get("passed", True)),
+                exhausted=len(used) >= len(_GENERATORS),
                 agent_id=self.agent_id)
-
-        return final_action(patch="", agent_id=self.agent_id)
+        plan.begin("tool:" + decision["tool"])
+        return tool_action(decision["tool"], dict(decision["args"]))
 
     def build_artifact(self, result) -> Dict[str, Any]:
         state = {"observations": list(result.observations)}
@@ -106,9 +167,9 @@ class FixAgent(BaseLoopAgent):
                         or (task.get("input") or {}).get("findings") or [])
         primary = findings[0] if findings else {}
 
-        det = _patch_of(tool_results(state, "generate_deterministic_patch"))
-        ast = _patch_of(tool_results(state, "generate_ast_patch"))
-        final_patch = ast or det
+        used = [g for g in _GENERATORS if tool_results(state, g)]
+        active = used[-1] if used else ""
+        final_patch = _patch_of(tool_results(state, active)) if active else ""
 
         compiles = tool_results(state, "compile_patch")
         compiled_ok = all(item.get("compile_ok") for item in compiles) if compiles else False
@@ -116,17 +177,21 @@ class FixAgent(BaseLoopAgent):
         tests_passed = all(item.get("passed", True) for item in tests) if tests else True
 
         changed_files = []
-        for result_ in tool_results(state, "generate_deterministic_patch") + \
-                tool_results(state, "generate_ast_patch"):
-            for path in result_.get("changed_files", []):
-                if path not in changed_files:
-                    changed_files.append(path)
+        for gen in _GENERATORS:
+            for result_ in tool_results(state, gen):
+                for path in result_.get("changed_files", []):
+                    if path not in changed_files:
+                        changed_files.append(path)
 
         return {
             "task_type": self.task_type,
             "agent_id": self.agent_id,
             "patch": final_patch,
             "changed_files": changed_files,
+            "generator": active,
+            "strategies_tried": used,
+            "replanned": len(used) > 1,
+            "patch_strategy_count": len(used),
             "verification": "verified" if (compiled_ok and tests_passed)
             else "unverified",
             "test_results": {"passed": tests_passed, "run": len(tests)},
@@ -135,4 +200,4 @@ class FixAgent(BaseLoopAgent):
         }
 
 
-__all__ = ["FixAgent"]
+__all__ = ["FixAgent", "choose_fix_tool"]

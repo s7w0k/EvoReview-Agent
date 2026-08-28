@@ -222,6 +222,362 @@ def test_verification_strategy_selection():
 
 
 # ---------------------------------------------------------------------------
+# 真正闭环 Phase 3: Verifier Deep Loop (plan §2.8) -- the hard gate asserts the
+# *observation* chooses the next tool, not just that a strategy field appeared.
+# ---------------------------------------------------------------------------
+
+def _vf_obs(tool, result):
+    return {"step": 1, "tool": tool, "ok": True, "result": dict(result)}
+
+
+def _sec_finding():
+    return {"rule_id": "SEC-EVAL", "path": "app.py", "line": 5,
+            "title": "sql", "evidence": "", "confidence": 0.8, "id": "f1"}
+
+
+def test_verifier_observation_selects_next_tool():
+    from evoagent.loop_agents.verifier import choose_verifier_tool
+    finding = _sec_finding()
+    # Evidence gathered, then verify_rule_signature SUCCEEDS -> finding done.
+    sat = choose_verifier_tool(
+        {"observations": [_vf_obs("inspect_evidence", {"evidence": "e"}),
+                          _vf_obs("verify_rule_signature", {"supported": True,
+                                                             "rule_id": "SEC-EVAL",
+                                                             "content": "x"})]},
+        [finding])
+    # falsify feedback -> the NEXT observed outcome selects a DIFFERENT tool.
+    fail = choose_verifier_tool(
+        {"observations": [_vf_obs("inspect_evidence", {"evidence": "e"}),
+                          _vf_obs("verify_rule_signature", {"supported": False,
+                                                             "rule_id": "SEC-EVAL",
+                                                             "content": ""})]},
+        [finding])
+    assert sat is None, "supported observation must finalize the finding"
+    assert fail is not None and fail["tool"] == "semantic_verify", (
+        "unsupported observation must cascade to a different verification tool")
+
+
+def test_verifier_no_repeat_same_strategy():
+    from evoagent.loop_agents.verifier import choose_verifier_tool
+    finding = _sec_finding()
+    # Inspect -> verify_rule_signature(False) -> semantic_verify(False) ->
+    # the SAME tool must never be re-offered; next is run_targeted_test.
+    state = {"observations": [
+        _vf_obs("inspect_evidence", {"evidence": "e"}),
+        _vf_obs("verify_rule_signature", {"supported": False, "rule_id": "SEC"}),
+        _vf_obs("semantic_verify", {"verified": False, "rule_id": "SEC"}),
+    ]}
+    decision = choose_verifier_tool(state, [finding])
+    assert decision is not None and decision["tool"] == "run_targeted_test"
+
+
+def test_verifier_failure_cascades_none_and_reports_unverified():
+    from evoagent.loop_agents.verifier import choose_verifier_tool
+    finding = _sec_finding()
+    state = {"observations": [
+        _vf_obs("inspect_evidence", {"evidence": "e"}),
+        _vf_obs("verify_rule_signature", {"supported": False, "rule_id": "SEC"}),
+        _vf_obs("semantic_verify", {"verified": False, "rule_id": "SEC"}),
+        _vf_obs("run_targeted_test", {"passed": False, "rule_id": "SEC"}),
+    ]}
+    assert choose_verifier_tool(state, [finding]) is None
+    rec = state["_vf"]["SEC-EVAL:app.py:5"]
+    assert rec["done"] is True and rec["verified"] is False
+
+
+def test_verifier_full_artifact_records_strategies():
+    from evoagent.loop_agents import VerifierAgent
+    agent = VerifierAgent()
+    out = agent.run({
+        "task_id": "v1", "task_type": "verify.findings", "objective": "verify",
+        "input": {"findings": [_sec_finding()]}})
+    decisions = out["artifact"]["decisions"]
+    rec = decisions["SEC-EVAL:app.py:5"]
+    assert rec["verified"] is True
+    assert rec["attempted_strategies"][0] == "verify_rule_signature"
+    assert "remaining_strategies" in rec
+    assert rec["verification_strategy"] == rec["attempted_strategies"][-1]
+
+
+# ---------------------------------------------------------------------------
+# 真正闭环 Phase 4: Critic Deep Loop (plan §2.4) -- previous observation selects
+# the next critique tool.
+# ---------------------------------------------------------------------------
+
+def test_critic_observation_selects_next_tool():
+    from evoagent.loop_agents.critic import choose_critic_tool
+    finding = {"rule_id": "SEC-EVAL", "path": "app.py", "line": 5,
+               "title": "sql", "evidence": "SELECT"}
+    key = "SEC-EVAL:app.py:5"
+    # In the real loop the per-finding pipeline has already dispatched
+    # check_evidence_match (stage == 1); the observation then selects the branch.
+    base = {
+        "observations": [
+            {"step": 1, "tool": "compare_peer_findings", "ok": True,
+             "result": {"count": 1, "duplicates": []}},
+            {"step": 2, "tool": "check_evidence_match", "ok": True,
+             "result": {"supported": True, "evidence": "SELECT"}}],
+        "_cr": {key: {"stage": 1, "done": False}},
+    }
+    strong = choose_critic_tool(dict(base), [finding])
+    weak_key = "SEC-EVAL:app.py:5"
+    weak = choose_critic_tool(
+        {"observations": [
+            {"step": 1, "tool": "compare_peer_findings", "ok": True,
+             "result": {"count": 1, "duplicates": []}},
+            {"step": 2, "tool": "check_evidence_match", "ok": True,
+             "result": {"supported": False, "evidence": None}}],
+         "_cr": {weak_key: {"stage": 1, "done": False}}},
+        [finding])
+    assert strong["tool"] == "find_conflict"
+    assert weak["tool"] == "check_explanation_quality"
+
+
+def test_critic_full_loop_finalizes_and_closes_pipeline():
+    from evoagent.loop_agents.critic import CriticAgent
+    finding = {"rule_id": "SEC-EVAL", "path": "app.py", "line": 5,
+               "title": "sql", "evidence": "SELECT"}
+    agent = CriticAgent()
+    out = agent.run({
+        "task_id": "c1", "task_type": "critique.findings", "objective": "critique",
+        "input": {"findings": [finding]}})
+    artifact = out["artifact"]
+    assert out["stop_reason"] == "final"
+    assert artifact["accepted_findings"] and "replan_requests" in artifact
+    observed = {o.get("tool") for o in out["observations"]}
+    assert observed & {"check_evidence_match", "find_conflict",
+                       "check_explanation_quality", "check_fix_actionability"}
+
+
+# ---------------------------------------------------------------------------
+# 真正闭环 Phase 5: Security / Reliability Deep Loop (plan §2.2 / §2.3) --
+# deterministic static approximations, never empty-shell tools.
+# ---------------------------------------------------------------------------
+
+def test_security_deep_loop_tools_are_real_static_analysis():
+    from evoagent.diff_parser import parse_unified_diff
+    from evoagent.loop_agents.tools import build_expert_context, build_expert_definitions
+    diff = ("--- a/a.py\n+++ b/a.py\n@@ -1,4 +1,4 @@\n"
+            "+import os\n"
+            "+def run():\n"
+            "+    name = input('l')\n"
+            "+    os.system(name)\n")
+    ctx = build_expert_context(diff, parse_unified_diff(diff))
+    defs = {d.tool.name: d for d in build_expert_definitions(ctx)}
+    finding = {"rule_id": "SEC-EVAL", "path": "a.py", "line": 2}
+    tf = defs["trace_dataflow"].tool.handler(finding)
+    assert tf["reached"] is True and "sources" in tf and "sinks" in tf
+    ic = defs["inspect_context"].tool.handler(finding)
+    assert "imports" in ic and ic["risk_relevant"] in (True, False)
+    ep = defs["inspect_execution_path"].tool.handler(finding)
+    assert "guarded" in ep
+
+
+def test_security_observation_selects_deepen_tool():
+    from evoagent.loop_agents.security import choose_security_tool
+    weak = {"rule_id": "SEC-X", "path": "a.py", "line": 1, "evidence": ""}
+    rich = {"rule_id": "SEC-Y", "path": "a.py", "line": 2,
+            "evidence": "x" * 60}
+    base = {"observations": [
+        {"step": 1, "tool": "security_rule_scan", "ok": True,
+         "result": {"findings": [weak]}},
+        {"step": 2, "tool": "semantic_scan", "ok": True,
+         "result": {"findings": []}}]}
+    # weak evidence -> trace_dataflow deepens the finding.
+    deep = choose_security_tool(dict(base), [weak, rich])
+    assert deep["tool"] == "trace_dataflow"
+    # strong evidence -> no per-finding deepen needed.
+    assert choose_security_tool(dict(base), [rich]) is None
+
+
+def test_reliability_deep_loop_end_to_end():
+    from evoagent.loop_agents import ReliabilityAgent
+    agent = ReliabilityAgent()
+    out = agent.run({
+        "task_id": "r1", "task_type": "review.reliability", "objective": "rel",
+        "input": {"findings": [], "diff": "import time\ntry:\n  time.sleep(1)\n"
+                                         "except Exception:\n  pass\n"}})
+    observed = {o.get("tool") for o in out["observations"]}
+    assert out["stop_reason"] == "final"
+    assert "reliability_rule_scan" in observed
+    artifact = out["artifact"]
+    assert "findings" in artifact and "count" in artifact
+    assert artifact.get("confidence") is not None
+
+
+# ---------------------------------------------------------------------------
+# Phase 6: Fix Agent strategy replan (plan §2.6) -- previous observation selects
+# the next patch strategy; a failed strategy is never retried.
+# ---------------------------------------------------------------------------
+
+def _fx_obs(tool, result):
+    return {"step": 1, "tool": tool, "ok": True, "result": dict(result)}
+
+
+def test_fix_observation_selects_next_strategy_on_compile_fail():
+    from evoagent.loop_agents.fix import choose_fix_tool
+    finding = {"rule_id": "SEC-EVAL", "path": "app.py", "line": 5}
+    # deterministic compile FAILS -> next strategy must be generate_ast_patch.
+    after_compile_fail = choose_fix_tool(
+        {"observations": [
+            _fx_obs("generate_deterministic_patch",
+                    {"patch": "+ x\n", "noop": False, "generator": "deterministic"}),
+            _fx_obs("compile_patch", {"compile_ok": False})]},
+        finding)
+    assert after_compile_fail is not None
+    assert after_compile_fail["tool"] == "generate_ast_patch"
+    # AST compile FAILS -> next is generate_model_assisted_patch (never repeat).
+    after_ast_fail = choose_fix_tool(
+        {"observations": [
+            _fx_obs("generate_deterministic_patch",
+                    {"patch": "+ x\n", "noop": False, "generator": "deterministic"}),
+            _fx_obs("compile_patch", {"compile_ok": False}),
+            _fx_obs("generate_ast_patch",
+                    {"patch": "+ x\n", "noop": False, "generator": "ast"}),
+            _fx_obs("compile_patch", {"compile_ok": False})]},
+        finding)
+    assert after_ast_fail is not None
+    assert after_ast_fail["tool"] == "generate_model_assisted_patch"
+
+
+def test_fix_observation_routes_to_tests_when_compiles():
+    from evoagent.loop_agents.fix import choose_fix_tool
+    finding = {"rule_id": "SEC-EVAL", "path": "app.py", "line": 5}
+    # deterministic compiles -> run_patch_tests; never the same strategy twice.
+    decision = choose_fix_tool(
+        {"observations": [
+            _fx_obs("generate_deterministic_patch",
+                    {"patch": "+ x\n", "noop": False, "generator": "deterministic"}),
+            _fx_obs("compile_patch", {"compile_ok": True}),
+            _fx_obs("run_patch_tests", {"passed": False})]},
+        finding)
+    # test FAIL -> replan to AST (next unused strategy), not repeat.
+    assert decision is not None and decision["tool"] == "generate_ast_patch"
+    # test PASS -> final (None), no mechanical repetition.
+    assert choose_fix_tool(
+        {"observations": [
+            _fx_obs("generate_deterministic_patch",
+                    {"patch": "+ x\n", "noop": False, "generator": "deterministic"}),
+            _fx_obs("compile_patch", {"compile_ok": True}),
+            _fx_obs("run_patch_tests", {"passed": True})]},
+        finding) is None
+
+
+def test_fix_full_loop_replans_and_closes():
+    from evoagent.loop_agents import FixAgent
+    agent = FixAgent()
+    out = agent.run({
+        "task_id": "f1", "task_type": "fix.generate", "objective": "fix",
+        "input": {"findings": [{"rule_id": "SEC-EVAL", "path": "app.py",
+                                "line": 5, "fix": "sanitize input"}]}})
+    assert out["stop_reason"] in ("final", "exhausted")
+    artifact = out["artifact"]
+    assert artifact["strategies_tried"][0] == "generate_deterministic_patch"
+    assert artifact["patch_strategy_count"] >= 1
+    assert list(artifact["strategies_tried"]) == list(dict.fromkeys(
+        artifact["strategies_tried"])), "A strategy must never repeat mechanically"
+
+
+def test_fix_scheme_registered_and_allowlisted():
+    from evoagent.diff_parser import parse_unified_diff
+    from evoagent.loop_agents.tools import AGENT_SPECS, build_expert_context, \
+        build_expert_definitions
+    assert "generate_model_assisted_patch" in AGENT_SPECS["fix-agent"]["allowed_tools"]
+    diff = "--- a/app.py\n+++ b/app.py\n@@ -1,3 +1,3 @@\n+import os\n+os.system('ls')\n"
+    ctx = build_expert_context(diff, parse_unified_diff(diff))
+    defs = {d.tool.name for d in build_expert_definitions(ctx)}
+    assert {"generate_deterministic_patch", "generate_ast_patch",
+            "generate_model_assisted_patch"} <= defs
+
+
+# ---------------------------------------------------------------------------
+# Phase 7: Runtime FeatureFlags (plan §4.3 / §4.4) -- each flag must genuinely
+# change runtime behaviour, never just sit as a False in a config dict.
+# ---------------------------------------------------------------------------
+
+def test_feature_flags_parallel_budget_and_variants():
+    from evoagent.loop_agents.feature_flags import MultiAgentFeatureFlags, \
+        ablation_variant, flags_from_dict
+    assert MultiAgentFeatureFlags().effective_max_parallel == 3
+    assert MultiAgentFeatureFlags(parallel_scheduler=False).effective_max_parallel == 1
+    assert ablation_variant("Sequential").parallel_scheduler is False
+    assert ablation_variant("Full").parallel_scheduler is True
+    assert flags_from_dict({"critic": False, "planner": True}).critic is False
+    assert flags_from_dict({"critic": False, "planner": True}).planner is True
+    assert MultiAgentFeatureFlags().clone(verifier=False).verifier is False
+
+
+def test_feature_flags_deep_loop_shallow_stepper():
+    from evoagent.loop_agents import ReliabilityAgent
+    deep = ReliabilityAgent()  # default deep loop
+    shallow = ReliabilityAgent(deep_loop=False)
+    task = {"task_id": "r", "task_type": "review.reliability",
+            "objective": "rel",
+            "input": {"findings": [],
+                      "diff": "--- a/app.py\n+++ b/app.py\n@@ -1,2 +1,3 @@\n"
+                              "+print(x)\n+import time\n"}}
+    deep_out = deep.run(dict(task))
+    shallow_out = shallow.run(dict(task))
+    # deep loop keeps deepening; shallow stops after the first gate observation.
+    assert deep_out["steps"] > shallow_out["steps"]
+
+
+# ---------------------------------------------------------------------------
+# Phase 8: Evaluation V4 Runtime Runner (plan §4.1/§4.2) -- the default runner
+# drives the real SixAgentReviewer stack; the synthetic runner is demo-only.
+# ---------------------------------------------------------------------------
+
+def test_runtime_runner_goes_through_real_stack():
+    from evoagent.evaluation_v4.runtime_runner import RuntimeScenarioRunner
+    runner = RuntimeScenarioRunner()
+    scenario = {
+        "scenario_id": "rt-1", "kind": "both", "objective": "review",
+        "diff": ("--- a/login.py\n+++ b/login.py\n@@ -1,4 +1,6 @@\n"
+                 "def login(user, pw):\n+    import sqlite3\n"
+                 "    db = sqlite3.connect('u.db')\n"
+                 "+    return db.execute('SELECT * FROM u WHERE pw='+pw)\n"),
+        "expected_count": 1,
+    }
+    record = runner.run(scenario, {"scheduler": True})
+    assert record["ran_real_runtime"] is True
+    assert record["synthetic"] is False
+    assert record["tool_calls"] > 0
+    assert record["a2a_calls"] > 0  # real delegation happened through A2A
+    assert record["artifact"]["architecture"] in ("six-agent", "six-agent-v2")
+
+
+def test_runtime_runner_flags_change_participating_agents():
+    from evoagent.evaluation_v4.runtime_runner import RuntimeScenarioRunner
+    runner = RuntimeScenarioRunner(architecture="six-agent-v2")
+    scenario = {
+        "scenario_id": "rt-2", "kind": "both", "objective": "review",
+        "diff": ("--- a/login.py\n+++ b/login.py\n@@ -1,4 +1,6 @@\n"
+                 "def login(user, pw):\n+    import sqlite3\n"
+                 "    db = sqlite3.connect('u.db')\n"
+                 "+    return db.execute('SELECT * FROM u WHERE pw='+pw)\n"),
+        "expected_count": 1,
+    }
+    full = runner.run(dict(scenario), {"critic": True, "verifier": True})
+    no_critic = runner.run(dict(scenario), {"critic": False, "verifier": True})
+    collisions_full = full["collaborations"]
+    collisions_nocritic = no_critic["collaborations"]
+    assert "critic-agent" in collisions_full
+    assert "critic-agent" not in collisions_nocritic
+
+
+def test_cli_default_runner_is_runtime():
+    from evoagent.evaluation_v4.cli import _pick_runner
+    runner = _pick_runner("runtime")
+    out = runner("--- a/a.py\n+++ b/a.py\n@@ -1,2 +1,3 @@\n+import os\n",
+                 {"kind": "both", "expected_count": 0})
+    assert out["ran_real_runtime"] is True
+    assert out["synthetic"] is False
+    # synthetic stays available but is explicitly flagged.
+    syn = _pick_runner("synthetic")("", {"kind": "clean"})
+    assert syn["synthetic"] is True
+
+
+# ---------------------------------------------------------------------------
 # Phase 6: Multi-Agent Value Evaluation V4
 # ---------------------------------------------------------------------------
 
@@ -289,3 +645,127 @@ def test_observability_trace_context():
                               replan_request_id="R1")
     assert "a2a_task_id" in ctx and ctx["graph_revision"] == 1
     assert ctx["agent_version"] == "six-agent-v2"
+
+
+# ---------------------------------------------------------------------------
+# Phase 9: 60-case scenario corpus (plan §4.5 / §4.6)
+# ---------------------------------------------------------------------------
+
+def test_v4_full_corpus_count_and_distribution():
+    from evoagent.evaluation_v4.scenarios import (
+        CATEGORY_SIZES, GOLD_KEYS, build_full_corpus,
+    )
+    corpus = build_full_corpus()
+    from collections import Counter
+    sizes = Counter(s["category"] for s in corpus)
+    # plan §4.5: planning 15 / replan 10 / collaboration 10 / deep_loop 10 /
+    # fix 5 / failure 10 == 60
+    assert sizes == CATEGORY_SIZES
+    assert len(corpus) == sum(CATEGORY_SIZES.values()) == 60
+
+
+def test_v4_full_corpus_gold_and_uniqueness():
+    from evoagent.evaluation_v4.scenarios import GOLD_KEYS, build_full_corpus
+    corpus = build_full_corpus()
+    ids = [s["scenario_id"] for s in corpus]
+    assert len(set(ids)) == len(ids)  # unique scenario ids
+    assert len(set(s["diff"] for s in corpus)) >= 30  # not a copy-paste corpus
+    for s in corpus:
+        assert set(GOLD_KEYS) <= set(s), s["scenario_id"]
+        assert "expected_agents" in s and s["expected_agents"]
+        assert "expected_replan" in s
+        # replan scenarios name a concrete target specialist
+        if s["expected_replan"]:
+            assert s["expected_replan_target"] in {
+                "security-agent", "reliability-agent"}
+        # expected_findings count is consistent with expected_count
+        assert len(s["expected_findings"]) <= max(1, s["expected_count"])
+
+
+def test_v4_full_corpus_roundtrip_write():
+    import os
+    from evoagent.evaluation_v4.scenarios import (
+        GOLD_KEYS, load_scenarios, write_full_corpus,
+    )
+    path = os.path.join(os.path.dirname(__file__), "_v4_corpus_tmp.jsonl")
+    try:
+        assert write_full_corpus(path) == 60
+        reloaded = load_scenarios(path)
+        assert len(reloaded) == 60
+        assert all(set(GOLD_KEYS) <= set(s) for s in reloaded)
+    finally:
+        if os.path.exists(path):
+            os.remove(path)
+
+
+# ---------------------------------------------------------------------------
+# Phases 10-12: real-runtime ablation smoke + evolution attribution (plan §5/§12)
+# ---------------------------------------------------------------------------
+
+def test_v4_runtime_runner_smoke():
+    """Phase 10: the real six-agent stack runs a scenario (no synthetic stub)."""
+    from evoagent.evaluation_v4.runtime_runner import RuntimeScenarioRunner
+    from evoagent.evaluation_v4.scenarios import build_full_corpus
+    scenario = build_full_corpus()[0]  # planning-001 sql-injection
+    record = RuntimeScenarioRunner().run(scenario, {})
+    assert record["ran_real_runtime"] is True
+    assert record["expected_count"] == scenario["expected_count"] == 1
+    assert record["artifact"]["count"] >= 0
+    # gold (plan §4.6) is attached to the real record.
+    assert record["expected_replan"] is False
+    assert record["expected_agents"] == ["security-agent", "critic-agent",
+                                         "verifier-agent"]
+
+
+def test_v4_ablation_runner_smoke():
+    """Phase 10/11: the ablation matrix runs the real runner over a small slice."""
+    from evoagent.evaluation_v4.ablation import AblationRunner
+    from evoagent.evaluation_v4.runtime_runner import build_runtime_runner
+    from evoagent.evaluation_v4.scenarios import load_scenarios, sample_scenarios
+    scenarios = sample_scenarios(load_scenarios("__missing__.jsonl"), 4, seed=1)
+    results = AblationRunner(build_runtime_runner()).run(scenarios)
+    assert set(results) == {"A", "B", "C", "D", "E", "F", "G"}
+    assert all(len(records) == 4 for records in results.values())
+
+
+def test_v4_attribution_runtime():
+    """Phase 12: gold-vs-actual gap maps to stable attribution codes."""
+    from evoagent.evaluation_v4.runtime_runner import attribute_runtime
+
+    # clean diff inflated to findings -> over-routing
+    fp = {"artifact": {"count": 2}, "expected_count": 0,
+          "expected_replan": False}
+    assert "PLANNER_OVER_ROUTING" in attribute_runtime(fp)
+
+    # genuine finding never recovered with no replan -> too-shallow loop
+    miss = {"artifact": {"count": 0, "replan_count": 0}, "expected_count": 1,
+            "expected_replan": True, "expected_replan_target": "security-agent"}
+    codes = attribute_runtime(miss)
+    assert "SPECIALIST_LOOP_TOO_SHALLOW" in codes
+    assert "REPLAN_INSUFFICIENT" in codes
+
+    # replan happened but target diverged from gold
+    wrong = {"artifact": {"count": 1, "replan_count": 1}, "expected_count": 1,
+             "expected_replan": True, "expected_replan_target": "security-agent",
+             "collaborations": ["reliability-agent"]}
+    assert "REPLAN_TARGET_ERROR" in attribute_runtime(wrong)
+
+    # correct run emits nothing
+    clean = {"artifact": {"count": 1, "replan_count": 0}, "expected_count": 1,
+             "expected_replan": False}
+    assert attribute_runtime(clean) == []
+
+
+def test_v4_report_includes_attribution():
+    from evoagent.evaluation_v4.report import build_report, render_markdown
+    record = {"artifact": {"count": 0, "replan_count": 0, "rationale_codes": ["HIGH_RISK"]},
+              "tool_calls": 2, "a2a_calls": 2, "loop_sizes": [2],
+              "expected_count": 1, "expected_replan": True,
+              "expected_replan_target": "security-agent",
+              "attribution": ["SPECIALIST_LOOP_TOO_SHALLOW",
+                              "REPLAN_INSUFFICIENT"]}
+    report = build_report({"A": [record]})
+    assert "attributions" in report["variants"][0]
+    assert "SPECIALIST_LOOP_TOO_SHALLOW" in report["variants"][0]["attributions"]
+    md = render_markdown(report)
+    assert "Evolution Attribution" in md

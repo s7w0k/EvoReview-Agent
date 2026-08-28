@@ -37,6 +37,7 @@ from .planning import (
 from .replan import (
     ReplanRequest, ReplanTargetResolver, ReplanTracker,
 )
+from .feature_flags import MultiAgentFeatureFlags
 from .scheduler import ConcurrencyBudget, TaskGraphScheduler
 from .stepper import (
     PlanTracker, final_action, observations, tool_action, tool_results,
@@ -72,11 +73,14 @@ class CoordinatorAgent(BaseLoopAgent):
     tool_allowlist = (
         "inspect_diff", "profile_risk", "semantic_change_summary",
         "evaluate_coverage", "compare_findings",
+        "delegate_agent", "delegate_agent_batch",
+        "discover_agents", "get_agent_artifacts", "cancel_agent_task",
     )
 
     def __init__(self, delegator=None, *, max_steps=None, timeout_seconds=None,
                  max_replans: int = 1, execution_policy=None, tools=None, bus=None,
-                 mode: str = "v1"):
+                 mode: str = "v1",
+                 feature_flags: Optional[MultiAgentFeatureFlags] = None):
         super().__init__(
             max_steps or 16, timeout_seconds or 60,
             execution_policy=execution_policy, tools=tools, bus=bus,
@@ -88,6 +92,15 @@ class CoordinatorAgent(BaseLoopAgent):
         self._replan_count = 0
         self._graph_revision = 1
         self._replan_tracker = ReplanTracker()
+        self._last_rationale: List[str] = []
+        self.flags = feature_flags or MultiAgentFeatureFlags()
+        # Expose flags so host/reviewer can read the effective parallelisation
+        # budget and the loop depth switch for specialists.
+        self.max_parallel_agents = self.flags.effective_max_parallel
+
+    @property
+    def _deep_loop(self) -> bool:
+        return self.flags.deep_loop
 
     # -- DAG validation helper (only when the scheduler is enabled) ----------
     @property
@@ -164,6 +177,9 @@ class CoordinatorAgent(BaseLoopAgent):
                 objective="generate a verified repair for the findings",
                 dependencies=["verifier"], agent_id="fix-agent",
             ))
+        # ablation flags: critic / verifier off => remove those stages entirely
+        # (plan §4.4) so the flag genuinely changes which agents run.
+        self._apply_stage_flags(graph)
         return graph
 
     # -- graph construction (v2: planner + validator + fallback) --------------
@@ -181,8 +197,9 @@ class CoordinatorAgent(BaseLoopAgent):
             if base_policy else
             {"remediation": True, "fix_policy": True, "repo_permission": True},
         )
-        planner = SemanticPlanner()
+        planner = SemanticPlanner() if self.flags.planner else FallbackPlanner()
         decision = planner.plan(ctx)
+        self._last_rationale = list(getattr(decision, "rationale_codes", []))
         gid = uuid.uuid4().hex
         graph = build_graph_from_tasks(decision.tasks, gid)
 
@@ -206,10 +223,32 @@ class CoordinatorAgent(BaseLoopAgent):
         # apply the conditional collaboration-graph policy on top (plan §8)
         mutator = graph_policy.GraphMutator(graph)
         self._add_plan_policy(mutator, graph)
+
+        # ablation flags: critic / verifier off => remove those stages entirely
+        # (plan §4.4) so the flag genuinely changes which agents run.
+        self._apply_stage_flags(graph)
         return graph
 
+    def _apply_stage_flags(self, graph: CoordinatorTaskGraph) -> None:
+        if self.flags.critic:
+            pass  # keep critic
+        else:
+            self._drop_nodes(graph, ("critique.findings",))
+        if not self.flags.verifier:
+            self._drop_nodes(graph, ("verify.findings",))
+
+    @staticmethod
+    def _drop_nodes(graph: CoordinatorTaskGraph, task_types: tuple) -> None:
+        for node in list(graph.nodes.values()):
+            if node.task_type in task_types:
+                graph.remove(node.node_id)
+
     def _add_plan_policy(self, mutator, graph) -> None:
-        """Re-inforce fix presence when remediation is allowed (plan §8 Fix trig)."""
+        """Re-inforce fix presence when remediation is allowed (plan §8 Fix trig).
+
+        Correct dependency semantics: ``Fix.dependencies = [Verifier]`` -- never
+        a self-dependency (plan §3.1, §3.2).
+        """
         if "fix" in graph.nodes:
             return
         # only add a fix stage if remediation was requested
@@ -220,14 +259,11 @@ class CoordinatorAgent(BaseLoopAgent):
             return
         verifier = next(
             (n for n in graph.nodes if n.startswith("verifier")), None)
-        if verifier is None:
-            graph.add(AgentTaskNode(
-                node_id="fix", task_type="fix.generate",
-                objective="generate a verified repair for the findings",
-                dependencies=[], agent_id="fix-agent"))
-        else:
-            mutator.change_dependency(
-                verifier, [verifier], reason="fix-after-verify")
+        deps = [verifier] if verifier else []
+        graph.add(AgentTaskNode(
+            node_id="fix", task_type="fix.generate",
+            objective="generate a verified repair for the findings",
+            dependencies=deps, agent_id="fix-agent"))
 
     def _available_agents(self) -> List[str]:
         names = list(_AGENT_TASK_TYPE)
@@ -282,18 +318,16 @@ class CoordinatorAgent(BaseLoopAgent):
             }
 
         # Phase B: reconcile + schedule fresh nodes through the scheduler.
-        scheduler = TaskGraphScheduler(graph)
+        budget = ConcurrencyBudget(
+            max_parallel_agents=self.flags.effective_max_parallel)
+        scheduler = TaskGraphScheduler(graph, budget=budget)
         scheduler.reconcile()
-        batch = state.get("_batch") or []
-        if not batch:
-            batch = scheduler.next_batch()
-            state["_batch"] = batch
-
+        batch = state.get("_batch") or scheduler.next_batch()
         if batch:
-            node_id = batch[0]
-            state["_batch"] = batch[1:]
-            scheduler.claim(node_id)
-            return self._delegate(state, graph.nodes[node_id], plan)
+            state["_batch"] = []
+            if len(batch) > 1:
+                return self._delegate_batch(state, graph, batch, plan)
+            return self._delegate(state, graph.nodes[batch[0]], plan)
 
         # Phase C: finalize / targeted replan.
         return self._finalize_v2(state, graph, plan)
@@ -349,11 +383,30 @@ class CoordinatorAgent(BaseLoopAgent):
             "diff": state.get("diff") or "",
         })
 
+    def _delegate_batch(self, state, graph, batch: List[str], plan) -> Dict[str, Any]:
+        """Delegate a ready batch concurrently via ``delegate_agent_batch``."""
+        tasks = []
+        for node_id in batch:
+            node = graph.nodes[node_id]
+            node.status = AgentTaskStatus.RUNNING
+            plan.begin("task:" + node.task_type)
+            if node.task_type in ("critique.findings", "verify.findings",
+                                  "fix.generate"):
+                findings = self.delegator.specialist_findings() if self.delegator else []
+            else:
+                findings = []
+            tasks.append({
+                "node_id": node.node_id, "agent_id": node.agent_id or "",
+                "task_type": node.task_type, "objective": str(node.objective),
+                "findings": findings, "diff": state.get("diff") or "",
+            })
+        return tool_action("delegate_agent_batch", {"tasks": tasks})
+
     # -- finalize (v1) ------------------------------------------------------
     def _finalize(self, state, graph, plan) -> Dict[str, Any]:
         if not state.get("_replan_checked"):
             state["_replan_checked"] = True
-            requests = self._critic_replan_requests()
+            requests = self._critic_replan_requests() if self.flags.targeted_replan else []
             if requests and state.get("_replan_count", 0) < self.max_replans:
                 state["_replan_count"] = state.get("_replan_count", 0) + 1
                 first = requests[0]
@@ -377,7 +430,9 @@ class CoordinatorAgent(BaseLoopAgent):
     def _finalize_v2(self, state, graph, plan) -> Dict[str, Any]:
         if not state.get("_replan_checked"):
             state["_replan_checked"] = True
-            request = self._pick_replan_request(state, graph)
+            request = None
+            if self.flags.targeted_replan:
+                request = self._pick_replan_request(state, graph)
             if request is not None and state.get("_replan_count", 0) < self.max_replans:
                 state["_replan_count"] = state.get("_replan_count", 0) + 1
                 mutator = graph_policy.GraphMutator(graph)
@@ -511,6 +566,12 @@ class CoordinatorAgent(BaseLoopAgent):
 
     def build_artifact(self, result) -> Dict[str, Any]:
         accepted, rejected = self._arbitrate()
+        collaborations: List[str] = []
+        if self.delegator is not None:
+            for record in self.delegator.artifacts.values():
+                agent_id = record.get("agent_id") or ""
+                if agent_id and agent_id not in collaborations:
+                    collaborations.append(agent_id)
         return {
             "task_type": self.task_type,
             "agent_id": self.agent_id,
@@ -522,6 +583,9 @@ class CoordinatorAgent(BaseLoopAgent):
             "replan_count": self._replan_count,
             "delegated_tasks": len(self.delegator.artifacts) if self.delegator else 0,
             "architecture": "six-agent-v2" if self._v2 else "six-agent",
+            "rationale_codes": list(self._last_rationale),
+            "collaborations": collaborations,
+            "graph_mutations": list(getattr(self, "_graph_mutations", [])),
         }
 
 

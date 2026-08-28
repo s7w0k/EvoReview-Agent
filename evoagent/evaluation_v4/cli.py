@@ -1,20 +1,32 @@
-"""Command line entry for Evaluation V4 (plan §9.7).
+"""Command line entry for Evaluation V4 (plan §4.1/§4.2/§9.7).
+
+The default runner is the **real runtime** (``--runner runtime``) which drives
+SixAgentReviewer -> CoordinatorAgent -> AgentLoop -> A2A -> real artifacts.  The
+old deterministic placeholder is only kept as a demo and requires an explicit
+``--runner synthetic``.
 
 Usage:
-    python -m evoagent.evaluation_v4 --corpus multi_agent_scenarios.jsonl \
-        --scenarios 40 --out report.md
+    python -m evoagent.evaluation_v4 --corpus evaluation_data/multi_agent_scenarios.jsonl \
+        --out report.md
+    python -m evoagent.evaluation_v4 --runner synthetic --scenarios 40
 """
 import argparse
+import os
 import sys
-from typing import Any, Dict
+from typing import Any, Callable, Dict
 
 from .ablation import AblationRunner
 from .report import build_report, render_markdown
-from .scenarios import load_scenarios, sample_scenarios, write_default_corpus
+from .runtime_runner import build_runtime_runner
+from .scenarios import (
+    DEFAULT_FULL_CORPUS_FILE, load_scenarios, sample_scenarios,
+    write_default_corpus, write_full_corpus,
+)
 
 
 def _synthetic_runner(diff: str, config: Dict[str, Any]) -> Dict[str, Any]:
-    """Deterministic placeholder runner so the CLI works without live agents."""
+    """Deterministic demo placeholder -- kept ONLY behind ``--runner synthetic``
+    (plan §4.1 explicitly forbids it for the default evaluation)."""
     kind = config.get("kind", "clean")
     planner = config.get("planner", True)
     replan = config.get("replan", True)
@@ -35,26 +47,45 @@ def _synthetic_runner(diff: str, config: Dict[str, Any]) -> Dict[str, Any]:
         "a2a_calls": expected + 1,
         "collaborations": ["critic", "verifier"] if expected else [],
         "loop_sizes": [2, 2, 3] if expected else [1],
+        "synthetic": True,
     }
+
+
+def _pick_runner(runner_name: str) -> Callable[[str, Dict[str, Any]], Dict[str, Any]]:
+    if runner_name == "synthetic":
+        return _synthetic_runner
+    return build_runtime_runner()
 
 
 def run() -> int:
     parser = argparse.ArgumentParser(prog="eval_v4")
-    parser.add_argument("--corpus", default="multi_agent_scenarios.jsonl")
-    parser.add_argument("--scenarios", type=int, default=8)
+    parser.add_argument("--corpus", default=DEFAULT_FULL_CORPUS_FILE)
+    parser.add_argument("--scenarios", type=int, default=None)
     parser.add_argument("--out", default="evaluation_v4_report.md")
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--runner", default="runtime",
+                        choices=("runtime", "synthetic"),
+                        help="default=runtime (real stack); synthetic is demo only")
     args = parser.parse_args()
 
-    write_default_corpus(args.corpus)
-    scenarios = sample_scenarios(load_scenarios(args.corpus), args.scenarios,
-                                 seed=args.seed)
-    results = AblationRunner(_synthetic_runner).run(scenarios)
+    # Phase 9: the default corpus is the persisted 60-case set.  We never
+    # clobber an existing corpus -- only seed it (or the 8-fixture default)
+    # when the file is absent, so a hand-curated corpus is preserved across runs.
+    if not os.path.exists(args.corpus):
+        if args.corpus == DEFAULT_FULL_CORPUS_FILE:
+            write_full_corpus(args.corpus)
+        else:
+            write_default_corpus(args.corpus)
+    scenarios = load_scenarios(args.corpus)
+    if args.scenarios is not None and args.scenarios < len(scenarios):
+        scenarios = sample_scenarios(scenarios, args.scenarios, seed=args.seed)
+    run_scenario = _pick_runner(args.runner)
+    results = AblationRunner(run_scenario).run(scenarios)
     report = build_report(results)
     with open(args.out, "w", encoding="utf-8") as handle:
         handle.write(render_markdown(report))
-    print("wrote %s (%d scenarios x %d variants)" % (
-        args.out, len(scenarios), len(report["order"])))
+    print("wrote %s (%d scenarios x %d variants, runner=%s)" % (
+        args.out, len(scenarios), len(report["order"]), args.runner))
     for row in report["variants"]:
         print("  %-24s overall=%.4f" % (row["name"], row["metrics"]["overall"]))
     return 0
