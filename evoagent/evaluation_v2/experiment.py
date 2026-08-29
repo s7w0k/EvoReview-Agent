@@ -51,6 +51,9 @@ def evaluate(
         execution = adapter.review_case(case)
         if not isinstance(execution, EvaluationExecutionResult):
             execution = EvaluationExecutionResult(**execution)
+        validator = getattr(adapter, "validate_execution", None)
+        if validator is not None:
+            validator(case, execution)
         case_results.append(metrics.score_case(case, execution))
     result = {
         "schema_version": 2,

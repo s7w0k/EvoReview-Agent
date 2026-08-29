@@ -122,7 +122,9 @@ class CoordinatorTest(unittest.TestCase):
             "objective": "coordinate", "input": {"diff": DIFF}})
         artifact = out["artifact"]
         accepted = {f["rule_id"] for f in artifact["accepted_findings"]}
-        self.assertIn("SEC-EVAL", accepted)
+        # SEC-EVAL and SEM-TAINTED-EXEC describe the same issue and are merged
+        # into one canonical finding by Plan Phase 5 cross-scanner de-duplication.
+        self.assertTrue({"SEC-EVAL", "SEM-TAINTED-EXEC"} & accepted)
         self.assertGreaterEqual(artifact["delegated_tasks"], 5)
         self.assertGreaterEqual(artifact["graph_revision"], 1)
 
@@ -168,7 +170,8 @@ class CalculatorTest(unittest.TestCase):
             via_http = {f.rule_id for f in http.review(DIFF, _parsed())}
         finally:
             http.close()
-        self.assertIn("SEC-EVAL", inproc)
+        # Same canonical issue (SEC-EVAL merged with SEM-TAINTED-EXEC, Phase 5).
+        self.assertTrue({"SEC-EVAL", "SEM-TAINTED-EXEC"} & inproc)
         self.assertEqual(inproc, via_http)
 
 

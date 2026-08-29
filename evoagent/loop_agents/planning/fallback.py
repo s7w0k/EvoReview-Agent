@@ -25,15 +25,11 @@ class FallbackPlanner:
         rationale: List[str] = []
         nodes: List[PlannedTask] = []
 
-        change_types = set(summary.get("change_types") or [])
-        sensitive_paths = [str(p).lower() for p in (summary.get("sensitive_paths") or [])]
-        security = bool(summary.get("estimated_risk") == "high" or
-                        bool(change_types & {"authentication", "security", "sql",
-                                             "database"}) or
-                        any(k in p for p in sensitive_paths
-                            for k in ("security", "auth")) or
-                        bool(summary.get("new_external_inputs")))
-        reliability = True  # always a baseline reliability pass
+        # Same shared predicates as the SemanticPlanner (plan §3.2 / §Phase 2),
+        # so fallback == planner == profiler routing -- no copy of the rules.
+        from .risk_signals import should_route_reliability, should_route_security
+        security = should_route_security(risk, summary)
+        reliability = should_route_reliability(risk, summary)
         specialist_ids: List[str] = []
 
         index = 0
@@ -41,16 +37,19 @@ class FallbackPlanner:
             nodes.append(PlannedTask(
                 task_id="spec%d" % index, agent_id="security-agent",
                 task_type="review.security", objective="security review",
-                priority=10, critical=True))
+                priority=10, critical=bool(risk.get("level") == "high")))
             specialist_ids.append("spec%d" % index)
-            rationale.append("SECURITY_SENSITIVE")
+            rationale.append(
+                "SECURITY_SENSITIVE" if security else "HIGH_RISK_DUAL_ROUTE")
             index += 1
-        nodes.append(PlannedTask(
-            task_id="spec%d" % index, agent_id="reliability-agent",
-            task_type="review.reliability", objective="reliability review",
-            priority=10))
-        specialist_ids.append("spec%d" % index)
-        rationale.append("RUNTIME_RELIABILITY" if not security else "CLEAN_BASELINE")
+        if reliability:
+            nodes.append(PlannedTask(
+                task_id="spec%d" % index, agent_id="reliability-agent",
+                task_type="review.reliability", objective="reliability review",
+                priority=10))
+            specialist_ids.append("spec%d" % index)
+            rationale.append("RUNTIME_RELIABILITY" if not security else "CLEAN_BASELINE")
+            index += 1
 
         # Downstream control nodes are result-driven runtime insertions.  The
         # fallback differs from SemanticPlanner by intentionally over-routing

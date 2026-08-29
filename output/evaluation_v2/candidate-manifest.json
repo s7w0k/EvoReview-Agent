@@ -13,15 +13,15 @@
     "gates": {
       "Validation Improvement": {
         "passed": true,
-        "detail": "candidate F1 0.5777 >= stable F1 0.0000"
+        "detail": "candidate F1 0.6154 >= stable F1 0.6154"
       },
       "High-risk Non-regression": {
         "passed": true,
-        "detail": "candidate HR-Recall 0.1250 >= stable 0.0000"
+        "detail": "candidate HR-Recall 0.5000 >= stable 0.5000"
       },
       "Critical Miss Non-regression": {
         "passed": true,
-        "detail": "candidate critical hits 2 >= stable 0"
+        "detail": "candidate critical misses 0 <= stable 0"
       },
       "Clean Accuracy Non-regression": {
         "passed": true,
@@ -29,7 +29,7 @@
       },
       "Catastrophic Forgetting": {
         "passed": true,
-        "detail": "no high-risk recall drop beyond threshold"
+        "detail": "high-risk non-regression and stable TP retention 1.0000"
       },
       "Runtime Safety": {
         "passed": true,
@@ -164,21 +164,6 @@
         "confidence": 0.7
       },
       {
-        "rule_id": "CWE-532",
-        "severity": "low",
-        "match": "print(value",
-        "ignore_case": false,
-        "include_paths": [],
-        "exclude_paths": [
-          "tests/"
-        ],
-        "title": "Confirmed CWE-532 finding (self-evolved)",
-        "explanation": "A confirmed CWE-532 was introduced on an added line; mined from repeated Validation false negatives.",
-        "fix": "Replace the unsafe construct with a constrained, validated alternative.",
-        "test": "Add a focused regression test covering this confirmed failure mode.",
-        "confidence": 0.9
-      },
-      {
         "rule_id": "CWE-614",
         "severity": "medium",
         "match": "response.set_cookie(\"sid\", value, secure=False",
@@ -222,6 +207,21 @@
         "fix": "Replace the unsafe construct with a constrained, validated alternative.",
         "test": "Add a focused regression test covering this confirmed failure mode.",
         "confidence": 0.7
+      },
+      {
+        "rule_id": "CWE-78",
+        "severity": "high",
+        "match": "result = subprocess.run(value, shell=True",
+        "ignore_case": false,
+        "include_paths": [],
+        "exclude_paths": [
+          "tests/"
+        ],
+        "title": "Confirmed CWE-78 finding (self-evolved)",
+        "explanation": "A confirmed CWE-78 was introduced on an added line; mined from repeated Validation false negatives.",
+        "fix": "Replace the unsafe construct with a constrained, validated alternative.",
+        "test": "Add a focused regression test covering this confirmed failure mode.",
+        "confidence": 0.9
       }
     ]
   }

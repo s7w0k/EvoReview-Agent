@@ -115,6 +115,36 @@ class CandidateFreezeTests(unittest.TestCase):
         gates = safety_gates(stable, evolved)
         self.assertFalse(gates["passed"])
 
+    def test_no_gain_candidate_is_not_promote_ready(self):
+        stable = {"metrics": {
+            "detection": {"f1": 0.80, "high_risk_recall": 0.80, "clean_accuracy": 0.90},
+            "runtime": {"execution_success_rate": 1.0}},
+            "case_results": [{"high_total": 10, "high_hits": 8}]}
+        # Identical metrics: no material gain, no regression.
+        evolved = {"metrics": {
+            "detection": {"f1": 0.80, "high_risk_recall": 0.80, "clean_accuracy": 0.90},
+            "runtime": {"execution_success_rate": 1.0}},
+            "case_results": [{"high_total": 10, "high_hits": 8}]}
+        gates = safety_gates(stable, evolved)
+        self.assertFalse(gates["passed"])
+        self.assertEqual("NO_MATERIAL_IMPROVEMENT", gates["disposition"])
+        self.assertFalse(
+            gates["gates"]["Material Improvement"]["passed"])
+
+    def test_hour_weighted_material_gain_is_promote_ready(self):
+        stable = {"metrics": {
+            "detection": {"f1": 0.80, "high_risk_recall": 0.80, "clean_accuracy": 0.90},
+            "runtime": {"execution_success_rate": 1.0}},
+            "case_results": [{"high_total": 10, "high_hits": 8}]}
+        # F1 +0.03 (>= +0.02) => material.
+        evolved = {"metrics": {
+            "detection": {"f1": 0.83, "high_risk_recall": 0.80, "clean_accuracy": 0.90},
+            "runtime": {"execution_success_rate": 1.0}},
+            "case_results": [{"high_total": 10, "high_hits": 8}]}
+        gates = safety_gates(stable, evolved)
+        self.assertTrue(gates["passed"])
+        self.assertEqual("PROMOTE_READY", gates["disposition"])
+
 
 if __name__ == "__main__":
     unittest.main()

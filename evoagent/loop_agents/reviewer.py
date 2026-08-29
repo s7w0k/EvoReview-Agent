@@ -61,10 +61,13 @@ class SixAgentReviewer(Reviewer):
         http_timeout_seconds: float = 10.0,
         http_token: str = "",
         feature_flags: Optional[MultiAgentFeatureFlags] = None,
+        tool_context_config: Optional[Dict[str, Any]] = None,
     ):
         self.mode = (mode or "inprocess").strip().lower()
         self.architecture = architecture
         self.flags = feature_flags or MultiAgentFeatureFlags()
+        self.tool_context_config = dict(tool_context_config or {})
+        self.last_runtime_artifact: Dict[str, Any] = {}
         # build specialists honouring the runtime's loop-depth switch so a
         # ``deep_loop=False`` reviewer genuinely runs a shallow stepper (§4.4)
         self.specialists = list(specialists) if specialists else [
@@ -121,6 +124,10 @@ class SixAgentReviewer(Reviewer):
     # -- Reviewer -----------------------------------------------------------
     def review(self, diff: str, parsed: ParsedDiff) -> List[Finding]:
         self._ensure_running()
+        runtime_tool_context = dict(self.tool_context_config)
+        runtime_tool_context["skill_invocations"] = {}
+        for agent in self.specialists:
+            agent.tool_context_config = runtime_tool_context
         delegator = (self._http_delegator if self.mode == "http"
                      else self._inprocess_delegator)(diff)
         coordinator = CoordinatorAgent(delegator, **self.coordinator_kwargs)
@@ -132,8 +139,15 @@ class SixAgentReviewer(Reviewer):
         }
         outcome = coordinator.run(task)
         artifact = outcome.get("artifact") or {}
+        artifact["architecture"] = self.architecture
+        artifact["skill_invocations"] = dict(
+            runtime_tool_context.get("skill_invocations") or {})
+        self.last_runtime_artifact = dict(artifact)
         accepted = list(artifact.get("accepted_findings") or [])
         return [self._to_finding(item) for item in accepted]
+
+    def runtime_summary(self) -> Dict[str, Any]:
+        return dict(self.last_runtime_artifact or {})
 
     # -- helpers ------------------------------------------------------------
     def _ensure_running(self) -> None:
@@ -185,6 +199,7 @@ def build_six_agent_reviewer(
     architecture: str = "six-agent",
     http_timeout_seconds: float = 10.0,
     http_token: str = "",
+    tool_context_config: Optional[Dict[str, Any]] = None,
 ) -> Reviewer:
     """Build a :class:`SixAgentReviewer` (plan §20)."""
     return SixAgentReviewer(
@@ -193,6 +208,7 @@ def build_six_agent_reviewer(
         architecture=architecture,
         http_timeout_seconds=http_timeout_seconds,
         http_token=http_token,
+        tool_context_config=tool_context_config,
     )
 
 

@@ -47,16 +47,24 @@ def score_case(case: dict, execution) -> Dict[str, Any]:
     fn = len(expected) - tp
     severity_hits = 0
     high_hits = 0
+    critical_hits = 0
     for match in matches:
         truth = expected[match.expected_index]
         finding = findings[match.predicted_index]
         severity_hit = finding.severity.value == str(truth["severity"]).lower()
         high = str(truth["severity"]).lower() in {"high", "critical"}
+        critical = str(truth["severity"]).lower() == "critical"
         severity_hits += int(severity_hit)
         high_hits += int(high)
+        critical_hits += int(critical)
     high_total = sum(
         str(item["severity"]).lower() in {"high", "critical"} for item in expected
     )
+    critical_total = sum(
+        str(item["severity"]).lower() == "critical" for item in expected
+    )
+    matched_expected = {match.expected_index for match in matches}
+    matched_predicted = {match.predicted_index for match in matches}
     result = {
         "id": case["id"],
         "repository": case["repository"],
@@ -70,6 +78,12 @@ def score_case(case: dict, execution) -> Dict[str, Any]:
         "severity_hits": severity_hits,
         "high_total": high_total,
         "high_hits": high_hits,
+        "high_risk_total": high_total,
+        "high_risk_hits": high_hits,
+        "high_risk_misses": high_total - high_hits,
+        "critical_total": critical_total,
+        "critical_hits": critical_hits,
+        "critical_misses": critical_total - critical_hits,
         "clean_hit": bool((not expected) and (not findings)),
         "execution_success": bool(_field(execution, "success")),
         # V1 aggregation expects these repair fields even when no repairer is used.
@@ -96,6 +110,24 @@ def score_case(case: dict, execution) -> Dict[str, Any]:
         "error": _field(execution, "error"),
         # Multi-agent execution proof (harness systems only; empty for reviewers).
         "collaboration": _field(execution, "collaboration", {}),
+        "architecture": _field(execution, "architecture", ""),
+        "called_agents": list(_field(execution, "called_agents", []) or []),
+        "graph_revision": int(_field(execution, "graph_revision", 0) or 0),
+        "graph_shapes": list(_field(execution, "graph_shapes", []) or []),
+        "loop_steps_by_agent": dict(
+            _field(execution, "loop_steps_by_agent", {}) or {}),
+        "parallel_batches": list(_field(execution, "parallel_batches", []) or []),
+        "replan_count": int(_field(execution, "replan_count", 0) or 0),
+        "replan_targets": list(_field(execution, "replan_targets", []) or []),
+        "feature_flags": dict(_field(execution, "feature_flags", {}) or {}),
+        "skill_invocations": dict(
+            _field(execution, "skill_invocations", {}) or {}),
+        "expected_findings": [dict(item) for item in expected],
+        "prediction_details": [finding.to_dict() for finding in findings],
+        "unmatched_expected_indices": [
+            index for index in range(len(expected)) if index not in matched_expected],
+        "unmatched_predicted_indices": [
+            index for index in range(len(findings)) if index not in matched_predicted],
         "matches": [
             {
                 "expected_index": match.expected_index,
@@ -114,7 +146,24 @@ def detection_metrics(case_results: List[dict]) -> Dict[str, Any]:
     totals = _SCORER._empty_totals()
     for result in case_results:
         _SCORER._accumulate(totals, result)
-    return _SCORER._metrics(totals | {"cases": totals["cases"]})
+    result = _SCORER._metrics(totals | {"cases": totals["cases"]})
+    high_total = sum(int(item.get("high_risk_total", item.get("high_total", 0)))
+                     for item in case_results)
+    high_hits = sum(int(item.get("high_risk_hits", item.get("high_hits", 0)))
+                    for item in case_results)
+    critical_total = sum(int(item.get("critical_total", 0)) for item in case_results)
+    critical_hits = sum(int(item.get("critical_hits", 0)) for item in case_results)
+    result.update({
+        "high_risk_total": high_total,
+        "high_risk_hits": high_hits,
+        "high_risk_misses": high_total - high_hits,
+        "critical_total": critical_total,
+        "critical_hits": critical_hits,
+        "critical_misses": critical_total - critical_hits,
+        "critical_recall": round(critical_hits / critical_total, 4)
+        if critical_total else 1.0,
+    })
+    return result
 
 
 def _percentile(values: List[float], fraction: float) -> float:
@@ -145,7 +194,8 @@ def _collab_agents(case_results: List[dict]) -> List[str]:
     """Distinct specialist agents observed across the collaboration summaries."""
     agents: List[str] = []
     for item in _collab(case_results):
-        for agent in item.get("agents") or []:
+        raw_agents = item.get("agents") or item.get("called_agents") or []
+        for agent in raw_agents:
             name = agent.get("agent") if isinstance(agent, dict) else str(agent)
             if name and name not in agents:
                 agents.append(name)
@@ -159,6 +209,12 @@ def runtime_metrics(case_results: List[dict]) -> Dict[str, Any]:
     latency = [float(r["latency_ms"]) for r in case_results]
     rec_attempts = sum(int(r.get("recovery_attempts", 0)) for r in case_results)
     rec_successes = sum(int(r.get("recovery_successes", 0)) for r in case_results)
+    architectures = sorted({str(r.get("architecture")) for r in case_results
+                            if r.get("architecture")})
+    invocations: Dict[str, int] = {}
+    for item in case_results:
+        for skill_id, count in (item.get("skill_invocations") or {}).items():
+            invocations[str(skill_id)] = invocations.get(str(skill_id), 0) + int(count)
     return {
         "execution_success_rate": round(len(successes) / total, 4) if total else 0.0,
         "recovery_attempts": rec_attempts,
@@ -193,6 +249,13 @@ def runtime_metrics(case_results: List[dict]) -> Dict[str, Any]:
         "collaboration_rounds": _collab_avg(case_results, "dialogue_rounds"),
         "collaboration_messages": _collab_avg(case_results, "messages"),
         "activated_agents": _collab_agents(case_results),
+        "architectures": architectures,
+        "architecture": architectures[0] if len(architectures) == 1 else "",
+        "runtime_wiring_coverage": round(sum(
+            bool(r.get("architecture") == "six-agent-v2"
+                 and r.get("graph_shapes") and r.get("called_agents"))
+            for r in case_results) / total, 4) if total else 0.0,
+        "skill_invocations": invocations,
         "collaboration_detected": round(
             sum(bool(r.get("collaboration")) for r in case_results) / total, 4
         ) if total else 0.0,
@@ -212,11 +275,13 @@ def by_split(case_results: List[dict]) -> Dict[str, Dict[str, Any]]:
 
 
 def summarize(case_results: List[dict]) -> Dict[str, Any]:
+    from .diagnostics import diagnostic_metrics
     return {
         "cases": len(case_results),
         "detection": detection_metrics(case_results),
         "runtime": runtime_metrics(case_results),
         "by_split": by_split(case_results),
+        "diagnostics": diagnostic_metrics(case_results),
     }
 
 

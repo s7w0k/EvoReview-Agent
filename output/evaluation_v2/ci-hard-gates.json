@@ -1,0 +1,88 @@
+{
+  "passed": true,
+  "gates": {
+    "Dataset SHA unchanged": {
+      "passed": true,
+      "detail": "frozen canonical dataset fingerprint",
+      "value": "88831bb19264f9fc15433de7801b623aad38b80076f5d5b085d0299fd40cc115"
+    },
+    "Single baseline reproduced": {
+      "passed": true,
+      "detail": "Single Agent F1 must remain 0.7143",
+      "value": 0.7143
+    },
+    "Legacy baseline reproduced": {
+      "passed": true,
+      "detail": "Legacy Multi-Agent F1 must remain 0.8250",
+      "value": 0.825
+    },
+    "Current runtime is six-agent-v2": {
+      "passed": true,
+      "detail": "all Current cases expose architecture, graph and agents"
+    },
+    "Evolved runtime is six-agent-v2": {
+      "passed": true,
+      "detail": "all Evolved cases expose architecture, graph and agents"
+    },
+    "Stable/Evolved runtime config identical": {
+      "passed": true,
+      "detail": "candidate skill is the only runtime configuration difference"
+    },
+    "Candidate skill invocation confirmed": {
+      "passed": true,
+      "detail": "eval-v2-evolved-review invocation count",
+      "value": 19
+    },
+    "Finding schema valid": {
+      "passed": true,
+      "detail": "path/line/rule/severity contract",
+      "value": []
+    },
+    "Produced Rule IDs mapping coverage": {
+      "passed": true,
+      "detail": "all produced Rule IDs map to CWE",
+      "value": {
+        "produced_rule_ids": [
+          "REL-BLOCKING-ASYNC",
+          "REL-DEBUG-PRINT",
+          "REL-EMPTY-EXCEPT",
+          "REL-FLOAT-MONEY",
+          "REL-NAIVE-DATETIME",
+          "REL-NONATOMIC-WRITE",
+          "REL-UNBOUNDED-RETRY",
+          "SEC-ASSERT-AUTH",
+          "SEC-EVAL",
+          "SEC-HARDCODED-SECRET",
+          "SEC-INSECURE-COOKIE",
+          "SEC-INSECURE-TEMPFILE",
+          "SEC-OPEN-REDIRECT",
+          "SEC-PATH-TRAVERSAL",
+          "SEC-PICKLE-LOAD",
+          "SEC-SQL-CONCAT",
+          "SEC-WEAK-HASH",
+          "SEC-WEAK-RANDOM",
+          "SEC-YAML-LOAD",
+          "SEM-TAINTED-EXEC",
+          "SEM-TAINTED-SUBPROCESS"
+        ],
+        "mapped_rule_ids": 21,
+        "unmapped_rule_ids": [],
+        "coverage": 1.0
+      }
+    },
+    "Current Harness TP positive": {
+      "passed": true,
+      "detail": "wiring regression guard TP > 0",
+      "value": 39
+    },
+    "Current Harness execution success": {
+      "passed": true,
+      "detail": "execution success must be 100%",
+      "value": 1.0
+    },
+    "Holdout isolation intact": {
+      "passed": true,
+      "detail": "candidate frozen from Validation before blind Holdout"
+    }
+  }
+}

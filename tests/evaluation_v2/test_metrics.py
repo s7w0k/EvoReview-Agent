@@ -72,6 +72,17 @@ class MetricsTests(unittest.TestCase):
         # High / critical recall requires the severity to be flagged as high-risk.
         self.assertEqual(1.0, det["high_risk_recall"])
 
+    def test_critical_misses_only_count_critical_gold(self):
+        critical = make_risk_case(case_id='pr-0101', severity='critical')
+        high = make_risk_case(case_id='pr-0102', severity='high')
+        missed = EvaluationExecutionResult(findings=[])
+        scored = [metrics.score_case(critical, missed), metrics.score_case(high, missed)]
+        det = metrics.detection_metrics(scored)
+        self.assertEqual(2, det['high_risk_total'])
+        self.assertEqual(2, det['high_risk_misses'])
+        self.assertEqual(1, det['critical_total'])
+        self.assertEqual(1, det['critical_misses'])
+
     def test_runtime_metrics_aggregate_governance_telemetry(self):
         case = make_risk_case(added_line="    result = eval(value)\n")
         execution = EvaluationExecutionResult(

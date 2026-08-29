@@ -22,7 +22,9 @@ from evoagent.config import Settings
 from evoagent.diff_parser import parse_unified_diff
 from evoagent.evaluation_benchmark import ContextRuleReviewer
 from evoagent.models import Finding, Severity
-from evoagent.reviewer import LocalRuleReviewer, OpenAICompatibleReviewer, Reviewer
+from evoagent.reviewer import (
+    LocalRuleReviewer, OpenAICompatibleReviewer, Reviewer, SecurityRuleReviewer,
+)
 from evoagent.service import ReviewService
 from evoagent.storage.repositories.recovery import RecoveryRepository
 
@@ -63,6 +65,16 @@ class EvaluationExecutionResult:
     # sourced from the coordinator's collaboration_summary (not the harness
     # decision-trace, which only carries harness-lifecycle events).
     collaboration: Dict[str, Any] = field(default_factory=dict)
+    architecture: str = ""
+    called_agents: List[str] = field(default_factory=list)
+    graph_revision: int = 0
+    graph_shapes: List[dict] = field(default_factory=list)
+    loop_steps_by_agent: Dict[str, int] = field(default_factory=dict)
+    parallel_batches: List[dict] = field(default_factory=list)
+    replan_count: int = 0
+    replan_targets: List[str] = field(default_factory=list)
+    feature_flags: Dict[str, Any] = field(default_factory=dict)
+    skill_invocations: Dict[str, int] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
         value: Dict[str, Any] = {
@@ -85,6 +97,16 @@ class EvaluationExecutionResult:
             "resolved_policy": self.resolved_policy,
             "error": self.error,
             "collaboration": self.collaboration,
+            "architecture": self.architecture,
+            "called_agents": list(self.called_agents),
+            "graph_revision": self.graph_revision,
+            "graph_shapes": list(self.graph_shapes),
+            "loop_steps_by_agent": dict(self.loop_steps_by_agent),
+            "parallel_batches": list(self.parallel_batches),
+            "replan_count": self.replan_count,
+            "replan_targets": list(self.replan_targets),
+            "feature_flags": dict(self.feature_flags),
+            "skill_invocations": dict(self.skill_invocations),
         }
         value["findings"] = [
             {
@@ -152,7 +174,58 @@ def build_evaluation_service(db_path: str) -> ReviewService:
         max_steps=8, timeout_seconds=120, llm_base_url="", llm_api_key="",
         llm_model="", github_webhook_secret="", github_token="",
         auto_post_review=False,
+        agent_architecture="six-agent-v2",
     ))
+
+
+def build_evaluation_leader(
+    svc: ReviewService, execution_policy, evolved_skill: Optional[Reviewer] = None,
+    candidate_id: str = "", reviewers: Optional[List[Reviewer]] = None,
+):
+    """Build stable/evolved leaders with the candidate as the sole variable.
+
+    Plan §Phase 3: the candidate is composed into the specialist(s) that own
+    its rules.  A security candidate joins ``security_reviewers``, a reliability
+    candidate joins ``reliability_reviewers``, and a shared candidate joins both,
+    so a Reliability mapping is never silently side-lined.
+    """
+    from evoagent.reviewer import ReliabilityRuleReviewer
+    from evoagent.loop_agents.planning.risk_signals import (
+        SECURITY, RELIABILITY, SHARED)
+
+    security_reviewers: List[Reviewer] = [SecurityRuleReviewer()]
+    security_reviewer_ids = ["security-rule@1"]
+    reliability_reviewers: List[Reviewer] = [ReliabilityRuleReviewer()]
+    reliability_reviewer_ids = ["reliability-rule@1"]
+    if evolved_skill is not None:
+        candidate_name = candidate_id or str(
+            getattr(evolved_skill, "name", "evolved-skill"))
+        artifact = getattr(evolved_skill, "artifact", {}) or {}
+        domain = str(artifact.get("domain") or SHARED)
+        if domain in (SECURITY, RELIABILITY, SHARED):
+            pass  # valid domain
+        else:
+            domain = SHARED
+        if domain in (SECURITY, SHARED):
+            security_reviewers.append(evolved_skill)
+            security_reviewer_ids.append(candidate_name)
+        if domain in (RELIABILITY, SHARED):
+            reliability_reviewers.append(evolved_skill)
+            reliability_reviewer_ids.append(candidate_name)
+    if reviewers is None:
+        reviewers = [
+            item for item in svc.registry.reviewers()
+            if not isinstance(item, OpenAICompatibleReviewer)
+        ]
+    return svc._build_leader(
+        list(reviewers), execution_policy=execution_policy,
+        tool_context_config={
+            "security_reviewers": security_reviewers,
+            "security_reviewer_ids": security_reviewer_ids,
+            "reliability_reviewers": reliability_reviewers,
+            "reliability_reviewer_ids": reliability_reviewer_ids,
+        },
+    )
 
 
 class _HarnessAdapter(BaseEvaluationAdapter):
@@ -163,9 +236,16 @@ class _HarnessAdapter(BaseEvaluationAdapter):
     (DecisionTrace / ReplaySnapshot / Outcome / Exposure) are produced per case.
     """
 
-    def __init__(self, db_path: str, extra_reviewers: Optional[List[Reviewer]] = None):
+    def __init__(
+        self, db_path: str, extra_reviewers: Optional[List[Reviewer]] = None,
+        candidate_id: str = "",
+    ):
         self.db_path = db_path
         self.extra_reviewers = list(extra_reviewers or [])
+        if len(self.extra_reviewers) > 1:
+            raise ValueError("Evaluation V2 supports one frozen evolved skill")
+        self.evolved_skill = self.extra_reviewers[0] if self.extra_reviewers else None
+        self.candidate_id = candidate_id
         self.service: Optional[ReviewService] = None
 
     def _ensure_service(self) -> ReviewService:
@@ -173,12 +253,38 @@ class _HarnessAdapter(BaseEvaluationAdapter):
             self.service = build_evaluation_service(self.db_path)
         return self.service
 
+    def validate_execution(
+        self, case: dict, result: EvaluationExecutionResult,
+    ) -> None:
+        """Fail fast when a formal result is not from the real Six-Agent DAG."""
+        violations = []
+        if result.architecture != "six-agent-v2":
+            violations.append("architecture is not six-agent-v2")
+        if not result.graph_shapes:
+            violations.append("runtime graph is empty")
+        if not result.called_agents:
+            violations.append("no specialist agent was called")
+        if case.get("expected_findings") and not (
+                {"security-agent", "reliability-agent"}
+                & set(result.called_agents)):
+            violations.append("risk case did not call a risk specialist")
+        if self.evolved_skill is not None and bool(
+                {"security-agent", "reliability-agent"} & set(result.called_agents)):
+            candidate_id = self.candidate_id or str(
+                getattr(self.evolved_skill, "name", ""))
+            if not candidate_id or result.skill_invocations.get(candidate_id, 0) < 1:
+                violations.append("frozen candidate was loaded but not invoked")
+        if violations:
+            raise RuntimeError(
+                "Evaluation V2 runtime wiring gate failed for %s: %s" % (
+                    case.get("id", "unknown"), "; ".join(violations)))
+
     def _lineup(self, svc: ReviewService) -> List[Reviewer]:
         reviewers = [
             item for item in svc.registry.reviewers()
             if not isinstance(item, OpenAICompatibleReviewer)
         ]
-        return reviewers + list(self.extra_reviewers)
+        return reviewers
 
     def review_case(self, case: dict) -> EvaluationExecutionResult:
         svc = self._ensure_service()
@@ -191,21 +297,24 @@ class _HarnessAdapter(BaseEvaluationAdapter):
         error: Optional[str] = None
         context = None
         coordination: Dict[str, Any] = {}
-        coordinator = None
+        leader = None
         try:
             context = svc._resolve_execution_context(
                 task_id, repository, pull_request, diff, EVAL_TENANT)
-            coordinator = svc._build_coordinator(
-                self._lineup(svc), execution_policy=context.execution_policy)
+            leader = build_evaluation_leader(
+                svc, context.execution_policy,
+                evolved_skill=self.evolved_skill,
+                candidate_id=self.candidate_id,
+                reviewers=self._lineup(svc),
+            )
             harness = svc._build_harness(
-                coordinator, context.execution_policy, context)
+                leader, context.execution_policy, context)
             report = harness.run(task_id, repository, pull_request, diff, EVAL_TENANT)
             findings = list(report.findings)
-            # The coordinator records its collaboration transcript in-memory; the
-            # harness decision-trace only holds lifecycle events.  Capture the
-            # summary here so it is persisted as the proofs the DAG ran.
             try:
-                coordination = coordinator.collaboration_summary(task_id) or {}
+                coordination = (
+                    leader.runtime_summary()
+                    if hasattr(leader, "runtime_summary") else {}) or {}
             except Exception:  # noqa: BLE001
                 coordination = {}
         except Exception as exc:  # noqa: BLE001 - capture unmet execution success
@@ -246,6 +355,12 @@ class _HarnessAdapter(BaseEvaluationAdapter):
             tool_calls = len(trace.tool_path()) if trace is not None else 0
         except Exception:  # noqa: BLE001
             tool_calls = 0
+        runtime_steps = dict(
+            (collaboration or {}).get("loop_steps_by_agent") or {})
+        runtime_tools = dict(
+            (collaboration or {}).get("tool_calls_by_agent") or {})
+        agent_steps = max(agent_steps, sum(int(v or 0) for v in runtime_steps.values()))
+        tool_calls = max(tool_calls, sum(int(v or 0) for v in runtime_tools.values()))
         rec_attempts = len(recovery_events)
         rec_successes = sum(
             1 for event in recovery_events
@@ -293,6 +408,19 @@ class _HarnessAdapter(BaseEvaluationAdapter):
             resolved_policy=policy_detail,
             error=error,
             collaboration=dict(collaboration or {}),
+            architecture=str((collaboration or {}).get("architecture") or ""),
+            called_agents=list((collaboration or {}).get("called_agents") or []),
+            graph_revision=int((collaboration or {}).get("graph_revision") or 0),
+            graph_shapes=list((collaboration or {}).get("graph_shapes") or []),
+            loop_steps_by_agent=dict(
+                (collaboration or {}).get("loop_steps_by_agent") or {}),
+            parallel_batches=list((collaboration or {}).get("parallel_batches") or []),
+            replan_count=int((collaboration or {}).get("replan_count") or 0),
+            replan_targets=list((collaboration or {}).get("replan_targets") or []),
+            feature_flags=dict(
+                (collaboration or {}).get("feature_flags_snapshot") or {}),
+            skill_invocations=dict(
+                (collaboration or {}).get("skill_invocations") or {}),
         )
 
     def close(self) -> None:
@@ -314,8 +442,18 @@ class CurrentHarnessEvaluationAdapter(_HarnessAdapter):
 class EvolvedHarnessEvaluationAdapter(_HarnessAdapter):
     name = "evolved_candidate"
 
-    def __init__(self, db_path: str, evolved_reviewers: List[Reviewer]):
-        super().__init__(db_path, extra_reviewers=evolved_reviewers)
+    def __init__(
+        self, db_path: str, evolved_reviewers: List[Reviewer],
+        candidate_id: str = "",
+    ):
+        reviewer = evolved_reviewers[0] if evolved_reviewers else None
+        if not candidate_id and reviewer is not None:
+            artifact = getattr(reviewer, "artifact", {}) or {}
+            if artifact.get("name"):
+                candidate_id = "eval-v2-%s" % artifact["name"]
+        super().__init__(
+            db_path, extra_reviewers=evolved_reviewers,
+            candidate_id=candidate_id)
 
 
 __all__ = [
@@ -325,4 +463,5 @@ __all__ = [
     "CurrentHarnessEvaluationAdapter",
     "EvolvedHarnessEvaluationAdapter",
     "build_evaluation_service",
+    "build_evaluation_leader",
 ]

@@ -93,6 +93,11 @@ def validate_artifact(artifact: dict, expected_name: str = "") -> dict:
             raise ValueError("rule path filters must be lists")
         if any(not isinstance(item, str) or len(item) > 200 for item in include_paths + exclude_paths):
             raise ValueError("invalid rule path filter")
+        # Domain ownership (plan §Phase 3): security / reliability / shared.
+        domain = str(raw.get("domain") or "shared").strip().lower()
+        if domain not in ("security", "reliability", "shared"):
+            raise ValueError(
+                "rule %s domain must be security, reliability or shared" % rule_id)
         rules.append({
             "rule_id": rule_id,
             "severity": severity,
@@ -100,6 +105,7 @@ def validate_artifact(artifact: dict, expected_name: str = "") -> dict:
             "ignore_case": bool(raw.get("ignore_case", False)),
             "include_paths": include_paths,
             "exclude_paths": exclude_paths,
+            "domain": domain,
             "title": str(raw.get("title") or ("Confirmed %s finding" % rule_id))[:200],
             "explanation": str(raw.get("explanation") or "A confirmed feedback pattern was found on an added line.")[:2000],
             "fix": str(raw.get("fix") or "Replace the unsafe construct with a constrained alternative.")[:2000],
@@ -107,12 +113,17 @@ def validate_artifact(artifact: dict, expected_name: str = "") -> dict:
             "confidence": round(confidence, 4),
         })
     rules.sort(key=lambda item: (item["rule_id"], item["match"]))
+    # Artifact-level domain is derived from its rules so adapters can compose
+    # the candidate into the correct specialist without hardcoding (plan §Phase 3).
+    domains = {rule["domain"] for rule in rules if rule["domain"] != "shared"}
+    artifact_domain = ("shared" if len(domains) != 1 else domains.pop())
     return {
         "schema_version": ARTIFACT_SCHEMA_VERSION,
         "name": name,
         "description": str(artifact.get("description") or "Replay-gated rules learned from confirmed review feedback")[:500],
         "permissions": [],
         "rules": rules,
+        "domain": artifact_domain,
     }
 
 

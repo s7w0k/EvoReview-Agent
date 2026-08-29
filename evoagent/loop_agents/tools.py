@@ -10,6 +10,7 @@ each agent independently.
 from typing import Any, Dict, Iterable, List, Optional
 
 from ..diff_parser import ParsedDiff
+from ..finding_identity import canonical_identity
 from ..models import Finding
 from ..policy.defaults import default_policy
 from ..policy.models import (
@@ -52,6 +53,24 @@ def findings_to_dicts(findings: Iterable[Finding]) -> List[Dict[str, Any]]:
     return [finding.to_dict() for finding in findings]
 
 
+def deduplicate_findings(findings: Iterable[Finding]) -> List[Finding]:
+    """Deduplicate composed scanner output by canonical identity.
+
+    Identical rule findings collapse on ``(rule_id, path, line)``.  Findings
+    emitted by different scanners for the same underlying issue (e.g. SEC-EVAL
+    and SEM-TAINTED-EXEC) collapse onto one canonical finding via
+    :func:`evoagent.finding_identity.canonical_identity`, without ever merging
+    distinct vulnerabilities that merely share a line.
+    """
+    merged: Dict[Any, Finding] = {}
+    for finding in findings:
+        key = canonical_identity(finding)
+        current = merged.get(key)
+        if current is None or finding.confidence > current.confidence:
+            merged[key] = finding
+    return list(merged.values())
+
+
 # ---------------------------------------------------------------------------
 # tiny schema definition helper (mirrors the catalog's _define)
 # ---------------------------------------------------------------------------
@@ -85,14 +104,40 @@ class ExpertContext:
         self, diff: str = "", parsed: Optional[ParsedDiff] = None,
         memory_manager=None, repository: str = "", workspace: Optional[str] = None,
         static_analyzer: str = "off",
+        security_reviewers=None, security_reviewer_ids=None,
+        reliability_reviewers=None, reliability_reviewer_ids=None,
+        skill_invocations: Optional[Dict[str, int]] = None,
     ):
         self.diff = diff or ""
         self.parsed = parsed or ParsedDiff(files=[], added_lines=[])
         self.memory_manager = memory_manager
         self.repository = repository
         self.workspace = workspace
-        self._security = SecurityRuleReviewer()
-        self._reliability = ReliabilityRuleReviewer()
+        self._security_reviewers = list(
+            security_reviewers or [SecurityRuleReviewer()])
+        default_ids = [
+            "security-rule@1" if isinstance(item, SecurityRuleReviewer)
+            else str(getattr(item, "name", item.__class__.__name__))
+            for item in self._security_reviewers
+        ]
+        self._security_reviewer_ids = list(
+            security_reviewer_ids or default_ids)
+        if len(self._security_reviewer_ids) != len(self._security_reviewers):
+            raise ValueError("security reviewer ids must align with reviewers")
+        self._reliability_reviewers = list(
+            reliability_reviewers or [ReliabilityRuleReviewer()])
+        rel_default_ids = [
+            "reliability-rule@1"
+            if isinstance(item, ReliabilityRuleReviewer)
+            else str(getattr(item, "name", item.__class__.__name__))
+            for item in self._reliability_reviewers
+        ]
+        self._reliability_reviewer_ids = list(
+            reliability_reviewer_ids or rel_default_ids)
+        if len(self._reliability_reviewer_ids) != len(self._reliability_reviewers):
+            raise ValueError("reliability reviewer ids must align with reviewers")
+        self.skill_invocations = (
+            skill_invocations if isinstance(skill_invocations, dict) else {})
         self._semantic = SemanticReviewer("ast")
 
     def added_lines(self) -> List[Any]:
@@ -117,6 +162,43 @@ def _scan_results(reviewer, ctx: ExpertContext) -> Dict[str, Any]:
     return {"findings": findings_to_dicts(findings), "count": len(findings)}
 
 
+def _security_scan_results(ctx: ExpertContext) -> Dict[str, Any]:
+    findings: List[Finding] = []
+    errors: List[str] = []
+    for reviewer_id, reviewer in zip(
+            ctx._security_reviewer_ids, ctx._security_reviewers):
+        ctx.skill_invocations[reviewer_id] = (
+            int(ctx.skill_invocations.get(reviewer_id, 0)) + 1)
+        try:
+            findings.extend(reviewer.review(ctx.diff, ctx.parsed))
+        except Exception as exc:  # scanner isolation mirrors _scan_results
+            errors.append("%s: %s" % (reviewer_id, str(exc)[:500]))
+    findings = deduplicate_findings(findings)
+    result = {"findings": findings_to_dicts(findings), "count": len(findings)}
+    if errors:
+        result["errors"] = errors
+    return result
+
+
+def _reliability_scan_results(ctx: ExpertContext) -> Dict[str, Any]:
+    """Run every reliability-domain reviewer (stable + domain candidates)."""
+    findings: List[Finding] = []
+    errors: List[str] = []
+    for reviewer_id, reviewer in zip(
+            ctx._reliability_reviewer_ids, ctx._reliability_reviewers):
+        ctx.skill_invocations[reviewer_id] = (
+            int(ctx.skill_invocations.get(reviewer_id, 0)) + 1)
+        try:
+            findings.extend(reviewer.review(ctx.diff, ctx.parsed))
+        except Exception as exc:  # scanner isolation mirrors _scan_results
+            errors.append("%s: %s" % (reviewer_id, str(exc)[:500]))
+    findings = deduplicate_findings(findings)
+    result = {"findings": findings_to_dicts(findings), "count": len(findings)}
+    if errors:
+        result["errors"] = errors
+    return result
+
+
 def _semantic_results(ctx: ExpertContext) -> Dict[str, Any]:
     try:
         findings = ctx._semantic.review(ctx.diff, ctx.parsed)
@@ -132,10 +214,10 @@ def _semantic_results(ctx: ExpertContext) -> Dict[str, Any]:
 def build_expert_definitions(ctx: ExpertContext):
     """All specialist + coordinator tool definitions bound to one review."""
     def security_rule_scan():
-        return _scan_results(ctx._security, ctx)
+        return _security_scan_results(ctx)
 
     def reliability_rule_scan():
-        return _scan_results(ctx._reliability, ctx)
+        return _reliability_scan_results(ctx)
 
     def semantic_scan():
         return _semantic_results(ctx)
@@ -321,16 +403,20 @@ def build_expert_definitions(ctx: ExpertContext):
         return {"files": list(ctx.parsed.files), "added_lines": len(ctx.added_lines()),}
 
     def profile_risk():
-        blob = ctx.diff.lower()
-        security = any(k in blob for k in ("sql", "exec(", "shell", "eval", "password"))
-        reliability = any(k in blob for k in ("except", "print(", "retry", "thread", "async"))
-        level = "high" if security else ("medium" if reliability else "low")
-        agents = ["security-agent"] if security else []
-        if reliability:
-            agents.append("reliability-agent")
-        if not agents:
-            agents = ["reliability-agent"]
-        return {"level": level, "agents": agents}
+        # Unified Risk Signal Catalog (plan Phase 1): single source of truth
+        # shared with semantic_change_summary and both planners.  Returns the
+        # structured profile, keeping the historical ``level``/``agents`` keys
+        # so v1 routing and existing consumers stay compatible.
+        from .planning.risk_signals import classify_risk
+        profile = classify_risk(ctx.diff, ctx.parsed)
+        return {
+            "level": profile["level"],
+            "domains": profile["domains"],
+            "agents": profile["agents"],
+            "signal_codes": profile["signal_codes"],
+            "confidence": profile["confidence"],
+            "rationale": profile["rationale"],
+        }
 
     def semantic_change_summary():
         """Produce a structured semantic change summary (plan §4.3).
@@ -341,6 +427,10 @@ def build_expert_definitions(ctx: ExpertContext):
         change_types / sensitive_paths / new_external_inputs /
         control_flow_changes / test_changes / estimated_risk /
         expected_findings.
+
+        Since plan Phase 1 the signal vocabulary is the *same* shared Risk Signal
+        Catalog used by ``profile_risk()``; this function only adds the
+        change-type taxonomy and path/test signals that the planner consumes.
         """
         files = list(ctx.parsed.files or [])
         lowered_paths = [str(f).lower() for f in files]
@@ -349,6 +439,13 @@ def build_expert_definitions(ctx: ExpertContext):
             text = str(getattr(item, "content", "") or "")
             added_lines.append(text)
         blob = "\n".join(added_lines).lower() + " " + ctx.diff.lower()
+
+        # Unified catalog drives the risk taxonomy + priorities.
+        from .planning.risk_signals import classify_risk
+        profile = classify_risk(ctx.diff, ctx.parsed)
+        codes = set(profile.get("signal_codes") or [])
+        sec_codes = set(profile.get("security_hits") or [])
+        rel_codes = set(profile.get("reliability_hits") or [])
 
         change_types: List[str] = []
         sensitive_paths: List[str] = []
@@ -361,19 +458,30 @@ def build_expert_definitions(ctx: ExpertContext):
         if any(p.endswith("_test.py") or p.endswith("test_.py")
                or "/tests/" in p for p in lowered_paths):
             change_types.append("test")
-        # keyword-based signals over the added source lines
-        if "sql" in blob or "cursor.execute" in blob or "db." in blob:
+        # catalog-driven taxonomy
+        if codes & {"SQL_INJECTION"}:
             change_types.append("sql")
-        if "eval(" in blob or "exec(" in blob or "shell=True" in blob:
+            change_types.append("database")
+        if codes & {"DANGEROUS_EVAL", "PROCESS_EXECUTION", "HARDCODED_CREDENTIAL",
+                    "PATH_TRAVERSAL", "INSECURE_DESERIALIZATION", "OPEN_REDIRECT",
+                    "LOG_FORGING", "WEAK_HASH", "INSECURE_RANDOM",
+                    "INSECURE_TEMPFILE", "ASSERT_AUTH", "INSECURE_COOKIE",
+                    "EXTERNAL_INPUT_TO_SINK", "CREDENTIAL_VARIABLE"}:
             change_types.append("security")
-        if any(k in blob for k in ("except", "exceptexception", "try:", "error-handling")):
+        if "sql" in profile.get("agents") and "database" not in change_types:
+            change_types.append("database")
+        if codes & {"EMPTY_EXCEPT"}:
             change_types.append("exception")
-        if any(k in blob for k in ("thread", "async ", "await ", "asyncio", "lock", "semaphore")):
+        if codes & {"BLOCKING_ASYNC", "SHARED_STATE_THREAD"}:
             change_types.append("concurrency")
-        if any(k in blob for k in ("resource", "conn.close", "with open", "io.", "tmpfile")):
-            change_types.append("resource")
-        if any(k in blob for k in ("elif", "else:", "switch", "match ")):
+        if codes & {"UNBOUNDED_RETRY", "FLOAT_MONEY", "NAIVE_DATETIME",
+                    "NONATOMIC_WRITE", "RESOURCE_LIFECYCLE", "BLOCKING_READ"}:
+            change_types.append("runtime")
+        if " if " in blob or any(k in blob for k in ("elif", "else:", "switch", "match ")):
             change_types.append("control-flow")
+        if codes & {"EXTERNAL_INPUT", "EXTERNAL_INPUT_TO_SINK"}:
+            change_types.append("input")
+
         # control_flow documented only when a dispatcher/branching change appears
         control_flow_changes = bool(
             (set(change_types) & {"control-flow"})
@@ -386,25 +494,30 @@ def build_expert_definitions(ctx: ExpertContext):
         )
         test_changes = "test" in change_types
         security_hits = bool(
-            {"security", "sql", "authentication"} & set(change_types)) or new_external_inputs
+            {"security", "sql", "authentication", "input"} & set(change_types)
+            or profile.get("level") in {"high", "critical"})
         reliability_hits = bool(
-            {"exception", "concurrency", "resource", "control-flow"} & set(change_types))
+            {"exception", "concurrency", "resource", "control-flow", "runtime"}
+            & set(change_types))
         if security_hits and reliability_hits:
             estimated_risk = "high"
         elif security_hits or reliability_hits:
-            estimated_risk = "medium"
+            estimated_risk = profile.get("level", "medium")
         else:
             estimated_risk = "low"
         return {
             "changed_files": files,
-            "change_types": sorted(change_types),
-            "sensitive_paths": sorted(sensitive_paths),
+            "change_types": sorted(set(change_types)),
+            "sensitive_paths": sorted(set(sensitive_paths)),
             "new_external_inputs": bool(new_external_inputs),
             "control_flow_changes": control_flow_changes,
             "test_changes": bool(test_changes),
             "estimated_risk": estimated_risk,
             "expected_findings": sum([
                 security_hits, reliability_hits]),
+            "signal_codes": sorted(codes),
+            "domains": list(profile.get("domains") or []),
+            "agents": list(profile.get("agents") or []),
         }
 
     def evaluate_coverage(nodes: list):
@@ -703,6 +816,7 @@ def _task_diff(task: Dict[str, Any]) -> str:
 def registry_for_task(
     agent_id: str, task: Dict[str, Any], *, allowed_tools: Optional[List[str]] = None,
     risk_level: Optional[str] = None,
+    tool_context_config: Optional[Dict[str, Any]] = None,
 ) -> GovernedToolRegistry:
     """Build a per-task governed registry straight from a delegate task.
 
@@ -720,7 +834,8 @@ def registry_for_task(
         risk_level = spec.get("risk_level", "low")
     diff = _task_diff(task)
     parsed = parse_unified_diff(diff)
-    ctx = build_expert_context(diff, parsed)
+    context_config = dict(tool_context_config or {})
+    ctx = build_expert_context(diff, parsed, **context_config)
     policy = build_agent_policy(agent_id, list(allowed_tools), risk_level=risk_level)
     return build_loop_registry(
         agent_id, ctx, allowed_tools=list(allowed_tools), execution_policy=policy,
@@ -837,15 +952,23 @@ __all__ = [
     "ExpertContext", "build_expert_definitions", "build_expert_context",
     "build_agent_policy", "build_loop_registry", "registry_for_task",
     "build_delegate_handlers", "AGENT_SPECS", "finding_key",
-    "findings_to_dicts", "finding_dict",
+    "findings_to_dicts", "finding_dict", "deduplicate_findings",
 ]
 
 
 def build_expert_context(
     diff: str = "", parsed=None, memory_manager=None, repository: str = "",
     workspace: Optional[str] = None,
+    security_reviewers=None, security_reviewer_ids=None,
+    reliability_reviewers=None, reliability_reviewer_ids=None,
+    skill_invocations: Optional[Dict[str, int]] = None,
 ) -> ExpertContext:
     return ExpertContext(
         diff=diff, parsed=parsed, memory_manager=memory_manager,
         repository=repository, workspace=workspace,
+        security_reviewers=security_reviewers,
+        security_reviewer_ids=security_reviewer_ids,
+        reliability_reviewers=reliability_reviewers,
+        reliability_reviewer_ids=reliability_reviewer_ids,
+        skill_invocations=skill_invocations,
     )

@@ -1,0 +1,318 @@
+{
+  "current_harness": [
+    {
+      "case_id": "pr-0094",
+      "cwe": "CWE-117",
+      "severity": "low",
+      "reason": "RULE_NOT_TRIGGERED",
+      "agents_called": [
+        "security-agent"
+      ],
+      "tools_called": [
+        "security-agent:2"
+      ],
+      "candidate_skill_hit": false
+    }
+  ],
+  "evolved_candidate": [
+    {
+      "case_id": "pr-0002",
+      "cwe": "CWE-798",
+      "severity": "high",
+      "reason": "NO_AGENT_ROUTED",
+      "agents_called": [
+        "reliability-agent"
+      ],
+      "tools_called": [
+        "reliability-agent:2"
+      ],
+      "candidate_skill_hit": false
+    },
+    {
+      "case_id": "pr-0004",
+      "cwe": "CWE-330",
+      "severity": "medium",
+      "reason": "NO_AGENT_ROUTED",
+      "agents_called": [
+        "reliability-agent"
+      ],
+      "tools_called": [
+        "reliability-agent:2"
+      ],
+      "candidate_skill_hit": false
+    },
+    {
+      "case_id": "pr-0012",
+      "cwe": "CWE-798",
+      "severity": "high",
+      "reason": "NO_AGENT_ROUTED",
+      "agents_called": [
+        "reliability-agent"
+      ],
+      "tools_called": [
+        "reliability-agent:2"
+      ],
+      "candidate_skill_hit": false
+    },
+    {
+      "case_id": "pr-0014",
+      "cwe": "CWE-835",
+      "severity": "medium",
+      "reason": "RULE_NOT_TRIGGERED",
+      "agents_called": [
+        "reliability-agent"
+      ],
+      "tools_called": [
+        "reliability-agent:2"
+      ],
+      "candidate_skill_hit": false
+    },
+    {
+      "case_id": "pr-0024",
+      "cwe": "CWE-617",
+      "severity": "medium",
+      "reason": "NO_AGENT_ROUTED",
+      "agents_called": [
+        "reliability-agent"
+      ],
+      "tools_called": [
+        "reliability-agent:2"
+      ],
+      "candidate_skill_hit": false
+    },
+    {
+      "case_id": "pr-0034",
+      "cwe": "CWE-614",
+      "severity": "medium",
+      "reason": "NO_AGENT_ROUTED",
+      "agents_called": [
+        "reliability-agent"
+      ],
+      "tools_called": [
+        "reliability-agent:2"
+      ],
+      "candidate_skill_hit": false
+    },
+    {
+      "case_id": "pr-0041",
+      "cwe": "CWE-78",
+      "severity": "high",
+      "reason": "NO_AGENT_ROUTED",
+      "agents_called": [
+        "reliability-agent"
+      ],
+      "tools_called": [
+        "reliability-agent:2"
+      ],
+      "candidate_skill_hit": false
+    },
+    {
+      "case_id": "pr-0044",
+      "cwe": "CWE-682",
+      "severity": "medium",
+      "reason": "RULE_NOT_TRIGGERED",
+      "agents_called": [
+        "reliability-agent"
+      ],
+      "tools_called": [
+        "reliability-agent:2"
+      ],
+      "candidate_skill_hit": false
+    },
+    {
+      "case_id": "pr-0051",
+      "cwe": "CWE-78",
+      "severity": "high",
+      "reason": "NO_AGENT_ROUTED",
+      "agents_called": [
+        "reliability-agent"
+      ],
+      "tools_called": [
+        "reliability-agent:2"
+      ],
+      "candidate_skill_hit": false
+    },
+    {
+      "case_id": "pr-0054",
+      "cwe": "CWE-367",
+      "severity": "medium",
+      "reason": "RULE_NOT_TRIGGERED",
+      "agents_called": [
+        "reliability-agent"
+      ],
+      "tools_called": [
+        "reliability-agent:2"
+      ],
+      "candidate_skill_hit": false
+    },
+    {
+      "case_id": "pr-0061",
+      "cwe": "CWE-78",
+      "severity": "high",
+      "reason": "NO_AGENT_ROUTED",
+      "agents_called": [
+        "reliability-agent"
+      ],
+      "tools_called": [
+        "reliability-agent:2"
+      ],
+      "candidate_skill_hit": false
+    },
+    {
+      "case_id": "pr-0062",
+      "cwe": "CWE-22",
+      "severity": "high",
+      "reason": "NO_AGENT_ROUTED",
+      "agents_called": [
+        "reliability-agent"
+      ],
+      "tools_called": [
+        "reliability-agent:2"
+      ],
+      "candidate_skill_hit": false
+    },
+    {
+      "case_id": "pr-0064",
+      "cwe": "CWE-400",
+      "severity": "medium",
+      "reason": "RULE_NOT_TRIGGERED",
+      "agents_called": [
+        "reliability-agent"
+      ],
+      "tools_called": [
+        "reliability-agent:2"
+      ],
+      "candidate_skill_hit": false
+    },
+    {
+      "case_id": "pr-0071",
+      "cwe": "CWE-78",
+      "severity": "high",
+      "reason": "NO_AGENT_ROUTED",
+      "agents_called": [
+        "reliability-agent"
+      ],
+      "tools_called": [
+        "reliability-agent:2"
+      ],
+      "candidate_skill_hit": false
+    },
+    {
+      "case_id": "pr-0072",
+      "cwe": "CWE-502",
+      "severity": "high",
+      "reason": "NO_AGENT_ROUTED",
+      "agents_called": [
+        "reliability-agent"
+      ],
+      "tools_called": [
+        "reliability-agent:2"
+      ],
+      "candidate_skill_hit": false
+    },
+    {
+      "case_id": "pr-0074",
+      "cwe": "CWE-362",
+      "severity": "medium",
+      "reason": "RULE_NOT_TRIGGERED",
+      "agents_called": [
+        "reliability-agent"
+      ],
+      "tools_called": [
+        "reliability-agent:2"
+      ],
+      "candidate_skill_hit": false
+    },
+    {
+      "case_id": "pr-0081",
+      "cwe": "CWE-798",
+      "severity": "high",
+      "reason": "NO_AGENT_ROUTED",
+      "agents_called": [
+        "reliability-agent"
+      ],
+      "tools_called": [
+        "reliability-agent:2"
+      ],
+      "candidate_skill_hit": false
+    },
+    {
+      "case_id": "pr-0082",
+      "cwe": "CWE-502",
+      "severity": "high",
+      "reason": "NO_AGENT_ROUTED",
+      "agents_called": [
+        "reliability-agent"
+      ],
+      "tools_called": [
+        "reliability-agent:2"
+      ],
+      "candidate_skill_hit": false
+    },
+    {
+      "case_id": "pr-0083",
+      "cwe": "CWE-328",
+      "severity": "medium",
+      "reason": "NO_AGENT_ROUTED",
+      "agents_called": [
+        "reliability-agent"
+      ],
+      "tools_called": [
+        "reliability-agent:2"
+      ],
+      "candidate_skill_hit": false
+    },
+    {
+      "case_id": "pr-0084",
+      "cwe": "CWE-601",
+      "severity": "medium",
+      "reason": "NO_AGENT_ROUTED",
+      "agents_called": [
+        "reliability-agent"
+      ],
+      "tools_called": [
+        "reliability-agent:2"
+      ],
+      "candidate_skill_hit": false
+    },
+    {
+      "case_id": "pr-0091",
+      "cwe": "CWE-798",
+      "severity": "high",
+      "reason": "NO_AGENT_ROUTED",
+      "agents_called": [
+        "reliability-agent"
+      ],
+      "tools_called": [
+        "reliability-agent:2"
+      ],
+      "candidate_skill_hit": false
+    },
+    {
+      "case_id": "pr-0093",
+      "cwe": "CWE-377",
+      "severity": "medium",
+      "reason": "NO_AGENT_ROUTED",
+      "agents_called": [
+        "reliability-agent"
+      ],
+      "tools_called": [
+        "reliability-agent:2"
+      ],
+      "candidate_skill_hit": false
+    },
+    {
+      "case_id": "pr-0094",
+      "cwe": "CWE-117",
+      "severity": "low",
+      "reason": "NO_AGENT_ROUTED",
+      "agents_called": [
+        "reliability-agent"
+      ],
+      "tools_called": [
+        "reliability-agent:2"
+      ],
+      "candidate_skill_hit": false
+    }
+  ]
+}

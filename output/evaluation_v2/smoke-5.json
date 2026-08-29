@@ -1,0 +1,2774 @@
+{
+  "schema_version": 2,
+  "name": "smoke-5",
+  "system": "current_harness",
+  "dataset": {
+    "cases": 5,
+    "repositories": 1,
+    "risk_cases": 4,
+    "clean_cases": 1,
+    "sha256": "1e06f17681b6da9c34ca02c5e5fa0e7b0460cdc5d00f2e491810cce21c4bebcd"
+  },
+  "metrics": {
+    "cases": 5,
+    "detection": {
+      "cases": 5,
+      "risk_cases": 4,
+      "clean_cases": 1,
+      "tp": 2,
+      "fp": 1,
+      "fn": 2,
+      "severity_hits": 2,
+      "high_total": 2,
+      "high_hits": 1,
+      "clean_hits": 1,
+      "execution_successes": 5,
+      "repair_attempted": 0,
+      "repair_passed": 0,
+      "e2e_successes": 0,
+      "precision": 0.6667,
+      "recall": 0.5,
+      "f1": 0.5714,
+      "severity_accuracy": 1.0,
+      "high_risk_recall": 0.5,
+      "clean_accuracy": 1.0,
+      "execution_success_rate": 1.0,
+      "safe_fix_rate": 0.0,
+      "e2e_security_fix_rate": 0.0,
+      "high_risk_total": 2,
+      "high_risk_hits": 1,
+      "high_risk_misses": 1,
+      "critical_total": 1,
+      "critical_hits": 1,
+      "critical_misses": 0,
+      "critical_recall": 1.0
+    },
+    "runtime": {
+      "execution_success_rate": 1.0,
+      "recovery_attempts": 0,
+      "recovery_successes": 0,
+      "recovery_success_rate": 0.0,
+      "avg_agent_steps": 6.6,
+      "avg_tool_calls": 6.6,
+      "p50_latency_ms": 213.1338,
+      "p95_latency_ms": 263.0128,
+      "tool_denials": 0,
+      "timeouts": 0,
+      "side_effect_blocks": 0,
+      "circuit_breaker_trips": 0,
+      "decision_trace_coverage": 1.0,
+      "replay_snapshot_coverage": 1.0,
+      "avg_policy_version": 1,
+      "collaboration_rounds": 0.0,
+      "collaboration_messages": 0.0,
+      "activated_agents": [
+        "security-agent",
+        "critic-agent",
+        "verifier-agent",
+        "reliability-agent"
+      ],
+      "architectures": [
+        "six-agent-v2"
+      ],
+      "architecture": "six-agent-v2",
+      "runtime_wiring_coverage": 1.0,
+      "skill_invocations": {
+        "security-rule@1": 1
+      },
+      "collaboration_detected": 1.0
+    },
+    "by_split": {
+      "validation": {
+        "detection": {
+          "cases": 5,
+          "risk_cases": 4,
+          "clean_cases": 1,
+          "tp": 2,
+          "fp": 1,
+          "fn": 2,
+          "severity_hits": 2,
+          "high_total": 2,
+          "high_hits": 1,
+          "clean_hits": 1,
+          "execution_successes": 5,
+          "repair_attempted": 0,
+          "repair_passed": 0,
+          "e2e_successes": 0,
+          "precision": 0.6667,
+          "recall": 0.5,
+          "f1": 0.5714,
+          "severity_accuracy": 1.0,
+          "high_risk_recall": 0.5,
+          "clean_accuracy": 1.0,
+          "execution_success_rate": 1.0,
+          "safe_fix_rate": 0.0,
+          "e2e_security_fix_rate": 0.0,
+          "high_risk_total": 2,
+          "high_risk_hits": 1,
+          "high_risk_misses": 1,
+          "critical_total": 1,
+          "critical_hits": 1,
+          "critical_misses": 0,
+          "critical_recall": 1.0
+        },
+        "runtime": {
+          "execution_success_rate": 1.0,
+          "recovery_attempts": 0,
+          "recovery_successes": 0,
+          "recovery_success_rate": 0.0,
+          "avg_agent_steps": 6.6,
+          "avg_tool_calls": 6.6,
+          "p50_latency_ms": 213.1338,
+          "p95_latency_ms": 263.0128,
+          "tool_denials": 0,
+          "timeouts": 0,
+          "side_effect_blocks": 0,
+          "circuit_breaker_trips": 0,
+          "decision_trace_coverage": 1.0,
+          "replay_snapshot_coverage": 1.0,
+          "avg_policy_version": 1,
+          "collaboration_rounds": 0.0,
+          "collaboration_messages": 0.0,
+          "activated_agents": [
+            "security-agent",
+            "critic-agent",
+            "verifier-agent",
+            "reliability-agent"
+          ],
+          "architectures": [
+            "six-agent-v2"
+          ],
+          "architecture": "six-agent-v2",
+          "runtime_wiring_coverage": 1.0,
+          "skill_invocations": {
+            "security-rule@1": 1
+          },
+          "collaboration_detected": 1.0
+        }
+      }
+    },
+    "diagnostics": {
+      "per_cwe_recall": {
+        "CWE-330": {
+          "total": 1,
+          "hits": 0,
+          "misses": 1,
+          "recall": 0.0
+        },
+        "CWE-703": {
+          "total": 1,
+          "hits": 1,
+          "misses": 0,
+          "recall": 1.0
+        },
+        "CWE-798": {
+          "total": 1,
+          "hits": 0,
+          "misses": 1,
+          "recall": 0.0
+        },
+        "CWE-95": {
+          "total": 1,
+          "hits": 1,
+          "misses": 0,
+          "recall": 1.0
+        }
+      },
+      "macro_recall_by_cwe": 0.5,
+      "rule_hit_rate": 0.4,
+      "finding_yield": 3,
+      "verifier_rejection_rate": 0.0,
+      "rule_mapping": {
+        "produced_rule_ids": [
+          "REL-EMPTY-EXCEPT",
+          "SEC-EVAL",
+          "SEM-TAINTED-EXEC"
+        ],
+        "mapped_rule_ids": 3,
+        "unmapped_rule_ids": [],
+        "coverage": 1.0
+      },
+      "fn_analysis": [
+        {
+          "case_id": "pr-0002",
+          "cwe": "CWE-798",
+          "severity": "high",
+          "reason": "NO_AGENT_ROUTED",
+          "agents_called": [
+            "reliability-agent"
+          ],
+          "tools_called": [
+            "reliability-agent:2"
+          ],
+          "candidate_skill_hit": false
+        },
+        {
+          "case_id": "pr-0004",
+          "cwe": "CWE-330",
+          "severity": "medium",
+          "reason": "NO_AGENT_ROUTED",
+          "agents_called": [
+            "reliability-agent"
+          ],
+          "tools_called": [
+            "reliability-agent:2"
+          ],
+          "candidate_skill_hit": false
+        }
+      ]
+    }
+  },
+  "duration_seconds": 2.5511,
+  "case_results": [
+    {
+      "id": "pr-0001",
+      "repository": "acme/service-01",
+      "pull_request": 1001,
+      "split": "validation",
+      "expected": 1,
+      "predicted": 2,
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "severity_hits": 1,
+      "high_total": 1,
+      "high_hits": 1,
+      "high_risk_total": 1,
+      "high_risk_hits": 1,
+      "high_risk_misses": 0,
+      "critical_total": 1,
+      "critical_hits": 1,
+      "critical_misses": 0,
+      "clean_hit": false,
+      "execution_success": true,
+      "repair_attempted": 0,
+      "repair_passed": 0,
+      "e2e_success": false,
+      "latency_ms": 251.43450000007306,
+      "agent_steps": 15,
+      "tool_calls": 15,
+      "recovery_attempts": 0,
+      "recovery_successes": 0,
+      "policy_denials": 0,
+      "circuit_breaker_trips": 0,
+      "timeouts": 0,
+      "side_effect_blocks": 0,
+      "decision_trace_created": true,
+      "replay_snapshot_created": true,
+      "trace_event_count": 3,
+      "policy_id": "baseline-medium",
+      "policy_version": 1,
+      "deployment_lane": "baseline",
+      "resolved_policy": {
+        "resolved_policy": "baseline-medium",
+        "max_steps": 6,
+        "timeout_seconds": null,
+        "max_tool_calls": 12,
+        "enabled_agents": [
+          "security-agent",
+          "reliability-agent",
+          "semantic-agent"
+        ],
+        "verification": {
+          "critic_required": true,
+          "evidence_required": false,
+          "verifier_required": true,
+          "sandbox_required": false
+        }
+      },
+      "error": null,
+      "collaboration": {
+        "task_type": "review.coordinate",
+        "agent_id": "coordinator",
+        "accepted_findings": [
+          {
+            "analyzer": null,
+            "confidence": 0.9,
+            "evidence": "result = [sanitized]value)",
+            "explanation": "新增代码调用了动态执行函数；当参数可被外部影响时，攻击者可能执行任意代码。",
+            "fix": "移除动态执行；使用显式解析器、命令映射表或严格白名单处理输入。",
+            "line": 3,
+            "path": "src/change_01.py",
+            "rule_id": "SEC-EVAL",
+            "severity": "critical",
+            "source_skill": null,
+            "test": "加入恶意表达式与边界输入测试，断言输入不会被当作代码执行。",
+            "title": "动态代码执行可能导致注入",
+            "finding_id": "SEC-EVAL:src/change_01.py:3",
+            "finding_version": 1,
+            "artifact_id": "93185e6147ce42e8b8b7aa4479d3adbb"
+          },
+          {
+            "analyzer": "ast",
+            "confidence": 0.8,
+            "evidence": "result = [sanitized]value)",
+            "explanation": "外部输入经过赋值传播后流入动态执行函数；当输入可被外部影响时，攻击者可能执行任意代码。",
+            "fix": "移除动态执行；使用显式解析器、命令映射表或严格白名单。",
+            "line": 3,
+            "path": "src/change_01.py",
+            "rule_id": "SEM-TAINTED-EXEC",
+            "severity": "critical",
+            "source_skill": null,
+            "test": "加入含恶意表达式与边界输入的测试，断言输入不被当作代码执行。",
+            "title": "SEM-TAINTED-EXEC",
+            "finding_id": "SEM-TAINTED-EXEC:src/change_01.py:3",
+            "finding_version": 1,
+            "artifact_id": "93185e6147ce42e8b8b7aa4479d3adbb"
+          }
+        ],
+        "rejected_findings": [],
+        "count": 2,
+        "rejected_count": 0,
+        "graph_revision": 3,
+        "replan_count": 0,
+        "delegated_tasks": 3,
+        "architecture": "six-agent-v2",
+        "rationale_codes": [],
+        "collaborations": [
+          "security-agent",
+          "critic-agent",
+          "verifier-agent"
+        ],
+        "graph_mutations": [],
+        "task_graph": {
+          "graph_id": "d188533f32334a8b994400af564093f8",
+          "revision": 3,
+          "mutation_history": [
+            {
+              "op": "add",
+              "node": "critic",
+              "reason": "HIGH_RISK",
+              "graph_revision": 2
+            },
+            {
+              "op": "add",
+              "node": "verifier-v1",
+              "reason": "HIGH_RISK",
+              "graph_revision": 3
+            }
+          ],
+          "nodes": {
+            "critic": {
+              "node_id": "critic",
+              "task_type": "critique.findings",
+              "objective": "challenge current findings and evidence",
+              "target_capabilities": [],
+              "dependencies": [
+                "spec0"
+              ],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "4b9f0f9a2433471ebcb5c60ee660e71f"
+              ],
+              "agent_id": "critic-agent",
+              "serial": false,
+              "metadata": {}
+            },
+            "spec0": {
+              "node_id": "spec0",
+              "task_type": "review.security",
+              "objective": "review changed lines for security",
+              "target_capabilities": [],
+              "dependencies": [],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "93185e6147ce42e8b8b7aa4479d3adbb"
+              ],
+              "agent_id": "security-agent",
+              "serial": false,
+              "metadata": {}
+            },
+            "verifier-v1": {
+              "node_id": "verifier-v1",
+              "task_type": "verify.findings",
+              "objective": "verify latest finding versions",
+              "target_capabilities": [],
+              "dependencies": [
+                "critic"
+              ],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "870592a8f1b04943bd0117d3c574e628"
+              ],
+              "agent_id": "verifier-agent",
+              "serial": false,
+              "metadata": {
+                "finding_versions": {
+                  "SEC-EVAL:src/change_01.py:3": 1,
+                  "SEM-TAINTED-EXEC:src/change_01.py:3": 1
+                }
+              }
+            }
+          }
+        },
+        "graph_shapes": [
+          {
+            "node_id": "spec0",
+            "task_type": "review.security",
+            "dependencies": [],
+            "status": "completed",
+            "artifact_ids": [
+              "93185e6147ce42e8b8b7aa4479d3adbb"
+            ],
+            "metadata": {}
+          },
+          {
+            "node_id": "critic",
+            "task_type": "critique.findings",
+            "dependencies": [
+              "spec0"
+            ],
+            "status": "completed",
+            "artifact_ids": [
+              "4b9f0f9a2433471ebcb5c60ee660e71f"
+            ],
+            "metadata": {}
+          },
+          {
+            "node_id": "verifier-v1",
+            "task_type": "verify.findings",
+            "dependencies": [
+              "critic"
+            ],
+            "status": "completed",
+            "artifact_ids": [
+              "870592a8f1b04943bd0117d3c574e628"
+            ],
+            "metadata": {
+              "finding_versions": {
+                "SEC-EVAL:src/change_01.py:3": 1,
+                "SEM-TAINTED-EXEC:src/change_01.py:3": 1
+              }
+            }
+          }
+        ],
+        "runtime_events": [
+          {
+            "kind": "FINDINGS_EMITTED",
+            "node_id": "spec0",
+            "artifact_id": "93185e6147ce42e8b8b7aa4479d3adbb",
+            "detail": {
+              "count": 2,
+              "recheck": false,
+              "changed_artifact_ids": []
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "spec0",
+            "artifact_id": "93185e6147ce42e8b8b7aa4479d3adbb",
+            "detail": {
+              "agent_id": "security-agent",
+              "task_type": "review.security"
+            }
+          },
+          {
+            "kind": "GRAPH_MUTATED",
+            "node_id": "critic",
+            "artifact_id": "",
+            "detail": {
+              "op": "add",
+              "reason": "HIGH_RISK",
+              "graph_revision": 2
+            }
+          },
+          {
+            "kind": "CRITIQUE_EMITTED",
+            "node_id": "critic",
+            "artifact_id": "4b9f0f9a2433471ebcb5c60ee660e71f",
+            "detail": {
+              "replan_requests": 0
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "critic",
+            "artifact_id": "4b9f0f9a2433471ebcb5c60ee660e71f",
+            "detail": {
+              "agent_id": "critic-agent",
+              "task_type": "critique.findings"
+            }
+          },
+          {
+            "kind": "GRAPH_MUTATED",
+            "node_id": "verifier-v1",
+            "artifact_id": "",
+            "detail": {
+              "op": "add",
+              "reason": "HIGH_RISK",
+              "graph_revision": 3
+            }
+          },
+          {
+            "kind": "VERIFICATION_COMPLETED",
+            "node_id": "verifier-v1",
+            "artifact_id": "870592a8f1b04943bd0117d3c574e628",
+            "detail": {
+              "verification_version": 1
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "verifier-v1",
+            "artifact_id": "870592a8f1b04943bd0117d3c574e628",
+            "detail": {
+              "agent_id": "verifier-agent",
+              "task_type": "verify.findings"
+            }
+          }
+        ],
+        "runtime_artifacts": [
+          {
+            "artifact_id": "93185e6147ce42e8b8b7aa4479d3adbb",
+            "producer_node": "spec0",
+            "agent_id": "security-agent",
+            "task_type": "review.security",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [],
+            "content": {
+              "task_type": "review.security",
+              "agent_id": "security-agent",
+              "count": 2,
+              "findings": [
+                {
+                  "analyzer": null,
+                  "confidence": 0.9,
+                  "evidence": "result = [sanitized]value)",
+                  "explanation": "新增代码调用了动态执行函数；当参数可被外部影响时，攻击者可能执行任意代码。",
+                  "fix": "移除动态执行；使用显式解析器、命令映射表或严格白名单处理输入。",
+                  "line": 3,
+                  "path": "src/change_01.py",
+                  "rule_id": "SEC-EVAL",
+                  "severity": "critical",
+                  "source_skill": null,
+                  "test": "加入恶意表达式与边界输入测试，断言输入不会被当作代码执行。",
+                  "title": "动态代码执行可能导致注入",
+                  "finding_id": "SEC-EVAL:src/change_01.py:3",
+                  "finding_version": 1,
+                  "artifact_id": "93185e6147ce42e8b8b7aa4479d3adbb"
+                },
+                {
+                  "analyzer": "ast",
+                  "confidence": 0.8,
+                  "evidence": "result = [sanitized]value)",
+                  "explanation": "外部输入经过赋值传播后流入动态执行函数；当输入可被外部影响时，攻击者可能执行任意代码。",
+                  "fix": "移除动态执行；使用显式解析器、命令映射表或严格白名单。",
+                  "line": 3,
+                  "path": "src/change_01.py",
+                  "rule_id": "SEM-TAINTED-EXEC",
+                  "severity": "critical",
+                  "source_skill": null,
+                  "test": "加入含恶意表达式与边界输入的测试，断言输入不被当作代码执行。",
+                  "title": "SEM-TAINTED-EXEC",
+                  "finding_id": "SEM-TAINTED-EXEC:src/change_01.py:3",
+                  "finding_version": 1,
+                  "artifact_id": "93185e6147ce42e8b8b7aa4479d3adbb"
+                }
+              ],
+              "confidence": 0.85,
+              "_a2a_metadata": [
+                {
+                  "task_type": "review.security",
+                  "stop_reason": "final",
+                  "steps": 3,
+                  "plan_versions": 0,
+                  "decision_count": 3,
+                  "correlation_id": "60d0bc7e0664478b83e3f323af5a60d8"
+                }
+              ]
+            },
+            "finding_versions": {
+              "SEC-EVAL:src/change_01.py:3": 1,
+              "SEM-TAINTED-EXEC:src/change_01.py:3": 1
+            }
+          },
+          {
+            "artifact_id": "4b9f0f9a2433471ebcb5c60ee660e71f",
+            "producer_node": "critic",
+            "agent_id": "critic-agent",
+            "task_type": "critique.findings",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [
+              "93185e6147ce42e8b8b7aa4479d3adbb"
+            ],
+            "content": {
+              "task_type": "critique.findings",
+              "agent_id": "critic-agent",
+              "accepted_findings": [
+                {
+                  "analyzer": null,
+                  "confidence": 0.9,
+                  "evidence": "result = [sanitized]value)",
+                  "explanation": "新增代码调用了动态执行函数；当参数可被外部影响时，攻击者可能执行任意代码。",
+                  "fix": "移除动态执行；使用显式解析器、命令映射表或严格白名单处理输入。",
+                  "line": 3,
+                  "path": "src/change_01.py",
+                  "rule_id": "SEC-EVAL",
+                  "severity": "critical",
+                  "source_skill": null,
+                  "test": "加入恶意表达式与边界输入测试，断言输入不会被当作代码执行。",
+                  "title": "动态代码执行可能导致注入",
+                  "finding_id": "SEC-EVAL:src/change_01.py:3",
+                  "finding_version": 1,
+                  "artifact_id": "93185e6147ce42e8b8b7aa4479d3adbb"
+                },
+                {
+                  "analyzer": "ast",
+                  "confidence": 0.8,
+                  "evidence": "result = [sanitized]value)",
+                  "explanation": "外部输入经过赋值传播后流入动态执行函数；当输入可被外部影响时，攻击者可能执行任意代码。",
+                  "fix": "移除动态执行；使用显式解析器、命令映射表或严格白名单。",
+                  "line": 3,
+                  "path": "src/change_01.py",
+                  "rule_id": "SEM-TAINTED-EXEC",
+                  "severity": "critical",
+                  "source_skill": null,
+                  "test": "加入含恶意表达式与边界输入的测试，断言输入不被当作代码执行。",
+                  "title": "SEM-TAINTED-EXEC",
+                  "finding_id": "SEM-TAINTED-EXEC:src/change_01.py:3",
+                  "finding_version": 1,
+                  "artifact_id": "93185e6147ce42e8b8b7aa4479d3adbb"
+                }
+              ],
+              "rejected_findings": [],
+              "conflicts": [],
+              "questions": [],
+              "missing_evidence": [],
+              "replan_requests": [],
+              "findings": [],
+              "_a2a_metadata": [
+                {
+                  "task_type": "critique.findings",
+                  "stop_reason": "final",
+                  "steps": 8,
+                  "plan_versions": 0,
+                  "decision_count": 8,
+                  "correlation_id": "11da27ab910b4cb19e2eccfa88907937"
+                }
+              ]
+            }
+          },
+          {
+            "artifact_id": "870592a8f1b04943bd0117d3c574e628",
+            "producer_node": "verifier-v1",
+            "agent_id": "verifier-agent",
+            "task_type": "verify.findings",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [
+              "4b9f0f9a2433471ebcb5c60ee660e71f"
+            ],
+            "content": {
+              "task_type": "verify.findings",
+              "agent_id": "verifier-agent",
+              "count": 2,
+              "decisions": {
+                "SEC-EVAL:src/change_01.py:3": {
+                  "finding_id": "SEC-EVAL:src/change_01.py:3",
+                  "verified": true,
+                  "evidence": "result = [sanitized]value)",
+                  "attempted_strategies": [
+                    "verify_rule_signature"
+                  ],
+                  "remaining_strategies": [
+                    "semantic_verify",
+                    "run_targeted_test"
+                  ],
+                  "verification_method": "verify_rule_signature",
+                  "verification_strategy": "verify_rule_signature",
+                  "confidence": 1.0,
+                  "failure_reason": "",
+                  "verification_version": 1,
+                  "finding_version": 1
+                },
+                "SEM-TAINTED-EXEC:src/change_01.py:3": {
+                  "finding_id": "SEM-TAINTED-EXEC:src/change_01.py:3",
+                  "verified": true,
+                  "evidence": "result = [sanitized]value)",
+                  "attempted_strategies": [
+                    "semantic_verify"
+                  ],
+                  "remaining_strategies": [
+                    "cross_check_finding"
+                  ],
+                  "verification_method": "semantic_verify",
+                  "verification_strategy": "semantic_verify",
+                  "confidence": 0.95,
+                  "failure_reason": "",
+                  "verification_version": 1,
+                  "finding_version": 1
+                }
+              },
+              "findings": [],
+              "_a2a_metadata": [
+                {
+                  "task_type": "verify.findings",
+                  "stop_reason": "final",
+                  "steps": 4,
+                  "plan_versions": 0,
+                  "decision_count": 4,
+                  "correlation_id": "4d2e085c27f44dfc8e1744a8998cbfff"
+                }
+              ]
+            },
+            "verification_version": 1
+          }
+        ],
+        "superseded_artifacts": [],
+        "feature_flags_snapshot": {
+          "planner": true,
+          "targeted_replan": true,
+          "critic": true,
+          "verifier": true,
+          "parallel_scheduler": true,
+          "deep_loop": true
+        },
+        "parallel_batches": [
+          {
+            "batch_id": "batch-1",
+            "parallel_width": 1,
+            "started_at": 875.2520358,
+            "finished_at": 875.253394,
+            "agent_ids": [
+              "security-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 1.3582,
+            "branch_duration_ms": [
+              1.3558
+            ],
+            "speedup_ratio": 1.0
+          },
+          {
+            "batch_id": "batch-2",
+            "parallel_width": 1,
+            "started_at": 875.2536305,
+            "finished_at": 875.2547872,
+            "agent_ids": [
+              "critic-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 1.1567,
+            "branch_duration_ms": [
+              1.1555
+            ],
+            "speedup_ratio": 1.0
+          },
+          {
+            "batch_id": "batch-3",
+            "parallel_width": 1,
+            "started_at": 875.2550244,
+            "finished_at": 875.2557954,
+            "agent_ids": [
+              "verifier-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 0.771,
+            "branch_duration_ms": [
+              0.7704
+            ],
+            "speedup_ratio": 1.0
+          }
+        ],
+        "loop_steps_by_agent": {
+          "security-agent": 3,
+          "critic-agent": 8,
+          "verifier-agent": 4
+        },
+        "tool_calls_by_agent": {
+          "security-agent": 3,
+          "critic-agent": 8,
+          "verifier-agent": 4
+        },
+        "called_agents": [
+          "security-agent",
+          "critic-agent",
+          "verifier-agent"
+        ],
+        "replan_targets": [],
+        "verification_version": 1,
+        "finding_versions": {
+          "SEC-EVAL:src/change_01.py:3": 1,
+          "SEM-TAINTED-EXEC:src/change_01.py:3": 1
+        },
+        "fix_stale_inputs": 0,
+        "skill_invocations": {
+          "security-rule@1": 1
+        }
+      },
+      "architecture": "six-agent-v2",
+      "called_agents": [
+        "security-agent",
+        "critic-agent",
+        "verifier-agent"
+      ],
+      "graph_revision": 3,
+      "graph_shapes": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.security",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "93185e6147ce42e8b8b7aa4479d3adbb"
+          ],
+          "metadata": {}
+        },
+        {
+          "node_id": "critic",
+          "task_type": "critique.findings",
+          "dependencies": [
+            "spec0"
+          ],
+          "status": "completed",
+          "artifact_ids": [
+            "4b9f0f9a2433471ebcb5c60ee660e71f"
+          ],
+          "metadata": {}
+        },
+        {
+          "node_id": "verifier-v1",
+          "task_type": "verify.findings",
+          "dependencies": [
+            "critic"
+          ],
+          "status": "completed",
+          "artifact_ids": [
+            "870592a8f1b04943bd0117d3c574e628"
+          ],
+          "metadata": {
+            "finding_versions": {
+              "SEC-EVAL:src/change_01.py:3": 1,
+              "SEM-TAINTED-EXEC:src/change_01.py:3": 1
+            }
+          }
+        }
+      ],
+      "loop_steps_by_agent": {
+        "security-agent": 3,
+        "critic-agent": 8,
+        "verifier-agent": 4
+      },
+      "parallel_batches": [
+        {
+          "batch_id": "batch-1",
+          "parallel_width": 1,
+          "started_at": 875.2520358,
+          "finished_at": 875.253394,
+          "agent_ids": [
+            "security-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 1.3582,
+          "branch_duration_ms": [
+            1.3558
+          ],
+          "speedup_ratio": 1.0
+        },
+        {
+          "batch_id": "batch-2",
+          "parallel_width": 1,
+          "started_at": 875.2536305,
+          "finished_at": 875.2547872,
+          "agent_ids": [
+            "critic-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 1.1567,
+          "branch_duration_ms": [
+            1.1555
+          ],
+          "speedup_ratio": 1.0
+        },
+        {
+          "batch_id": "batch-3",
+          "parallel_width": 1,
+          "started_at": 875.2550244,
+          "finished_at": 875.2557954,
+          "agent_ids": [
+            "verifier-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 0.771,
+          "branch_duration_ms": [
+            0.7704
+          ],
+          "speedup_ratio": 1.0
+        }
+      ],
+      "replan_count": 0,
+      "replan_targets": [],
+      "feature_flags": {
+        "planner": true,
+        "targeted_replan": true,
+        "critic": true,
+        "verifier": true,
+        "parallel_scheduler": true,
+        "deep_loop": true
+      },
+      "skill_invocations": {
+        "security-rule@1": 1
+      },
+      "expected_findings": [
+        {
+          "cwe": "CWE-95",
+          "end_line": 3,
+          "path": "src/change_01.py",
+          "rule_id": "SEC-EVAL",
+          "severity": "critical",
+          "start_line": 3
+        }
+      ],
+      "prediction_details": [
+        {
+          "rule_id": "SEC-EVAL",
+          "severity": "critical",
+          "title": "动态代码执行可能导致注入",
+          "explanation": "新增代码调用了动态执行函数；当参数可被外部影响时，攻击者可能执行任意代码。",
+          "path": "src/change_01.py",
+          "line": 3,
+          "evidence": "result = [sanitized]value)",
+          "fix": "移除动态执行；使用显式解析器、命令映射表或严格白名单处理输入。",
+          "test": "加入恶意表达式与边界输入测试，断言输入不会被当作代码执行。",
+          "confidence": 0.9,
+          "source_skill": null,
+          "analyzer": null
+        },
+        {
+          "rule_id": "SEM-TAINTED-EXEC",
+          "severity": "critical",
+          "title": "SEM-TAINTED-EXEC",
+          "explanation": "外部输入经过赋值传播后流入动态执行函数；当输入可被外部影响时，攻击者可能执行任意代码。",
+          "path": "src/change_01.py",
+          "line": 3,
+          "evidence": "result = [sanitized]value)",
+          "fix": "移除动态执行；使用显式解析器、命令映射表或严格白名单。",
+          "test": "加入含恶意表达式与边界输入的测试，断言输入不被当作代码执行。",
+          "confidence": 0.8,
+          "source_skill": null,
+          "analyzer": "ast"
+        }
+      ],
+      "unmatched_expected_indices": [],
+      "unmatched_predicted_indices": [
+        1
+      ],
+      "matches": [
+        {
+          "expected_index": 0,
+          "predicted_index": 0,
+          "cwe": "CWE-95"
+        }
+      ]
+    },
+    {
+      "id": "pr-0002",
+      "repository": "acme/service-01",
+      "pull_request": 1002,
+      "split": "validation",
+      "expected": 1,
+      "predicted": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "severity_hits": 0,
+      "high_total": 1,
+      "high_hits": 0,
+      "high_risk_total": 1,
+      "high_risk_hits": 0,
+      "high_risk_misses": 1,
+      "critical_total": 0,
+      "critical_hits": 0,
+      "critical_misses": 0,
+      "clean_hit": false,
+      "execution_success": true,
+      "repair_attempted": 0,
+      "repair_passed": 0,
+      "e2e_success": false,
+      "latency_ms": 186.06199999999262,
+      "agent_steps": 2,
+      "tool_calls": 2,
+      "recovery_attempts": 0,
+      "recovery_successes": 0,
+      "policy_denials": 0,
+      "circuit_breaker_trips": 0,
+      "timeouts": 0,
+      "side_effect_blocks": 0,
+      "decision_trace_created": true,
+      "replay_snapshot_created": true,
+      "trace_event_count": 3,
+      "policy_id": "baseline-medium",
+      "policy_version": 1,
+      "deployment_lane": "baseline",
+      "resolved_policy": {
+        "resolved_policy": "baseline-medium",
+        "max_steps": 6,
+        "timeout_seconds": null,
+        "max_tool_calls": 12,
+        "enabled_agents": [
+          "security-agent",
+          "reliability-agent",
+          "semantic-agent"
+        ],
+        "verification": {
+          "critic_required": true,
+          "evidence_required": false,
+          "verifier_required": true,
+          "sandbox_required": false
+        }
+      },
+      "error": null,
+      "collaboration": {
+        "task_type": "review.coordinate",
+        "agent_id": "coordinator",
+        "accepted_findings": [],
+        "rejected_findings": [],
+        "count": 0,
+        "rejected_count": 0,
+        "graph_revision": 1,
+        "replan_count": 0,
+        "delegated_tasks": 1,
+        "architecture": "six-agent-v2",
+        "rationale_codes": [
+          "CLEAN_BASELINE"
+        ],
+        "collaborations": [
+          "reliability-agent"
+        ],
+        "graph_mutations": [],
+        "task_graph": {
+          "graph_id": "39db8a013a5c4627925ab16a35c2cc36",
+          "revision": 1,
+          "mutation_history": [],
+          "nodes": {
+            "spec0": {
+              "node_id": "spec0",
+              "task_type": "review.reliability",
+              "objective": "review changed lines for reliability",
+              "target_capabilities": [],
+              "dependencies": [],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "bb323037e3e741c2b5dd662aa49b5882"
+              ],
+              "agent_id": "reliability-agent",
+              "serial": false,
+              "metadata": {}
+            }
+          }
+        },
+        "graph_shapes": [
+          {
+            "node_id": "spec0",
+            "task_type": "review.reliability",
+            "dependencies": [],
+            "status": "completed",
+            "artifact_ids": [
+              "bb323037e3e741c2b5dd662aa49b5882"
+            ],
+            "metadata": {}
+          }
+        ],
+        "runtime_events": [
+          {
+            "kind": "FINDINGS_EMITTED",
+            "node_id": "spec0",
+            "artifact_id": "bb323037e3e741c2b5dd662aa49b5882",
+            "detail": {
+              "count": 0,
+              "recheck": false,
+              "changed_artifact_ids": []
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "spec0",
+            "artifact_id": "bb323037e3e741c2b5dd662aa49b5882",
+            "detail": {
+              "agent_id": "reliability-agent",
+              "task_type": "review.reliability"
+            }
+          }
+        ],
+        "runtime_artifacts": [
+          {
+            "artifact_id": "bb323037e3e741c2b5dd662aa49b5882",
+            "producer_node": "spec0",
+            "agent_id": "reliability-agent",
+            "task_type": "review.reliability",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [],
+            "content": {
+              "task_type": "review.reliability",
+              "agent_id": "reliability-agent",
+              "count": 0,
+              "findings": [],
+              "confidence": 0.0,
+              "_a2a_metadata": [
+                {
+                  "task_type": "review.reliability",
+                  "stop_reason": "final",
+                  "steps": 2,
+                  "plan_versions": 0,
+                  "decision_count": 2,
+                  "correlation_id": "777cd2fd47de491bbbf26e11db19ba65"
+                }
+              ]
+            },
+            "finding_versions": {}
+          }
+        ],
+        "superseded_artifacts": [],
+        "feature_flags_snapshot": {
+          "planner": true,
+          "targeted_replan": true,
+          "critic": true,
+          "verifier": true,
+          "parallel_scheduler": true,
+          "deep_loop": true
+        },
+        "parallel_batches": [
+          {
+            "batch_id": "batch-1",
+            "parallel_width": 1,
+            "started_at": 875.446779,
+            "finished_at": 875.4477076,
+            "agent_ids": [
+              "reliability-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 0.9286,
+            "branch_duration_ms": [
+              0.9282
+            ],
+            "speedup_ratio": 1.0
+          }
+        ],
+        "loop_steps_by_agent": {
+          "reliability-agent": 2
+        },
+        "tool_calls_by_agent": {
+          "reliability-agent": 2
+        },
+        "called_agents": [
+          "reliability-agent"
+        ],
+        "replan_targets": [],
+        "verification_version": 0,
+        "finding_versions": {},
+        "fix_stale_inputs": 0,
+        "skill_invocations": {}
+      },
+      "architecture": "six-agent-v2",
+      "called_agents": [
+        "reliability-agent"
+      ],
+      "graph_revision": 1,
+      "graph_shapes": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "bb323037e3e741c2b5dd662aa49b5882"
+          ],
+          "metadata": {}
+        }
+      ],
+      "loop_steps_by_agent": {
+        "reliability-agent": 2
+      },
+      "parallel_batches": [
+        {
+          "batch_id": "batch-1",
+          "parallel_width": 1,
+          "started_at": 875.446779,
+          "finished_at": 875.4477076,
+          "agent_ids": [
+            "reliability-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 0.9286,
+          "branch_duration_ms": [
+            0.9282
+          ],
+          "speedup_ratio": 1.0
+        }
+      ],
+      "replan_count": 0,
+      "replan_targets": [],
+      "feature_flags": {
+        "planner": true,
+        "targeted_replan": true,
+        "critic": true,
+        "verifier": true,
+        "parallel_scheduler": true,
+        "deep_loop": true
+      },
+      "skill_invocations": {},
+      "expected_findings": [
+        {
+          "cwe": "CWE-798",
+          "end_line": 3,
+          "path": "src/change_11.py",
+          "rule_id": "SEC-HARDCODED-SECRET",
+          "severity": "high",
+          "start_line": 3
+        }
+      ],
+      "prediction_details": [],
+      "unmatched_expected_indices": [
+        0
+      ],
+      "unmatched_predicted_indices": [],
+      "matches": []
+    },
+    {
+      "id": "pr-0003",
+      "repository": "acme/service-01",
+      "pull_request": 1003,
+      "split": "validation",
+      "expected": 1,
+      "predicted": 1,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "severity_hits": 1,
+      "high_total": 0,
+      "high_hits": 0,
+      "high_risk_total": 0,
+      "high_risk_hits": 0,
+      "high_risk_misses": 0,
+      "critical_total": 0,
+      "critical_hits": 0,
+      "critical_misses": 0,
+      "clean_hit": false,
+      "execution_success": true,
+      "repair_attempted": 0,
+      "repair_passed": 0,
+      "e2e_success": false,
+      "latency_ms": 213.1337999999232,
+      "agent_steps": 12,
+      "tool_calls": 12,
+      "recovery_attempts": 0,
+      "recovery_successes": 0,
+      "policy_denials": 0,
+      "circuit_breaker_trips": 0,
+      "timeouts": 0,
+      "side_effect_blocks": 0,
+      "decision_trace_created": true,
+      "replay_snapshot_created": true,
+      "trace_event_count": 3,
+      "policy_id": "baseline-low",
+      "policy_version": 1,
+      "deployment_lane": "baseline",
+      "resolved_policy": {
+        "resolved_policy": "baseline-low",
+        "max_steps": 3,
+        "timeout_seconds": null,
+        "max_tool_calls": 5,
+        "enabled_agents": [
+          "reliability-agent"
+        ],
+        "verification": {
+          "critic_required": false,
+          "evidence_required": false,
+          "verifier_required": false,
+          "sandbox_required": false
+        }
+      },
+      "error": null,
+      "collaboration": {
+        "task_type": "review.coordinate",
+        "agent_id": "coordinator",
+        "accepted_findings": [
+          {
+            "analyzer": null,
+            "confidence": 0.9,
+            "evidence": "except Exception:",
+            "explanation": "宽泛捕获会隐藏真实故障，使调用方误以为操作成功。",
+            "fix": "仅捕获可处理的异常，记录必要上下文，并让不可恢复错误向上传播。",
+            "line": 4,
+            "path": "src/change_21.py",
+            "rule_id": "REL-EMPTY-EXCEPT",
+            "severity": "medium",
+            "source_skill": null,
+            "test": "加入依赖失败测试，断言错误可观察且不会返回伪成功。",
+            "title": "异常被宽泛捕获",
+            "deep_evidence": {
+              "inspect_execution_path": {
+                "guarded": false,
+                "has_try": false,
+                "has_except": true
+              }
+            },
+            "finding_id": "REL-EMPTY-EXCEPT:src/change_21.py:4",
+            "finding_version": 1,
+            "artifact_id": "c58cc28240614431b52b8dd39dc2cf66"
+          }
+        ],
+        "rejected_findings": [],
+        "count": 1,
+        "rejected_count": 0,
+        "graph_revision": 3,
+        "replan_count": 0,
+        "delegated_tasks": 3,
+        "architecture": "six-agent-v2",
+        "rationale_codes": [
+          "EXCEPTION_PATH_CHANGED"
+        ],
+        "collaborations": [
+          "reliability-agent",
+          "critic-agent",
+          "verifier-agent"
+        ],
+        "graph_mutations": [],
+        "task_graph": {
+          "graph_id": "11aa837efd4c44b7bcc56cef255d98f8",
+          "revision": 3,
+          "mutation_history": [
+            {
+              "op": "add",
+              "node": "critic",
+              "reason": "LOW_CONFIDENCE",
+              "graph_revision": 2
+            },
+            {
+              "op": "add",
+              "node": "verifier-v1",
+              "reason": "EXPECTED_FINDINGS",
+              "graph_revision": 3
+            }
+          ],
+          "nodes": {
+            "critic": {
+              "node_id": "critic",
+              "task_type": "critique.findings",
+              "objective": "challenge current findings and evidence",
+              "target_capabilities": [],
+              "dependencies": [
+                "spec0"
+              ],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "dd665deb121c49059495fd409da368ed"
+              ],
+              "agent_id": "critic-agent",
+              "serial": false,
+              "metadata": {}
+            },
+            "spec0": {
+              "node_id": "spec0",
+              "task_type": "review.reliability",
+              "objective": "review changed lines for reliability",
+              "target_capabilities": [],
+              "dependencies": [],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "c58cc28240614431b52b8dd39dc2cf66"
+              ],
+              "agent_id": "reliability-agent",
+              "serial": false,
+              "metadata": {}
+            },
+            "verifier-v1": {
+              "node_id": "verifier-v1",
+              "task_type": "verify.findings",
+              "objective": "verify latest finding versions",
+              "target_capabilities": [],
+              "dependencies": [
+                "critic"
+              ],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "eedcc4ebd46f4a248e63df23c36d13b5"
+              ],
+              "agent_id": "verifier-agent",
+              "serial": false,
+              "metadata": {
+                "finding_versions": {
+                  "REL-EMPTY-EXCEPT:src/change_21.py:4": 1
+                }
+              }
+            }
+          }
+        },
+        "graph_shapes": [
+          {
+            "node_id": "spec0",
+            "task_type": "review.reliability",
+            "dependencies": [],
+            "status": "completed",
+            "artifact_ids": [
+              "c58cc28240614431b52b8dd39dc2cf66"
+            ],
+            "metadata": {}
+          },
+          {
+            "node_id": "critic",
+            "task_type": "critique.findings",
+            "dependencies": [
+              "spec0"
+            ],
+            "status": "completed",
+            "artifact_ids": [
+              "dd665deb121c49059495fd409da368ed"
+            ],
+            "metadata": {}
+          },
+          {
+            "node_id": "verifier-v1",
+            "task_type": "verify.findings",
+            "dependencies": [
+              "critic"
+            ],
+            "status": "completed",
+            "artifact_ids": [
+              "eedcc4ebd46f4a248e63df23c36d13b5"
+            ],
+            "metadata": {
+              "finding_versions": {
+                "REL-EMPTY-EXCEPT:src/change_21.py:4": 1
+              }
+            }
+          }
+        ],
+        "runtime_events": [
+          {
+            "kind": "FINDINGS_EMITTED",
+            "node_id": "spec0",
+            "artifact_id": "c58cc28240614431b52b8dd39dc2cf66",
+            "detail": {
+              "count": 1,
+              "recheck": false,
+              "changed_artifact_ids": []
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "spec0",
+            "artifact_id": "c58cc28240614431b52b8dd39dc2cf66",
+            "detail": {
+              "agent_id": "reliability-agent",
+              "task_type": "review.reliability"
+            }
+          },
+          {
+            "kind": "GRAPH_MUTATED",
+            "node_id": "critic",
+            "artifact_id": "",
+            "detail": {
+              "op": "add",
+              "reason": "LOW_CONFIDENCE",
+              "graph_revision": 2
+            }
+          },
+          {
+            "kind": "CRITIQUE_EMITTED",
+            "node_id": "critic",
+            "artifact_id": "dd665deb121c49059495fd409da368ed",
+            "detail": {
+              "replan_requests": 0
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "critic",
+            "artifact_id": "dd665deb121c49059495fd409da368ed",
+            "detail": {
+              "agent_id": "critic-agent",
+              "task_type": "critique.findings"
+            }
+          },
+          {
+            "kind": "GRAPH_MUTATED",
+            "node_id": "verifier-v1",
+            "artifact_id": "",
+            "detail": {
+              "op": "add",
+              "reason": "EXPECTED_FINDINGS",
+              "graph_revision": 3
+            }
+          },
+          {
+            "kind": "VERIFICATION_COMPLETED",
+            "node_id": "verifier-v1",
+            "artifact_id": "eedcc4ebd46f4a248e63df23c36d13b5",
+            "detail": {
+              "verification_version": 1
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "verifier-v1",
+            "artifact_id": "eedcc4ebd46f4a248e63df23c36d13b5",
+            "detail": {
+              "agent_id": "verifier-agent",
+              "task_type": "verify.findings"
+            }
+          }
+        ],
+        "runtime_artifacts": [
+          {
+            "artifact_id": "c58cc28240614431b52b8dd39dc2cf66",
+            "producer_node": "spec0",
+            "agent_id": "reliability-agent",
+            "task_type": "review.reliability",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [],
+            "content": {
+              "task_type": "review.reliability",
+              "agent_id": "reliability-agent",
+              "count": 1,
+              "findings": [
+                {
+                  "analyzer": null,
+                  "confidence": 0.9,
+                  "evidence": "except Exception:",
+                  "explanation": "宽泛捕获会隐藏真实故障，使调用方误以为操作成功。",
+                  "fix": "仅捕获可处理的异常，记录必要上下文，并让不可恢复错误向上传播。",
+                  "line": 4,
+                  "path": "src/change_21.py",
+                  "rule_id": "REL-EMPTY-EXCEPT",
+                  "severity": "medium",
+                  "source_skill": null,
+                  "test": "加入依赖失败测试，断言错误可观察且不会返回伪成功。",
+                  "title": "异常被宽泛捕获",
+                  "deep_evidence": {
+                    "inspect_execution_path": {
+                      "guarded": false,
+                      "has_try": false,
+                      "has_except": true
+                    }
+                  },
+                  "finding_id": "REL-EMPTY-EXCEPT:src/change_21.py:4",
+                  "finding_version": 1,
+                  "artifact_id": "c58cc28240614431b52b8dd39dc2cf66"
+                }
+              ],
+              "confidence": 0.9,
+              "_a2a_metadata": [
+                {
+                  "task_type": "review.reliability",
+                  "stop_reason": "final",
+                  "steps": 4,
+                  "plan_versions": 0,
+                  "decision_count": 4,
+                  "correlation_id": "f75cadf3e88045279fb42206d306bf3b"
+                }
+              ]
+            },
+            "finding_versions": {
+              "REL-EMPTY-EXCEPT:src/change_21.py:4": 1
+            }
+          },
+          {
+            "artifact_id": "dd665deb121c49059495fd409da368ed",
+            "producer_node": "critic",
+            "agent_id": "critic-agent",
+            "task_type": "critique.findings",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [
+              "c58cc28240614431b52b8dd39dc2cf66"
+            ],
+            "content": {
+              "task_type": "critique.findings",
+              "agent_id": "critic-agent",
+              "accepted_findings": [
+                {
+                  "analyzer": null,
+                  "confidence": 0.9,
+                  "evidence": "except Exception:",
+                  "explanation": "宽泛捕获会隐藏真实故障，使调用方误以为操作成功。",
+                  "fix": "仅捕获可处理的异常，记录必要上下文，并让不可恢复错误向上传播。",
+                  "line": 4,
+                  "path": "src/change_21.py",
+                  "rule_id": "REL-EMPTY-EXCEPT",
+                  "severity": "medium",
+                  "source_skill": null,
+                  "test": "加入依赖失败测试，断言错误可观察且不会返回伪成功。",
+                  "title": "异常被宽泛捕获",
+                  "deep_evidence": {
+                    "inspect_execution_path": {
+                      "guarded": false,
+                      "has_try": false,
+                      "has_except": true
+                    }
+                  },
+                  "finding_id": "REL-EMPTY-EXCEPT:src/change_21.py:4",
+                  "finding_version": 1,
+                  "artifact_id": "c58cc28240614431b52b8dd39dc2cf66"
+                }
+              ],
+              "rejected_findings": [],
+              "conflicts": [],
+              "questions": [],
+              "missing_evidence": [],
+              "replan_requests": [],
+              "findings": [],
+              "_a2a_metadata": [
+                {
+                  "task_type": "critique.findings",
+                  "stop_reason": "final",
+                  "steps": 5,
+                  "plan_versions": 0,
+                  "decision_count": 5,
+                  "correlation_id": "1a6432da7b0e49ee9742fcee997fcd8d"
+                }
+              ]
+            }
+          },
+          {
+            "artifact_id": "eedcc4ebd46f4a248e63df23c36d13b5",
+            "producer_node": "verifier-v1",
+            "agent_id": "verifier-agent",
+            "task_type": "verify.findings",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [
+              "dd665deb121c49059495fd409da368ed"
+            ],
+            "content": {
+              "task_type": "verify.findings",
+              "agent_id": "verifier-agent",
+              "count": 1,
+              "decisions": {
+                "REL-EMPTY-EXCEPT:src/change_21.py:4": {
+                  "finding_id": "REL-EMPTY-EXCEPT:src/change_21.py:4",
+                  "verified": true,
+                  "evidence": "except Exception:",
+                  "attempted_strategies": [
+                    "run_targeted_test"
+                  ],
+                  "remaining_strategies": [
+                    "verify_rule_signature",
+                    "semantic_verify"
+                  ],
+                  "verification_method": "run_targeted_test",
+                  "verification_strategy": "run_targeted_test",
+                  "confidence": 1.0,
+                  "failure_reason": "",
+                  "verification_version": 1,
+                  "finding_version": 1
+                }
+              },
+              "findings": [],
+              "_a2a_metadata": [
+                {
+                  "task_type": "verify.findings",
+                  "stop_reason": "final",
+                  "steps": 3,
+                  "plan_versions": 0,
+                  "decision_count": 3,
+                  "correlation_id": "69d26a68b9cd4e26b0850dc974b003b6"
+                }
+              ]
+            },
+            "verification_version": 1
+          }
+        ],
+        "superseded_artifacts": [],
+        "feature_flags_snapshot": {
+          "planner": true,
+          "targeted_replan": true,
+          "critic": true,
+          "verifier": true,
+          "parallel_scheduler": true,
+          "deep_loop": true
+        },
+        "parallel_batches": [
+          {
+            "batch_id": "batch-1",
+            "parallel_width": 1,
+            "started_at": 875.6436467,
+            "finished_at": 875.6449409,
+            "agent_ids": [
+              "reliability-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 1.2942,
+            "branch_duration_ms": [
+              1.2895
+            ],
+            "speedup_ratio": 1.0
+          },
+          {
+            "batch_id": "batch-2",
+            "parallel_width": 1,
+            "started_at": 875.6451487,
+            "finished_at": 875.6458649,
+            "agent_ids": [
+              "critic-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 0.7162,
+            "branch_duration_ms": [
+              0.7152
+            ],
+            "speedup_ratio": 1.0
+          },
+          {
+            "batch_id": "batch-3",
+            "parallel_width": 1,
+            "started_at": 875.6460788,
+            "finished_at": 875.6466357,
+            "agent_ids": [
+              "verifier-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 0.5569,
+            "branch_duration_ms": [
+              0.5564
+            ],
+            "speedup_ratio": 1.0
+          }
+        ],
+        "loop_steps_by_agent": {
+          "reliability-agent": 4,
+          "critic-agent": 5,
+          "verifier-agent": 3
+        },
+        "tool_calls_by_agent": {
+          "reliability-agent": 4,
+          "critic-agent": 5,
+          "verifier-agent": 3
+        },
+        "called_agents": [
+          "reliability-agent",
+          "critic-agent",
+          "verifier-agent"
+        ],
+        "replan_targets": [],
+        "verification_version": 1,
+        "finding_versions": {
+          "REL-EMPTY-EXCEPT:src/change_21.py:4": 1
+        },
+        "fix_stale_inputs": 0,
+        "skill_invocations": {}
+      },
+      "architecture": "six-agent-v2",
+      "called_agents": [
+        "reliability-agent",
+        "critic-agent",
+        "verifier-agent"
+      ],
+      "graph_revision": 3,
+      "graph_shapes": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "c58cc28240614431b52b8dd39dc2cf66"
+          ],
+          "metadata": {}
+        },
+        {
+          "node_id": "critic",
+          "task_type": "critique.findings",
+          "dependencies": [
+            "spec0"
+          ],
+          "status": "completed",
+          "artifact_ids": [
+            "dd665deb121c49059495fd409da368ed"
+          ],
+          "metadata": {}
+        },
+        {
+          "node_id": "verifier-v1",
+          "task_type": "verify.findings",
+          "dependencies": [
+            "critic"
+          ],
+          "status": "completed",
+          "artifact_ids": [
+            "eedcc4ebd46f4a248e63df23c36d13b5"
+          ],
+          "metadata": {
+            "finding_versions": {
+              "REL-EMPTY-EXCEPT:src/change_21.py:4": 1
+            }
+          }
+        }
+      ],
+      "loop_steps_by_agent": {
+        "reliability-agent": 4,
+        "critic-agent": 5,
+        "verifier-agent": 3
+      },
+      "parallel_batches": [
+        {
+          "batch_id": "batch-1",
+          "parallel_width": 1,
+          "started_at": 875.6436467,
+          "finished_at": 875.6449409,
+          "agent_ids": [
+            "reliability-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 1.2942,
+          "branch_duration_ms": [
+            1.2895
+          ],
+          "speedup_ratio": 1.0
+        },
+        {
+          "batch_id": "batch-2",
+          "parallel_width": 1,
+          "started_at": 875.6451487,
+          "finished_at": 875.6458649,
+          "agent_ids": [
+            "critic-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 0.7162,
+          "branch_duration_ms": [
+            0.7152
+          ],
+          "speedup_ratio": 1.0
+        },
+        {
+          "batch_id": "batch-3",
+          "parallel_width": 1,
+          "started_at": 875.6460788,
+          "finished_at": 875.6466357,
+          "agent_ids": [
+            "verifier-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 0.5569,
+          "branch_duration_ms": [
+            0.5564
+          ],
+          "speedup_ratio": 1.0
+        }
+      ],
+      "replan_count": 0,
+      "replan_targets": [],
+      "feature_flags": {
+        "planner": true,
+        "targeted_replan": true,
+        "critic": true,
+        "verifier": true,
+        "parallel_scheduler": true,
+        "deep_loop": true
+      },
+      "skill_invocations": {},
+      "expected_findings": [
+        {
+          "cwe": "CWE-703",
+          "end_line": 4,
+          "path": "src/change_21.py",
+          "rule_id": "REL-EMPTY-EXCEPT",
+          "severity": "medium",
+          "start_line": 4
+        }
+      ],
+      "prediction_details": [
+        {
+          "rule_id": "REL-EMPTY-EXCEPT",
+          "severity": "medium",
+          "title": "异常被宽泛捕获",
+          "explanation": "宽泛捕获会隐藏真实故障，使调用方误以为操作成功。",
+          "path": "src/change_21.py",
+          "line": 4,
+          "evidence": "except Exception:",
+          "fix": "仅捕获可处理的异常，记录必要上下文，并让不可恢复错误向上传播。",
+          "test": "加入依赖失败测试，断言错误可观察且不会返回伪成功。",
+          "confidence": 0.9,
+          "source_skill": null,
+          "analyzer": null
+        }
+      ],
+      "unmatched_expected_indices": [],
+      "unmatched_predicted_indices": [],
+      "matches": [
+        {
+          "expected_index": 0,
+          "predicted_index": 0,
+          "cwe": "CWE-703"
+        }
+      ]
+    },
+    {
+      "id": "pr-0004",
+      "repository": "acme/service-01",
+      "pull_request": 1004,
+      "split": "validation",
+      "expected": 1,
+      "predicted": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "severity_hits": 0,
+      "high_total": 0,
+      "high_hits": 0,
+      "high_risk_total": 0,
+      "high_risk_hits": 0,
+      "high_risk_misses": 0,
+      "critical_total": 0,
+      "critical_hits": 0,
+      "critical_misses": 0,
+      "clean_hit": false,
+      "execution_success": true,
+      "repair_attempted": 0,
+      "repair_passed": 0,
+      "e2e_success": false,
+      "latency_ms": 263.01279999995586,
+      "agent_steps": 2,
+      "tool_calls": 2,
+      "recovery_attempts": 0,
+      "recovery_successes": 0,
+      "policy_denials": 0,
+      "circuit_breaker_trips": 0,
+      "timeouts": 0,
+      "side_effect_blocks": 0,
+      "decision_trace_created": true,
+      "replay_snapshot_created": true,
+      "trace_event_count": 3,
+      "policy_id": "baseline-low",
+      "policy_version": 1,
+      "deployment_lane": "baseline",
+      "resolved_policy": {
+        "resolved_policy": "baseline-low",
+        "max_steps": 3,
+        "timeout_seconds": null,
+        "max_tool_calls": 5,
+        "enabled_agents": [
+          "reliability-agent"
+        ],
+        "verification": {
+          "critic_required": false,
+          "evidence_required": false,
+          "verifier_required": false,
+          "sandbox_required": false
+        }
+      },
+      "error": null,
+      "collaboration": {
+        "task_type": "review.coordinate",
+        "agent_id": "coordinator",
+        "accepted_findings": [],
+        "rejected_findings": [],
+        "count": 0,
+        "rejected_count": 0,
+        "graph_revision": 1,
+        "replan_count": 0,
+        "delegated_tasks": 1,
+        "architecture": "six-agent-v2",
+        "rationale_codes": [
+          "CLEAN_BASELINE"
+        ],
+        "collaborations": [
+          "reliability-agent"
+        ],
+        "graph_mutations": [],
+        "task_graph": {
+          "graph_id": "1154c89f03ee41e5b1d81cd6c3a2e81b",
+          "revision": 1,
+          "mutation_history": [],
+          "nodes": {
+            "spec0": {
+              "node_id": "spec0",
+              "task_type": "review.reliability",
+              "objective": "review changed lines for reliability",
+              "target_capabilities": [],
+              "dependencies": [],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "60d3eed9850e4cc8966e6b027199e23b"
+              ],
+              "agent_id": "reliability-agent",
+              "serial": false,
+              "metadata": {}
+            }
+          }
+        },
+        "graph_shapes": [
+          {
+            "node_id": "spec0",
+            "task_type": "review.reliability",
+            "dependencies": [],
+            "status": "completed",
+            "artifact_ids": [
+              "60d3eed9850e4cc8966e6b027199e23b"
+            ],
+            "metadata": {}
+          }
+        ],
+        "runtime_events": [
+          {
+            "kind": "FINDINGS_EMITTED",
+            "node_id": "spec0",
+            "artifact_id": "60d3eed9850e4cc8966e6b027199e23b",
+            "detail": {
+              "count": 0,
+              "recheck": false,
+              "changed_artifact_ids": []
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "spec0",
+            "artifact_id": "60d3eed9850e4cc8966e6b027199e23b",
+            "detail": {
+              "agent_id": "reliability-agent",
+              "task_type": "review.reliability"
+            }
+          }
+        ],
+        "runtime_artifacts": [
+          {
+            "artifact_id": "60d3eed9850e4cc8966e6b027199e23b",
+            "producer_node": "spec0",
+            "agent_id": "reliability-agent",
+            "task_type": "review.reliability",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [],
+            "content": {
+              "task_type": "review.reliability",
+              "agent_id": "reliability-agent",
+              "count": 0,
+              "findings": [],
+              "confidence": 0.0,
+              "_a2a_metadata": [
+                {
+                  "task_type": "review.reliability",
+                  "stop_reason": "final",
+                  "steps": 2,
+                  "plan_versions": 0,
+                  "decision_count": 2,
+                  "correlation_id": "d51f9254ac444f57b8a340b0dc70a888"
+                }
+              ]
+            },
+            "finding_versions": {}
+          }
+        ],
+        "superseded_artifacts": [],
+        "feature_flags_snapshot": {
+          "planner": true,
+          "targeted_replan": true,
+          "critic": true,
+          "verifier": true,
+          "parallel_scheduler": true,
+          "deep_loop": true
+        },
+        "parallel_batches": [
+          {
+            "batch_id": "batch-1",
+            "parallel_width": 1,
+            "started_at": 875.8685707,
+            "finished_at": 875.9210157,
+            "agent_ids": [
+              "reliability-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 52.445,
+            "branch_duration_ms": [
+              52.4436
+            ],
+            "speedup_ratio": 1.0
+          }
+        ],
+        "loop_steps_by_agent": {
+          "reliability-agent": 2
+        },
+        "tool_calls_by_agent": {
+          "reliability-agent": 2
+        },
+        "called_agents": [
+          "reliability-agent"
+        ],
+        "replan_targets": [],
+        "verification_version": 0,
+        "finding_versions": {},
+        "fix_stale_inputs": 0,
+        "skill_invocations": {}
+      },
+      "architecture": "six-agent-v2",
+      "called_agents": [
+        "reliability-agent"
+      ],
+      "graph_revision": 1,
+      "graph_shapes": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "60d3eed9850e4cc8966e6b027199e23b"
+          ],
+          "metadata": {}
+        }
+      ],
+      "loop_steps_by_agent": {
+        "reliability-agent": 2
+      },
+      "parallel_batches": [
+        {
+          "batch_id": "batch-1",
+          "parallel_width": 1,
+          "started_at": 875.8685707,
+          "finished_at": 875.9210157,
+          "agent_ids": [
+            "reliability-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 52.445,
+          "branch_duration_ms": [
+            52.4436
+          ],
+          "speedup_ratio": 1.0
+        }
+      ],
+      "replan_count": 0,
+      "replan_targets": [],
+      "feature_flags": {
+        "planner": true,
+        "targeted_replan": true,
+        "critic": true,
+        "verifier": true,
+        "parallel_scheduler": true,
+        "deep_loop": true
+      },
+      "skill_invocations": {},
+      "expected_findings": [
+        {
+          "cwe": "CWE-330",
+          "end_line": 3,
+          "path": "src/change_31.py",
+          "rule_id": "SEC-WEAK-RANDOM",
+          "severity": "medium",
+          "start_line": 3
+        }
+      ],
+      "prediction_details": [],
+      "unmatched_expected_indices": [
+        0
+      ],
+      "unmatched_predicted_indices": [],
+      "matches": []
+    },
+    {
+      "id": "pr-0005",
+      "repository": "acme/service-01",
+      "pull_request": 1005,
+      "split": "validation",
+      "expected": 0,
+      "predicted": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "severity_hits": 0,
+      "high_total": 0,
+      "high_hits": 0,
+      "high_risk_total": 0,
+      "high_risk_hits": 0,
+      "high_risk_misses": 0,
+      "critical_total": 0,
+      "critical_hits": 0,
+      "critical_misses": 0,
+      "clean_hit": true,
+      "execution_success": true,
+      "repair_attempted": 0,
+      "repair_passed": 0,
+      "e2e_success": false,
+      "latency_ms": 207.43860000004588,
+      "agent_steps": 2,
+      "tool_calls": 2,
+      "recovery_attempts": 0,
+      "recovery_successes": 0,
+      "policy_denials": 0,
+      "circuit_breaker_trips": 0,
+      "timeouts": 0,
+      "side_effect_blocks": 0,
+      "decision_trace_created": true,
+      "replay_snapshot_created": true,
+      "trace_event_count": 3,
+      "policy_id": "baseline-low",
+      "policy_version": 1,
+      "deployment_lane": "baseline",
+      "resolved_policy": {
+        "resolved_policy": "baseline-low",
+        "max_steps": 3,
+        "timeout_seconds": null,
+        "max_tool_calls": 5,
+        "enabled_agents": [
+          "reliability-agent"
+        ],
+        "verification": {
+          "critic_required": false,
+          "evidence_required": false,
+          "verifier_required": false,
+          "sandbox_required": false
+        }
+      },
+      "error": null,
+      "collaboration": {
+        "task_type": "review.coordinate",
+        "agent_id": "coordinator",
+        "accepted_findings": [],
+        "rejected_findings": [],
+        "count": 0,
+        "rejected_count": 0,
+        "graph_revision": 1,
+        "replan_count": 0,
+        "delegated_tasks": 1,
+        "architecture": "six-agent-v2",
+        "rationale_codes": [
+          "CLEAN_BASELINE"
+        ],
+        "collaborations": [
+          "reliability-agent"
+        ],
+        "graph_mutations": [],
+        "task_graph": {
+          "graph_id": "4ce1d30149b8493aac92de54008a606c",
+          "revision": 1,
+          "mutation_history": [],
+          "nodes": {
+            "spec0": {
+              "node_id": "spec0",
+              "task_type": "review.reliability",
+              "objective": "review changed lines for reliability",
+              "target_capabilities": [],
+              "dependencies": [],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "d5ae3a1998144c70b21480c187fd5fa9"
+              ],
+              "agent_id": "reliability-agent",
+              "serial": false,
+              "metadata": {}
+            }
+          }
+        },
+        "graph_shapes": [
+          {
+            "node_id": "spec0",
+            "task_type": "review.reliability",
+            "dependencies": [],
+            "status": "completed",
+            "artifact_ids": [
+              "d5ae3a1998144c70b21480c187fd5fa9"
+            ],
+            "metadata": {}
+          }
+        ],
+        "runtime_events": [
+          {
+            "kind": "FINDINGS_EMITTED",
+            "node_id": "spec0",
+            "artifact_id": "d5ae3a1998144c70b21480c187fd5fa9",
+            "detail": {
+              "count": 0,
+              "recheck": false,
+              "changed_artifact_ids": []
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "spec0",
+            "artifact_id": "d5ae3a1998144c70b21480c187fd5fa9",
+            "detail": {
+              "agent_id": "reliability-agent",
+              "task_type": "review.reliability"
+            }
+          }
+        ],
+        "runtime_artifacts": [
+          {
+            "artifact_id": "d5ae3a1998144c70b21480c187fd5fa9",
+            "producer_node": "spec0",
+            "agent_id": "reliability-agent",
+            "task_type": "review.reliability",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [],
+            "content": {
+              "task_type": "review.reliability",
+              "agent_id": "reliability-agent",
+              "count": 0,
+              "findings": [],
+              "confidence": 0.0,
+              "_a2a_metadata": [
+                {
+                  "task_type": "review.reliability",
+                  "stop_reason": "final",
+                  "steps": 2,
+                  "plan_versions": 0,
+                  "decision_count": 2,
+                  "correlation_id": "269cfb7622ba44eaa682f7b99158f3d1"
+                }
+              ]
+            },
+            "finding_versions": {}
+          }
+        ],
+        "superseded_artifacts": [],
+        "feature_flags_snapshot": {
+          "planner": true,
+          "targeted_replan": true,
+          "critic": true,
+          "verifier": true,
+          "parallel_scheduler": true,
+          "deep_loop": true
+        },
+        "parallel_batches": [
+          {
+            "batch_id": "batch-1",
+            "parallel_width": 1,
+            "started_at": 876.1296876,
+            "finished_at": 876.130378,
+            "agent_ids": [
+              "reliability-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 0.6904,
+            "branch_duration_ms": [
+              0.6898
+            ],
+            "speedup_ratio": 1.0
+          }
+        ],
+        "loop_steps_by_agent": {
+          "reliability-agent": 2
+        },
+        "tool_calls_by_agent": {
+          "reliability-agent": 2
+        },
+        "called_agents": [
+          "reliability-agent"
+        ],
+        "replan_targets": [],
+        "verification_version": 0,
+        "finding_versions": {},
+        "fix_stale_inputs": 0,
+        "skill_invocations": {}
+      },
+      "architecture": "six-agent-v2",
+      "called_agents": [
+        "reliability-agent"
+      ],
+      "graph_revision": 1,
+      "graph_shapes": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "d5ae3a1998144c70b21480c187fd5fa9"
+          ],
+          "metadata": {}
+        }
+      ],
+      "loop_steps_by_agent": {
+        "reliability-agent": 2
+      },
+      "parallel_batches": [
+        {
+          "batch_id": "batch-1",
+          "parallel_width": 1,
+          "started_at": 876.1296876,
+          "finished_at": 876.130378,
+          "agent_ids": [
+            "reliability-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 0.6904,
+          "branch_duration_ms": [
+            0.6898
+          ],
+          "speedup_ratio": 1.0
+        }
+      ],
+      "replan_count": 0,
+      "replan_targets": [],
+      "feature_flags": {
+        "planner": true,
+        "targeted_replan": true,
+        "critic": true,
+        "verifier": true,
+        "parallel_scheduler": true,
+        "deep_loop": true
+      },
+      "skill_invocations": {},
+      "expected_findings": [],
+      "prediction_details": [],
+      "unmatched_expected_indices": [],
+      "unmatched_predicted_indices": [],
+      "matches": []
+    }
+  ],
+  "diagnostic_proof": [
+    {
+      "case_id": "pr-0001",
+      "gold": [
+        {
+          "cwe": "CWE-95",
+          "end_line": 3,
+          "path": "src/change_01.py",
+          "rule_id": "SEC-EVAL",
+          "severity": "critical",
+          "start_line": 3
+        }
+      ],
+      "predicted_findings": [
+        {
+          "rule_id": "SEC-EVAL",
+          "severity": "critical",
+          "title": "动态代码执行可能导致注入",
+          "explanation": "新增代码调用了动态执行函数；当参数可被外部影响时，攻击者可能执行任意代码。",
+          "path": "src/change_01.py",
+          "line": 3,
+          "evidence": "result = [sanitized]value)",
+          "fix": "移除动态执行；使用显式解析器、命令映射表或严格白名单处理输入。",
+          "test": "加入恶意表达式与边界输入测试，断言输入不会被当作代码执行。",
+          "confidence": 0.9,
+          "source_skill": null,
+          "analyzer": null
+        },
+        {
+          "rule_id": "SEM-TAINTED-EXEC",
+          "severity": "critical",
+          "title": "SEM-TAINTED-EXEC",
+          "explanation": "外部输入经过赋值传播后流入动态执行函数；当输入可被外部影响时，攻击者可能执行任意代码。",
+          "path": "src/change_01.py",
+          "line": 3,
+          "evidence": "result = [sanitized]value)",
+          "fix": "移除动态执行；使用显式解析器、命令映射表或严格白名单。",
+          "test": "加入含恶意表达式与边界输入的测试，断言输入不被当作代码执行。",
+          "confidence": 0.8,
+          "source_skill": null,
+          "analyzer": "ast"
+        }
+      ],
+      "matched_tp": [
+        {
+          "expected_index": 0,
+          "predicted_index": 0,
+          "cwe": "CWE-95"
+        }
+      ],
+      "unmatched_predictions_fp": [
+        {
+          "rule_id": "SEM-TAINTED-EXEC",
+          "severity": "critical",
+          "title": "SEM-TAINTED-EXEC",
+          "explanation": "外部输入经过赋值传播后流入动态执行函数；当输入可被外部影响时，攻击者可能执行任意代码。",
+          "path": "src/change_01.py",
+          "line": 3,
+          "evidence": "result = [sanitized]value)",
+          "fix": "移除动态执行；使用显式解析器、命令映射表或严格白名单。",
+          "test": "加入含恶意表达式与边界输入的测试，断言输入不被当作代码执行。",
+          "confidence": 0.8,
+          "source_skill": null,
+          "analyzer": "ast"
+        }
+      ],
+      "unmatched_gold_fn": [],
+      "called_agents": [
+        "security-agent",
+        "critic-agent",
+        "verifier-agent"
+      ],
+      "graph_shape": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.security",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "93185e6147ce42e8b8b7aa4479d3adbb"
+          ],
+          "metadata": {}
+        },
+        {
+          "node_id": "critic",
+          "task_type": "critique.findings",
+          "dependencies": [
+            "spec0"
+          ],
+          "status": "completed",
+          "artifact_ids": [
+            "4b9f0f9a2433471ebcb5c60ee660e71f"
+          ],
+          "metadata": {}
+        },
+        {
+          "node_id": "verifier-v1",
+          "task_type": "verify.findings",
+          "dependencies": [
+            "critic"
+          ],
+          "status": "completed",
+          "artifact_ids": [
+            "870592a8f1b04943bd0117d3c574e628"
+          ],
+          "metadata": {
+            "finding_versions": {
+              "SEC-EVAL:src/change_01.py:3": 1,
+              "SEM-TAINTED-EXEC:src/change_01.py:3": 1
+            }
+          }
+        }
+      ],
+      "tool_calls": {
+        "security-agent": 3,
+        "critic-agent": 8,
+        "verifier-agent": 4
+      },
+      "rule_to_cwe_mapping": {
+        "SEC-EVAL": "CWE-95",
+        "SEM-TAINTED-EXEC": "CWE-95"
+      }
+    },
+    {
+      "case_id": "pr-0002",
+      "gold": [
+        {
+          "cwe": "CWE-798",
+          "end_line": 3,
+          "path": "src/change_11.py",
+          "rule_id": "SEC-HARDCODED-SECRET",
+          "severity": "high",
+          "start_line": 3
+        }
+      ],
+      "predicted_findings": [],
+      "matched_tp": [],
+      "unmatched_predictions_fp": [],
+      "unmatched_gold_fn": [
+        {
+          "cwe": "CWE-798",
+          "end_line": 3,
+          "path": "src/change_11.py",
+          "rule_id": "SEC-HARDCODED-SECRET",
+          "severity": "high",
+          "start_line": 3
+        }
+      ],
+      "called_agents": [
+        "reliability-agent"
+      ],
+      "graph_shape": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "bb323037e3e741c2b5dd662aa49b5882"
+          ],
+          "metadata": {}
+        }
+      ],
+      "tool_calls": {
+        "reliability-agent": 2
+      },
+      "rule_to_cwe_mapping": {}
+    },
+    {
+      "case_id": "pr-0003",
+      "gold": [
+        {
+          "cwe": "CWE-703",
+          "end_line": 4,
+          "path": "src/change_21.py",
+          "rule_id": "REL-EMPTY-EXCEPT",
+          "severity": "medium",
+          "start_line": 4
+        }
+      ],
+      "predicted_findings": [
+        {
+          "rule_id": "REL-EMPTY-EXCEPT",
+          "severity": "medium",
+          "title": "异常被宽泛捕获",
+          "explanation": "宽泛捕获会隐藏真实故障，使调用方误以为操作成功。",
+          "path": "src/change_21.py",
+          "line": 4,
+          "evidence": "except Exception:",
+          "fix": "仅捕获可处理的异常，记录必要上下文，并让不可恢复错误向上传播。",
+          "test": "加入依赖失败测试，断言错误可观察且不会返回伪成功。",
+          "confidence": 0.9,
+          "source_skill": null,
+          "analyzer": null
+        }
+      ],
+      "matched_tp": [
+        {
+          "expected_index": 0,
+          "predicted_index": 0,
+          "cwe": "CWE-703"
+        }
+      ],
+      "unmatched_predictions_fp": [],
+      "unmatched_gold_fn": [],
+      "called_agents": [
+        "reliability-agent",
+        "critic-agent",
+        "verifier-agent"
+      ],
+      "graph_shape": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "c58cc28240614431b52b8dd39dc2cf66"
+          ],
+          "metadata": {}
+        },
+        {
+          "node_id": "critic",
+          "task_type": "critique.findings",
+          "dependencies": [
+            "spec0"
+          ],
+          "status": "completed",
+          "artifact_ids": [
+            "dd665deb121c49059495fd409da368ed"
+          ],
+          "metadata": {}
+        },
+        {
+          "node_id": "verifier-v1",
+          "task_type": "verify.findings",
+          "dependencies": [
+            "critic"
+          ],
+          "status": "completed",
+          "artifact_ids": [
+            "eedcc4ebd46f4a248e63df23c36d13b5"
+          ],
+          "metadata": {
+            "finding_versions": {
+              "REL-EMPTY-EXCEPT:src/change_21.py:4": 1
+            }
+          }
+        }
+      ],
+      "tool_calls": {
+        "reliability-agent": 4,
+        "critic-agent": 5,
+        "verifier-agent": 3
+      },
+      "rule_to_cwe_mapping": {
+        "REL-EMPTY-EXCEPT": "CWE-703"
+      }
+    },
+    {
+      "case_id": "pr-0004",
+      "gold": [
+        {
+          "cwe": "CWE-330",
+          "end_line": 3,
+          "path": "src/change_31.py",
+          "rule_id": "SEC-WEAK-RANDOM",
+          "severity": "medium",
+          "start_line": 3
+        }
+      ],
+      "predicted_findings": [],
+      "matched_tp": [],
+      "unmatched_predictions_fp": [],
+      "unmatched_gold_fn": [
+        {
+          "cwe": "CWE-330",
+          "end_line": 3,
+          "path": "src/change_31.py",
+          "rule_id": "SEC-WEAK-RANDOM",
+          "severity": "medium",
+          "start_line": 3
+        }
+      ],
+      "called_agents": [
+        "reliability-agent"
+      ],
+      "graph_shape": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "60d3eed9850e4cc8966e6b027199e23b"
+          ],
+          "metadata": {}
+        }
+      ],
+      "tool_calls": {
+        "reliability-agent": 2
+      },
+      "rule_to_cwe_mapping": {}
+    },
+    {
+      "case_id": "pr-0005",
+      "gold": [],
+      "predicted_findings": [],
+      "matched_tp": [],
+      "unmatched_predictions_fp": [],
+      "unmatched_gold_fn": [],
+      "called_agents": [
+        "reliability-agent"
+      ],
+      "graph_shape": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "d5ae3a1998144c70b21480c187fd5fa9"
+          ],
+          "metadata": {}
+        }
+      ],
+      "tool_calls": {
+        "reliability-agent": 2
+      },
+      "rule_to_cwe_mapping": {}
+    }
+  ]
+}

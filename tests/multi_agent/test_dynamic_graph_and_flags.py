@@ -21,7 +21,10 @@ def test_runtime_produces_distinct_dynamic_graph_shapes():
     fix = runner.run(_one("fix"), {"kind": "fix-success"})
 
     assert _types(clean) == ["review.reliability"]
-    assert _types(security) == ["review.security", "verify.findings"]
+    # Plan §Phase 2: a high-risk security diff is dual-routed, so the security
+    # specialist AND the reliability specialist both get a chance to run.
+    assert _types(security) == ["review.security", "review.reliability",
+                                "verify.findings"]
     assert {"review.security", "review.reliability", "critique.findings",
             "verify.findings"} <= set(_types(parallel))
     assert any("recheck" in n["node_id"]

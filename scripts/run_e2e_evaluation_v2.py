@@ -131,6 +131,72 @@ def run_current(cases, out_dir: str, db_dir: str) -> dict:
     return {"current_harness": result}
 
 
+def _smoke_cases(cases) -> list:
+    preferred = ["pr-0001", "pr-0002", "pr-0003", "pr-0004", "pr-0005"]
+    indexed = {case["id"]: case for case in cases}
+    selected = [indexed[case_id] for case_id in preferred if case_id in indexed]
+    if len(selected) != 5:
+        raise RuntimeError("frozen dataset no longer contains the 5-case smoke set")
+    return selected
+
+
+def run_smoke(cases, out_dir: str, db_dir: str) -> dict:
+    """Five-case runtime/matcher/schema proof before any larger evaluation."""
+    from evoagent.evaluation_v2.diagnostics import cwe_for_rule
+    selected = _smoke_cases(cases)
+    print("[smoke] six-agent-v2 wiring over 5 representative cases")
+    adapter = CurrentHarnessEvaluationAdapter(os.path.join(db_dir, "smoke-5.db"))
+    try:
+        result = evaluate(adapter, selected, name="smoke-5", out_dir=out_dir,
+                          write=False)
+    finally:
+        adapter.close()
+    proof = []
+    for item in result["case_results"]:
+        predictions = item.get("prediction_details") or []
+        proof.append({
+            "case_id": item["id"],
+            "gold": item.get("expected_findings") or [],
+            "predicted_findings": predictions,
+            "matched_tp": item.get("matches") or [],
+            "unmatched_predictions_fp": [
+                predictions[index] for index in item.get(
+                    "unmatched_predicted_indices") or []],
+            "unmatched_gold_fn": [
+                (item.get("expected_findings") or [])[index]
+                for index in item.get("unmatched_expected_indices") or []],
+            "called_agents": item.get("called_agents") or [],
+            "graph_shape": item.get("graph_shapes") or [],
+            "tool_calls": item.get("loop_steps_by_agent") or {},
+            "rule_to_cwe_mapping": {
+                finding.get("rule_id"): cwe_for_rule(finding.get("rule_id"))
+                for finding in predictions},
+        })
+    result["diagnostic_proof"] = proof
+    _save_json(os.path.join(out_dir, "smoke-5.json"), result)
+    return result
+
+
+def run_diagnostic(cases, out_dir: str, db_dir: str) -> dict:
+    """Twenty Validation cases with per-CWE and false-negative diagnostics."""
+    selected = split_cases(cases, "validation")[:20]
+    print("[diagnostic] six-agent-v2 over 20 Validation cases")
+    adapter = CurrentHarnessEvaluationAdapter(
+        os.path.join(db_dir, "diagnostic-20.db"))
+    try:
+        result = evaluate(adapter, selected, name="diagnostic-20",
+                          out_dir=out_dir, write=False)
+    finally:
+        adapter.close()
+    _save_json(os.path.join(out_dir, "diagnostic-20.json"), result)
+    _save_json(os.path.join(out_dir, "fn-analysis-20.json"),
+               result["metrics"]["diagnostics"]["fn_analysis"])
+    det = result["metrics"]["detection"]
+    print("[diagnostic]   TP=%d FP=%d FN=%d F1=%.4f" % (
+        det["tp"], det["fp"], det["fn"], det["f1"]))
+    return result
+
+
 # --------------------------------------------------------------------------- #
 # Stage: validation evolution (Milestone 3)
 # --------------------------------------------------------------------------- #
@@ -156,7 +222,8 @@ def run_evolve(cases, out_dir: str, db_dir: str) -> dict:
     evolved = run_model_on_split(
         EvolvedHarnessEvaluationAdapter, validation, "evolved_candidate",
         out_dir, db_dir, db_file="validation_evolved.db",
-        evolved_reviewers=[evolved_reviewer])
+        evolved_reviewers=[evolved_reviewer],
+        candidate_id="eval-v2-%s" % artifact["name"])
 
     gates = safety_gates(stable, evolved)
     print("[evolve]   safety gates passed=%s" % gates["passed"])
@@ -172,10 +239,13 @@ def run_evolve(cases, out_dir: str, db_dir: str) -> dict:
 
 
 def run_model_on_split(adapter_cls, cases, name, out_dir, db_dir, *,
-                       db_file, evolved_reviewers=None) -> dict:
+                       db_file, evolved_reviewers=None,
+                       candidate_id: str = "") -> dict:
     adapter = adapter_cls(
         os.path.join(db_dir, db_file),
-        **({"evolved_reviewers": evolved_reviewers} if evolved_reviewers is not None else {}))
+        **({"evolved_reviewers": evolved_reviewers,
+            "candidate_id": candidate_id}
+           if evolved_reviewers is not None else {}))
     try:
         return evaluate(adapter, cases, name=name, out_dir=out_dir,
                         write=False)
@@ -199,7 +269,8 @@ def run_holdout(cases, out_dir: str, db_dir: str) -> dict:
     evolved = run_model_on_split(
         EvolvedHarnessEvaluationAdapter, holdout, "evolved_candidate",
         out_dir, db_dir, db_file="holdout_evolved.db",
-        evolved_reviewers=[evolved_reviewer])
+        evolved_reviewers=[evolved_reviewer],
+        candidate_id=frozen.candidate_id)
     comparison = {
         "stable_f1": stable["metrics"]["detection"]["f1"],
         "evolved_f1": evolved["metrics"]["detection"]["f1"],
@@ -223,7 +294,7 @@ def run_holdout(cases, out_dir: str, db_dir: str) -> dict:
 
 def _critical_misses(result: dict) -> int:
     det = result["metrics"]["detection"]
-    return int((det.get("high_total") or 0) - (det.get("high_hits") or 0))
+    return int(det.get("critical_misses") or 0)
 
 
 # --------------------------------------------------------------------------- #
@@ -314,23 +385,27 @@ def run_canary_rollback() -> dict:
 def assemble_report(out_dir: str, dataset_info: dict,
                     holdout_evolution: dict) -> dict:
     from evoagent.evaluation_v2 import metrics as v2_metrics
+    from evoagent.evaluation_v2.gates import build_ci_hard_gates
     from evoagent.evaluation_v2.report import write_report
     systems = {}
-    for name in ("baseline", "legacy_multi_agent", "current_harness", "evolved_candidate"):
+    for name in ("baseline", "legacy_multi_agent", "current_harness"):
         path = os.path.join(out_dir, "%s.json" % name)
         if os.path.exists(path):
             systems[{"baseline": "single_agent",
                      "legacy_multi_agent": "legacy_multi_agent",
-                     "current_harness": "current_harness",
-                     "evolved_candidate": "evolved_candidate"}[name]] = _load_json(path)
+                     "current_harness": "current_harness"}[name]] = _load_json(path)
     # The frozen candidate is only ever run on Validation (replay) and Holdout
     # (blind).  Re-aggregate those two non-overlapping splits into the full 100
     # case "Self-Evolved" system so the Overall Comparison table is complete
     # without ever training on the Holdout ground truth (it is already frozen).
-    if "evolved_candidate" not in systems:
-        merged = _merge_evolved_full(out_dir, v2_metrics, dataset_info)
-        if merged is not None:
-            systems["evolved_candidate"] = merged
+    merged = _merge_evolved_full(out_dir, v2_metrics, dataset_info)
+    if merged is not None:
+        systems["evolved_candidate"] = merged
+        _save_json(os.path.join(out_dir, "evolved_candidate.json"), merged)
+    else:
+        persisted = _load_optional(out_dir, "evolved_candidate.json")
+        if persisted:
+            systems["evolved_candidate"] = persisted
 
     # Report-only runs may skip dataset loading; reconstruct the fingerprint
     # header from any persisted system so the report stays self-consistent.
@@ -371,8 +446,19 @@ def assemble_report(out_dir: str, dataset_info: dict,
     dataset_label = "Dataset SHA-256: %s · %d cases · %d repos" % (
         dataset_info.get("sha256", ""), dataset_info.get("cases", 0),
         dataset_info.get("repositories", 0))
+    ci_hard_gates = build_ci_hard_gates(dataset_info, systems, evolution)
+    current_diagnostics = ((systems.get("current_harness") or {}).get(
+        "metrics") or {}).get("diagnostics") or {}
+    evolved_diagnostics = ((systems.get("evolved_candidate") or {}).get(
+        "metrics") or {}).get("diagnostics") or {}
+    _save_json(os.path.join(out_dir, "fn-analysis.json"), {
+        "current_harness": current_diagnostics.get("fn_analysis") or [],
+        "evolved_candidate": evolved_diagnostics.get("fn_analysis") or [],
+    })
+    _save_json(os.path.join(out_dir, "ci-hard-gates.json"), ci_hard_gates)
     return write_report(out_dir, dataset_info, systems, evolution, deployment,
-                        dataset_label=dataset_label)
+                        dataset_label=dataset_label,
+                        ci_hard_gates=ci_hard_gates)
 
 
 def _load_optional(out_dir: str, filename: str) -> dict:
@@ -397,6 +483,7 @@ def _merge_evolved_full(out_dir: str, v2_metrics, dataset_info: dict) -> Optiona
         "duration_seconds": round(
             float(val.get("duration_seconds") or 0.0)
             + float(ho.get("duration_seconds") or 0.0), 4),
+        "case_results": case_results,
     }
 
 
@@ -437,7 +524,8 @@ def _stage_holdout(cases, args) -> dict:
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description="Evaluation Harness V2 runner")
     parser.add_argument("--stage", choices=[
-        "baseline", "current", "evolve", "holdout", "canary", "report", "all"],
+        "baseline", "smoke", "diagnostic", "current", "evolve", "holdout",
+        "canary", "report", "all"],
         default="all")
     parser.add_argument("--dataset", default=DEFAULT_DATASET)
     parser.add_argument("--out-dir", default=DEFAULT_OUT)
@@ -450,16 +538,20 @@ def main(argv=None) -> int:
     args.out_dir = os.path.abspath(args.out_dir)
     args.db_dir = os.path.abspath(args.db_dir or os.path.join(args.out_dir, ".db"))
     os.makedirs(args.out_dir, exist_ok=True)
-    # The JSONL is append-only; truncate it each fresh run to keep it authoritative.
-    with open(os.path.join(args.out_dir, "case-results.jsonl"), "w",
-              encoding="utf-8"):
-        pass
-    if args.stage in ("current", "evolve", "holdout", "all"):
+    os.makedirs(args.db_dir, exist_ok=True)
+    # The JSONL is append-only; truncate only when an experiment will write it.
+    # A report-only render must never erase the persisted per-case evidence.
+    if args.stage not in ("report", "canary"):
+        with open(os.path.join(args.out_dir, "case-results.jsonl"), "w",
+                  encoding="utf-8"):
+            pass
+    if args.stage in ("smoke", "diagnostic", "current", "evolve", "holdout", "all"):
         _reset_db_dir(args.db_dir)
 
     started = time.monotonic()
     dataset_info = {"sha256": None, "cases": 0, "repositories": 0}
-    if args.stage in ("baseline", "current", "evolve", "holdout", "all"):
+    if args.stage in (
+            "baseline", "smoke", "diagnostic", "current", "evolve", "holdout", "all"):
         cases = load_dataset(args.dataset,
                              verify_sha=None if args.reuse_dataset else DATASET_SHA256)
         dataset_info = {
@@ -479,6 +571,10 @@ def main(argv=None) -> int:
 
     if args.stage in ("baseline", "all"):
         run_baseline(cases, args.out_dir)
+    if args.stage in ("smoke", "all"):
+        run_smoke(cases, args.out_dir, args.db_dir)
+    if args.stage in ("diagnostic", "all"):
+        run_diagnostic(cases, args.out_dir, args.db_dir)
     if args.stage in ("current", "all"):
         run_current(cases, args.out_dir, args.db_dir)
     if args.stage in ("evolve", "all"):
@@ -489,11 +585,16 @@ def main(argv=None) -> int:
         side_results["deployment"] = run_canary_rollback()
         _save_json(os.path.join(args.out_dir, "deployment.json"),
                    side_results["deployment"])
+    final_report = None
     if args.stage in ("report", "all"):
-        assemble_report(args.out_dir, dataset_info, side_results)
+        final_report = assemble_report(args.out_dir, dataset_info, side_results)
 
     print("[done] %d cases in %.1fs -> %s" % (
         len(cases), time.monotonic() - started, args.out_dir))
+    if final_report and not (
+            final_report.get("ci_hard_gates") or {}).get("passed", False):
+        print("[hard-gates] FAIL")
+        return 1
     return 0
 
 

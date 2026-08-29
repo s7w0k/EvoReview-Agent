@@ -38,18 +38,26 @@ class SemanticPlanner:
         risk = ctx.risk_profile or {}
         rationale: List[str] = []
 
-        change_types = set(summary.get("change_types") or [])
-        sensitive = set(summary.get("sensitive_paths") or [])
-        new_inputs = bool(summary.get("new_external_inputs"))
-        control_flow = bool(summary.get("control_flow_changes"))
-        test_changes = bool(summary.get("test_changes"))
         level = str(risk.get("level") or "low")
 
         # -- specialist selection -------------------------------------------
-        security = self._want_security(change_types, sensitive, new_inputs, rationale)
-        reliability = self._want_reliability(
-            change_types, control_flow, summary, rationale)
-        if not security and not reliability:
+        # Shared predicates guarantee planner == fallback == profiler routing and
+        # dual-route high-risk diffs (plan §3.2 / §Phase 2).  risk_profile.agents
+        # and risk_profile.domains are strong inputs -- the planner must never
+        # silently drop the profiler's specialist suggestion.
+        from .risk_signals import should_route_reliability, should_route_security
+        security = should_route_security(risk, summary)
+        reliability = should_route_reliability(risk, summary)
+        if security and reliability:
+            rationale.append("DUAL_ROUTE_HIGH_OR_CROSS")
+        if "security-agent" in (risk.get("agents") or []):
+            rationale.append("PROFILER_SUGGESTED_SECURITY")
+        if "reliability-agent" in (risk.get("agents") or []):
+            rationale.append("PROFILER_SUGGESTED_RELIABILITY")
+        change_types = set(summary.get("change_types") or [])
+        if "authentication" in change_types:
+            rationale.append("AUTH_CHANGE")
+        if not (security or reliability):
             # clean / test-only PR still gets a lightweight reliability pass so
             # every PR has an evidence baseline.
             reliability = True
@@ -96,36 +104,6 @@ class SemanticPlanner:
         )
 
     # -- decision helpers ---------------------------------------------------
-    def _want_security(self, change_types, sensitive, new_inputs, rationale) -> bool:
-        if new_inputs:
-            rationale.append("NEW_EXTERNAL_INPUT")
-        if "authentication" in change_types or (sensitive & {"auth", "authentication"}):
-            rationale.append("AUTH_CHANGE")
-        if change_types & {"database", "sql"}:
-            rationale.append("DATABASE_CHANGE")
-        if any("security" in str(p).lower() for p in sensitive):
-            rationale.append("SECURITY_SENSITIVE_FILE")
-        return bool(new_inputs) or bool(
-            change_types & {"authentication", "database", "sql", "security"})
-
-    def _want_reliability(self, change_types, control_flow, summary, rationale) -> bool:
-        if change_types & {"exception", "error-handling"}:
-            rationale.append("EXCEPTION_PATH_CHANGED")
-            return True
-        if change_types & {"concurrency", "async", "threading"}:
-            rationale.append("CONCURRENCY_CHANGE")
-            return True
-        if change_types & {"runtime", "resource", "io"}:
-            rationale.append("RESOURCE_LIFECYCLE_CHANGED")
-            return True
-        if control_flow:
-            rationale.append("CONTROL_FLOW_CHANGED")
-            return True
-        if change_types & {"test"}:
-            rationale.append("TEST_CHANGED")
-            return bool(summary.get("test_changes"))
-        return False
-
     def _want_critic(self, summary, risk) -> bool:
         # Disagreement / low confidence / novel rule are strong triggers.
         if len(summary.get("change_types") or []) >= 3:

@@ -310,7 +310,9 @@ class ReviewService:
             agent_registry=self.agent_registry,
         )
 
-    def _build_leader(self, reviewers: list, execution_policy=None):
+    def _build_leader(
+        self, reviewers: list, execution_policy=None, tool_context_config=None,
+    ):
         """Select the top-level reviewer (plan §11, §20).
 
         ``legacy`` keeps the staged :class:`MultiAgentCoordinator` behaviour
@@ -325,7 +327,8 @@ class ReviewService:
                 coordinator_kwargs["execution_policy"] = execution_policy
             return build_six_agent_reviewer(
                 "inprocess", coordinator_kwargs=coordinator_kwargs,
-                architecture=self.settings.agent_architecture)
+                architecture=self.settings.agent_architecture,
+                tool_context_config=tool_context_config)
         return self._build_coordinator(reviewers, execution_policy=execution_policy)
 
     def _build_harness(self, reviewer, execution_policy=None,

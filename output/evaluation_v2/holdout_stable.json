@@ -15,10 +15,10 @@
       "cases": 20,
       "risk_cases": 8,
       "clean_cases": 12,
-      "tp": 0,
+      "tp": 1,
       "fp": 0,
-      "fn": 8,
-      "severity_hits": 0,
+      "fn": 7,
+      "severity_hits": 1,
       "high_total": 3,
       "high_hits": 0,
       "clean_hits": 12,
@@ -26,25 +26,32 @@
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_successes": 0,
-      "precision": 0.0,
-      "recall": 0.0,
-      "f1": 0.0,
+      "precision": 1.0,
+      "recall": 0.125,
+      "f1": 0.2222,
       "severity_accuracy": 1.0,
       "high_risk_recall": 0.0,
       "clean_accuracy": 1.0,
       "execution_success_rate": 1.0,
       "safe_fix_rate": 0.0,
-      "e2e_security_fix_rate": 0.0
+      "e2e_security_fix_rate": 0.0,
+      "high_risk_total": 3,
+      "high_risk_hits": 0,
+      "high_risk_misses": 3,
+      "critical_total": 0,
+      "critical_hits": 0,
+      "critical_misses": 0,
+      "critical_recall": 1.0
     },
     "runtime": {
       "execution_success_rate": 1.0,
       "recovery_attempts": 0,
       "recovery_successes": 0,
       "recovery_success_rate": 0.0,
-      "avg_agent_steps": 0.0,
-      "avg_tool_calls": 0.0,
-      "p50_latency_ms": 164.0487,
-      "p95_latency_ms": 243.2013,
+      "avg_agent_steps": 2.5,
+      "avg_tool_calls": 2.5,
+      "p50_latency_ms": 47.2643,
+      "p95_latency_ms": 113.3426,
       "tool_denials": 0,
       "timeouts": 0,
       "side_effect_blocks": 0,
@@ -52,11 +59,19 @@
       "decision_trace_coverage": 1.0,
       "replay_snapshot_coverage": 1.0,
       "avg_policy_version": 1,
-      "collaboration_rounds": 0.15,
-      "collaboration_messages": 5,
+      "collaboration_rounds": 0.0,
+      "collaboration_messages": 0.0,
       "activated_agents": [
-        "code-quality"
+        "reliability-agent",
+        "critic-agent",
+        "verifier-agent"
       ],
+      "architectures": [
+        "six-agent-v2"
+      ],
+      "architecture": "six-agent-v2",
+      "runtime_wiring_coverage": 1.0,
+      "skill_invocations": {},
       "collaboration_detected": 1.0
     },
     "by_split": {
@@ -65,10 +80,10 @@
           "cases": 20,
           "risk_cases": 8,
           "clean_cases": 12,
-          "tp": 0,
+          "tp": 1,
           "fp": 0,
-          "fn": 8,
-          "severity_hits": 0,
+          "fn": 7,
+          "severity_hits": 1,
           "high_total": 3,
           "high_hits": 0,
           "clean_hits": 12,
@@ -76,25 +91,32 @@
           "repair_attempted": 0,
           "repair_passed": 0,
           "e2e_successes": 0,
-          "precision": 0.0,
-          "recall": 0.0,
-          "f1": 0.0,
+          "precision": 1.0,
+          "recall": 0.125,
+          "f1": 0.2222,
           "severity_accuracy": 1.0,
           "high_risk_recall": 0.0,
           "clean_accuracy": 1.0,
           "execution_success_rate": 1.0,
           "safe_fix_rate": 0.0,
-          "e2e_security_fix_rate": 0.0
+          "e2e_security_fix_rate": 0.0,
+          "high_risk_total": 3,
+          "high_risk_hits": 0,
+          "high_risk_misses": 3,
+          "critical_total": 0,
+          "critical_hits": 0,
+          "critical_misses": 0,
+          "critical_recall": 1.0
         },
         "runtime": {
           "execution_success_rate": 1.0,
           "recovery_attempts": 0,
           "recovery_successes": 0,
           "recovery_success_rate": 0.0,
-          "avg_agent_steps": 0.0,
-          "avg_tool_calls": 0.0,
-          "p50_latency_ms": 164.0487,
-          "p95_latency_ms": 243.2013,
+          "avg_agent_steps": 2.5,
+          "avg_tool_calls": 2.5,
+          "p50_latency_ms": 47.2643,
+          "p95_latency_ms": 113.3426,
           "tool_denials": 0,
           "timeouts": 0,
           "side_effect_blocks": 0,
@@ -102,17 +124,176 @@
           "decision_trace_coverage": 1.0,
           "replay_snapshot_coverage": 1.0,
           "avg_policy_version": 1,
-          "collaboration_rounds": 0.15,
-          "collaboration_messages": 5,
+          "collaboration_rounds": 0.0,
+          "collaboration_messages": 0.0,
           "activated_agents": [
-            "code-quality"
+            "reliability-agent",
+            "critic-agent",
+            "verifier-agent"
           ],
+          "architectures": [
+            "six-agent-v2"
+          ],
+          "architecture": "six-agent-v2",
+          "runtime_wiring_coverage": 1.0,
+          "skill_invocations": {},
           "collaboration_detected": 1.0
         }
       }
+    },
+    "diagnostics": {
+      "per_cwe_recall": {
+        "CWE-117": {
+          "total": 1,
+          "hits": 0,
+          "misses": 1,
+          "recall": 0.0
+        },
+        "CWE-328": {
+          "total": 1,
+          "hits": 0,
+          "misses": 1,
+          "recall": 0.0
+        },
+        "CWE-377": {
+          "total": 1,
+          "hits": 0,
+          "misses": 1,
+          "recall": 0.0
+        },
+        "CWE-502": {
+          "total": 1,
+          "hits": 0,
+          "misses": 1,
+          "recall": 0.0
+        },
+        "CWE-601": {
+          "total": 1,
+          "hits": 0,
+          "misses": 1,
+          "recall": 0.0
+        },
+        "CWE-703": {
+          "total": 1,
+          "hits": 1,
+          "misses": 0,
+          "recall": 1.0
+        },
+        "CWE-798": {
+          "total": 2,
+          "hits": 0,
+          "misses": 2,
+          "recall": 0.0
+        }
+      },
+      "macro_recall_by_cwe": 0.1429,
+      "rule_hit_rate": 0.05,
+      "finding_yield": 1,
+      "verifier_rejection_rate": 0.0,
+      "rule_mapping": {
+        "produced_rule_ids": [
+          "REL-EMPTY-EXCEPT"
+        ],
+        "mapped_rule_ids": 1,
+        "unmapped_rule_ids": [],
+        "coverage": 1.0
+      },
+      "fn_analysis": [
+        {
+          "case_id": "pr-0081",
+          "cwe": "CWE-798",
+          "severity": "high",
+          "reason": "NO_AGENT_ROUTED",
+          "agents_called": [
+            "reliability-agent"
+          ],
+          "tools_called": [
+            "reliability-agent:2"
+          ],
+          "candidate_skill_hit": false
+        },
+        {
+          "case_id": "pr-0082",
+          "cwe": "CWE-502",
+          "severity": "high",
+          "reason": "NO_AGENT_ROUTED",
+          "agents_called": [
+            "reliability-agent"
+          ],
+          "tools_called": [
+            "reliability-agent:2"
+          ],
+          "candidate_skill_hit": false
+        },
+        {
+          "case_id": "pr-0083",
+          "cwe": "CWE-328",
+          "severity": "medium",
+          "reason": "NO_AGENT_ROUTED",
+          "agents_called": [
+            "reliability-agent"
+          ],
+          "tools_called": [
+            "reliability-agent:2"
+          ],
+          "candidate_skill_hit": false
+        },
+        {
+          "case_id": "pr-0084",
+          "cwe": "CWE-601",
+          "severity": "medium",
+          "reason": "NO_AGENT_ROUTED",
+          "agents_called": [
+            "reliability-agent"
+          ],
+          "tools_called": [
+            "reliability-agent:2"
+          ],
+          "candidate_skill_hit": false
+        },
+        {
+          "case_id": "pr-0091",
+          "cwe": "CWE-798",
+          "severity": "high",
+          "reason": "NO_AGENT_ROUTED",
+          "agents_called": [
+            "reliability-agent"
+          ],
+          "tools_called": [
+            "reliability-agent:2"
+          ],
+          "candidate_skill_hit": false
+        },
+        {
+          "case_id": "pr-0093",
+          "cwe": "CWE-377",
+          "severity": "medium",
+          "reason": "NO_AGENT_ROUTED",
+          "agents_called": [
+            "reliability-agent"
+          ],
+          "tools_called": [
+            "reliability-agent:2"
+          ],
+          "candidate_skill_hit": false
+        },
+        {
+          "case_id": "pr-0094",
+          "cwe": "CWE-117",
+          "severity": "low",
+          "reason": "NO_AGENT_ROUTED",
+          "agents_called": [
+            "reliability-agent"
+          ],
+          "tools_called": [
+            "reliability-agent:2"
+          ],
+          "candidate_skill_hit": false
+        }
+      ]
     }
   },
-  "duration_seconds": 3.7201,
+  "duration_seconds": 1.3556,
   "case_results": [
     {
       "id": "pr-0081",
@@ -127,14 +308,20 @@
       "severity_hits": 0,
       "high_total": 1,
       "high_hits": 0,
+      "high_risk_total": 1,
+      "high_risk_hits": 0,
+      "high_risk_misses": 1,
+      "critical_total": 0,
+      "critical_hits": 0,
+      "critical_misses": 0,
       "clean_hit": false,
       "execution_success": true,
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 182.42960000497987,
-      "agent_steps": 0,
-      "tool_calls": 0,
+      "latency_ms": 56.210800001281314,
+      "agent_steps": 2,
+      "tool_calls": 2,
       "recovery_attempts": 0,
       "recovery_successes": 0,
       "policy_denials": 0,
@@ -143,7 +330,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 18,
+      "trace_event_count": 24,
       "policy_id": "baseline-medium",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -165,41 +352,213 @@
       },
       "error": null,
       "collaboration": {
-        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
-        "roles": [
-          "planner-agent",
-          "specialists",
-          "critic-agent",
-          "reflection-agent",
-          "evidence-agent",
-          "verifier-agent",
-          "arbiter-agent"
+        "task_type": "review.coordinate",
+        "agent_id": "coordinator",
+        "accepted_findings": [],
+        "rejected_findings": [],
+        "count": 0,
+        "rejected_count": 0,
+        "graph_revision": 1,
+        "replan_count": 0,
+        "delegated_tasks": 1,
+        "architecture": "six-agent-v2",
+        "rationale_codes": [
+          "CLEAN_BASELINE"
         ],
-        "planned_assignments": 1,
-        "dialogue_rounds": 1,
-        "messages": 5,
-        "retries": 0,
-        "handoffs": 0,
-        "agents": [
+        "collaborations": [
+          "reliability-agent"
+        ],
+        "graph_mutations": [],
+        "task_graph": {
+          "graph_id": "23b99734d5e9432a90cb07928c6738c6",
+          "revision": 1,
+          "mutation_history": [],
+          "nodes": {
+            "spec0": {
+              "node_id": "spec0",
+              "task_type": "review.reliability",
+              "objective": "review changed lines for reliability",
+              "target_capabilities": [],
+              "dependencies": [],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "d9bd3cfa3aab49a89d1b7bc5ff8e1b13"
+              ],
+              "agent_id": "reliability-agent",
+              "serial": false,
+              "metadata": {}
+            }
+          }
+        },
+        "graph_shapes": [
           {
-            "agent": "code-quality",
+            "node_id": "spec0",
+            "task_type": "review.reliability",
+            "dependencies": [],
             "status": "completed",
-            "attempts": 1,
-            "substituted_for": "",
-            "loop_steps": 0,
-            "loop_stop_reason": "one-shot",
-            "context_compressed": false,
-            "memories_recalled": 0
+            "artifact_ids": [
+              "d9bd3cfa3aab49a89d1b7bc5ff8e1b13"
+            ],
+            "metadata": {}
           }
         ],
-        "agent_loop_steps": 0,
-        "context_compressions": 0,
-        "memories_recalled": 0,
-        "proposed_findings": 0,
-        "approved_findings": 0,
-        "rejected_findings": 0,
-        "finding_sources": {}
+        "runtime_events": [
+          {
+            "kind": "FINDINGS_EMITTED",
+            "node_id": "spec0",
+            "artifact_id": "d9bd3cfa3aab49a89d1b7bc5ff8e1b13",
+            "detail": {
+              "count": 0,
+              "recheck": false,
+              "changed_artifact_ids": []
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "spec0",
+            "artifact_id": "d9bd3cfa3aab49a89d1b7bc5ff8e1b13",
+            "detail": {
+              "agent_id": "reliability-agent",
+              "task_type": "review.reliability"
+            }
+          }
+        ],
+        "runtime_artifacts": [
+          {
+            "artifact_id": "d9bd3cfa3aab49a89d1b7bc5ff8e1b13",
+            "producer_node": "spec0",
+            "agent_id": "reliability-agent",
+            "task_type": "review.reliability",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [],
+            "content": {
+              "task_type": "review.reliability",
+              "agent_id": "reliability-agent",
+              "count": 0,
+              "findings": [],
+              "confidence": 0.0,
+              "_a2a_metadata": [
+                {
+                  "task_type": "review.reliability",
+                  "stop_reason": "final",
+                  "steps": 2,
+                  "plan_versions": 0,
+                  "decision_count": 2,
+                  "correlation_id": "2ce769fb73e740549d2262f2bc00d4f1"
+                }
+              ]
+            },
+            "finding_versions": {}
+          }
+        ],
+        "superseded_artifacts": [],
+        "feature_flags_snapshot": {
+          "planner": true,
+          "targeted_replan": true,
+          "critic": true,
+          "verifier": true,
+          "parallel_scheduler": true,
+          "deep_loop": true
+        },
+        "parallel_batches": [
+          {
+            "batch_id": "batch-1",
+            "parallel_width": 1,
+            "started_at": 48762.1437783,
+            "finished_at": 48762.1445253,
+            "agent_ids": [
+              "reliability-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 0.747,
+            "branch_duration_ms": [
+              0.7463
+            ],
+            "speedup_ratio": 1.0
+          }
+        ],
+        "loop_steps_by_agent": {
+          "reliability-agent": 2
+        },
+        "tool_calls_by_agent": {
+          "reliability-agent": 2
+        },
+        "called_agents": [
+          "reliability-agent"
+        ],
+        "replan_targets": [],
+        "verification_version": 0,
+        "finding_versions": {},
+        "fix_stale_inputs": 0,
+        "skill_invocations": {}
       },
+      "architecture": "six-agent-v2",
+      "called_agents": [
+        "reliability-agent"
+      ],
+      "graph_revision": 1,
+      "graph_shapes": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "d9bd3cfa3aab49a89d1b7bc5ff8e1b13"
+          ],
+          "metadata": {}
+        }
+      ],
+      "loop_steps_by_agent": {
+        "reliability-agent": 2
+      },
+      "parallel_batches": [
+        {
+          "batch_id": "batch-1",
+          "parallel_width": 1,
+          "started_at": 48762.1437783,
+          "finished_at": 48762.1445253,
+          "agent_ids": [
+            "reliability-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 0.747,
+          "branch_duration_ms": [
+            0.7463
+          ],
+          "speedup_ratio": 1.0
+        }
+      ],
+      "replan_count": 0,
+      "replan_targets": [],
+      "feature_flags": {
+        "planner": true,
+        "targeted_replan": true,
+        "critic": true,
+        "verifier": true,
+        "parallel_scheduler": true,
+        "deep_loop": true
+      },
+      "skill_invocations": {},
+      "expected_findings": [
+        {
+          "cwe": "CWE-798",
+          "end_line": 3,
+          "path": "src/change_09.py",
+          "rule_id": "SEC-HARDCODED-SECRET",
+          "severity": "high",
+          "start_line": 3
+        }
+      ],
+      "prediction_details": [],
+      "unmatched_expected_indices": [
+        0
+      ],
+      "unmatched_predicted_indices": [],
       "matches": []
     },
     {
@@ -215,14 +574,20 @@
       "severity_hits": 0,
       "high_total": 1,
       "high_hits": 0,
+      "high_risk_total": 1,
+      "high_risk_hits": 0,
+      "high_risk_misses": 1,
+      "critical_total": 0,
+      "critical_hits": 0,
+      "critical_misses": 0,
       "clean_hit": false,
       "execution_success": true,
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 173.297300003469,
-      "agent_steps": 0,
-      "tool_calls": 0,
+      "latency_ms": 60.01269999978831,
+      "agent_steps": 2,
+      "tool_calls": 2,
       "recovery_attempts": 0,
       "recovery_successes": 0,
       "policy_denials": 0,
@@ -231,7 +596,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 18,
+      "trace_event_count": 24,
       "policy_id": "baseline-medium",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -253,41 +618,213 @@
       },
       "error": null,
       "collaboration": {
-        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
-        "roles": [
-          "planner-agent",
-          "specialists",
-          "critic-agent",
-          "reflection-agent",
-          "evidence-agent",
-          "verifier-agent",
-          "arbiter-agent"
+        "task_type": "review.coordinate",
+        "agent_id": "coordinator",
+        "accepted_findings": [],
+        "rejected_findings": [],
+        "count": 0,
+        "rejected_count": 0,
+        "graph_revision": 1,
+        "replan_count": 0,
+        "delegated_tasks": 1,
+        "architecture": "six-agent-v2",
+        "rationale_codes": [
+          "CLEAN_BASELINE"
         ],
-        "planned_assignments": 1,
-        "dialogue_rounds": 1,
-        "messages": 5,
-        "retries": 0,
-        "handoffs": 0,
-        "agents": [
+        "collaborations": [
+          "reliability-agent"
+        ],
+        "graph_mutations": [],
+        "task_graph": {
+          "graph_id": "a59a51473a0141cebb6dd8af33b954c7",
+          "revision": 1,
+          "mutation_history": [],
+          "nodes": {
+            "spec0": {
+              "node_id": "spec0",
+              "task_type": "review.reliability",
+              "objective": "review changed lines for reliability",
+              "target_capabilities": [],
+              "dependencies": [],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "5fb38afee446458ea8dffdfb967598ab"
+              ],
+              "agent_id": "reliability-agent",
+              "serial": false,
+              "metadata": {}
+            }
+          }
+        },
+        "graph_shapes": [
           {
-            "agent": "code-quality",
+            "node_id": "spec0",
+            "task_type": "review.reliability",
+            "dependencies": [],
             "status": "completed",
-            "attempts": 1,
-            "substituted_for": "",
-            "loop_steps": 0,
-            "loop_stop_reason": "one-shot",
-            "context_compressed": false,
-            "memories_recalled": 0
+            "artifact_ids": [
+              "5fb38afee446458ea8dffdfb967598ab"
+            ],
+            "metadata": {}
           }
         ],
-        "agent_loop_steps": 0,
-        "context_compressions": 0,
-        "memories_recalled": 0,
-        "proposed_findings": 0,
-        "approved_findings": 0,
-        "rejected_findings": 0,
-        "finding_sources": {}
+        "runtime_events": [
+          {
+            "kind": "FINDINGS_EMITTED",
+            "node_id": "spec0",
+            "artifact_id": "5fb38afee446458ea8dffdfb967598ab",
+            "detail": {
+              "count": 0,
+              "recheck": false,
+              "changed_artifact_ids": []
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "spec0",
+            "artifact_id": "5fb38afee446458ea8dffdfb967598ab",
+            "detail": {
+              "agent_id": "reliability-agent",
+              "task_type": "review.reliability"
+            }
+          }
+        ],
+        "runtime_artifacts": [
+          {
+            "artifact_id": "5fb38afee446458ea8dffdfb967598ab",
+            "producer_node": "spec0",
+            "agent_id": "reliability-agent",
+            "task_type": "review.reliability",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [],
+            "content": {
+              "task_type": "review.reliability",
+              "agent_id": "reliability-agent",
+              "count": 0,
+              "findings": [],
+              "confidence": 0.0,
+              "_a2a_metadata": [
+                {
+                  "task_type": "review.reliability",
+                  "stop_reason": "final",
+                  "steps": 2,
+                  "plan_versions": 0,
+                  "decision_count": 2,
+                  "correlation_id": "38433e4821084524a5c3393e798e78ac"
+                }
+              ]
+            },
+            "finding_versions": {}
+          }
+        ],
+        "superseded_artifacts": [],
+        "feature_flags_snapshot": {
+          "planner": true,
+          "targeted_replan": true,
+          "critic": true,
+          "verifier": true,
+          "parallel_scheduler": true,
+          "deep_loop": true
+        },
+        "parallel_batches": [
+          {
+            "batch_id": "batch-1",
+            "parallel_width": 1,
+            "started_at": 48762.2132452,
+            "finished_at": 48762.2139662,
+            "agent_ids": [
+              "reliability-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 0.721,
+            "branch_duration_ms": [
+              0.7203
+            ],
+            "speedup_ratio": 1.0
+          }
+        ],
+        "loop_steps_by_agent": {
+          "reliability-agent": 2
+        },
+        "tool_calls_by_agent": {
+          "reliability-agent": 2
+        },
+        "called_agents": [
+          "reliability-agent"
+        ],
+        "replan_targets": [],
+        "verification_version": 0,
+        "finding_versions": {},
+        "fix_stale_inputs": 0,
+        "skill_invocations": {}
       },
+      "architecture": "six-agent-v2",
+      "called_agents": [
+        "reliability-agent"
+      ],
+      "graph_revision": 1,
+      "graph_shapes": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "5fb38afee446458ea8dffdfb967598ab"
+          ],
+          "metadata": {}
+        }
+      ],
+      "loop_steps_by_agent": {
+        "reliability-agent": 2
+      },
+      "parallel_batches": [
+        {
+          "batch_id": "batch-1",
+          "parallel_width": 1,
+          "started_at": 48762.2132452,
+          "finished_at": 48762.2139662,
+          "agent_ids": [
+            "reliability-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 0.721,
+          "branch_duration_ms": [
+            0.7203
+          ],
+          "speedup_ratio": 1.0
+        }
+      ],
+      "replan_count": 0,
+      "replan_targets": [],
+      "feature_flags": {
+        "planner": true,
+        "targeted_replan": true,
+        "critic": true,
+        "verifier": true,
+        "parallel_scheduler": true,
+        "deep_loop": true
+      },
+      "skill_invocations": {},
+      "expected_findings": [
+        {
+          "cwe": "CWE-502",
+          "end_line": 3,
+          "path": "src/change_19.py",
+          "rule_id": "SEC-PICKLE-LOAD",
+          "severity": "high",
+          "start_line": 3
+        }
+      ],
+      "prediction_details": [],
+      "unmatched_expected_indices": [
+        0
+      ],
+      "unmatched_predicted_indices": [],
       "matches": []
     },
     {
@@ -303,14 +840,20 @@
       "severity_hits": 0,
       "high_total": 0,
       "high_hits": 0,
+      "high_risk_total": 0,
+      "high_risk_hits": 0,
+      "high_risk_misses": 0,
+      "critical_total": 0,
+      "critical_hits": 0,
+      "critical_misses": 0,
       "clean_hit": false,
       "execution_success": true,
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 178.73310000140918,
-      "agent_steps": 0,
-      "tool_calls": 0,
+      "latency_ms": 51.425099998596124,
+      "agent_steps": 2,
+      "tool_calls": 2,
       "recovery_attempts": 0,
       "recovery_successes": 0,
       "policy_denials": 0,
@@ -319,7 +862,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 18,
+      "trace_event_count": 24,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -340,41 +883,213 @@
       },
       "error": null,
       "collaboration": {
-        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
-        "roles": [
-          "planner-agent",
-          "specialists",
-          "critic-agent",
-          "reflection-agent",
-          "evidence-agent",
-          "verifier-agent",
-          "arbiter-agent"
+        "task_type": "review.coordinate",
+        "agent_id": "coordinator",
+        "accepted_findings": [],
+        "rejected_findings": [],
+        "count": 0,
+        "rejected_count": 0,
+        "graph_revision": 1,
+        "replan_count": 0,
+        "delegated_tasks": 1,
+        "architecture": "six-agent-v2",
+        "rationale_codes": [
+          "CLEAN_BASELINE"
         ],
-        "planned_assignments": 1,
-        "dialogue_rounds": 0,
-        "messages": 5,
-        "retries": 0,
-        "handoffs": 0,
-        "agents": [
+        "collaborations": [
+          "reliability-agent"
+        ],
+        "graph_mutations": [],
+        "task_graph": {
+          "graph_id": "8a3074d63e4749cbb2fba00324aa48fe",
+          "revision": 1,
+          "mutation_history": [],
+          "nodes": {
+            "spec0": {
+              "node_id": "spec0",
+              "task_type": "review.reliability",
+              "objective": "review changed lines for reliability",
+              "target_capabilities": [],
+              "dependencies": [],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "6931c087dcf1445b9777892c5b536449"
+              ],
+              "agent_id": "reliability-agent",
+              "serial": false,
+              "metadata": {}
+            }
+          }
+        },
+        "graph_shapes": [
           {
-            "agent": "code-quality",
+            "node_id": "spec0",
+            "task_type": "review.reliability",
+            "dependencies": [],
             "status": "completed",
-            "attempts": 1,
-            "substituted_for": "",
-            "loop_steps": 0,
-            "loop_stop_reason": "one-shot",
-            "context_compressed": false,
-            "memories_recalled": 0
+            "artifact_ids": [
+              "6931c087dcf1445b9777892c5b536449"
+            ],
+            "metadata": {}
           }
         ],
-        "agent_loop_steps": 0,
-        "context_compressions": 0,
-        "memories_recalled": 0,
-        "proposed_findings": 0,
-        "approved_findings": 0,
-        "rejected_findings": 0,
-        "finding_sources": {}
+        "runtime_events": [
+          {
+            "kind": "FINDINGS_EMITTED",
+            "node_id": "spec0",
+            "artifact_id": "6931c087dcf1445b9777892c5b536449",
+            "detail": {
+              "count": 0,
+              "recheck": false,
+              "changed_artifact_ids": []
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "spec0",
+            "artifact_id": "6931c087dcf1445b9777892c5b536449",
+            "detail": {
+              "agent_id": "reliability-agent",
+              "task_type": "review.reliability"
+            }
+          }
+        ],
+        "runtime_artifacts": [
+          {
+            "artifact_id": "6931c087dcf1445b9777892c5b536449",
+            "producer_node": "spec0",
+            "agent_id": "reliability-agent",
+            "task_type": "review.reliability",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [],
+            "content": {
+              "task_type": "review.reliability",
+              "agent_id": "reliability-agent",
+              "count": 0,
+              "findings": [],
+              "confidence": 0.0,
+              "_a2a_metadata": [
+                {
+                  "task_type": "review.reliability",
+                  "stop_reason": "final",
+                  "steps": 2,
+                  "plan_versions": 0,
+                  "decision_count": 2,
+                  "correlation_id": "59fb79a2e17c4b1389d0aef3a8c2f07d"
+                }
+              ]
+            },
+            "finding_versions": {}
+          }
+        ],
+        "superseded_artifacts": [],
+        "feature_flags_snapshot": {
+          "planner": true,
+          "targeted_replan": true,
+          "critic": true,
+          "verifier": true,
+          "parallel_scheduler": true,
+          "deep_loop": true
+        },
+        "parallel_batches": [
+          {
+            "batch_id": "batch-1",
+            "parallel_width": 1,
+            "started_at": 48762.2825437,
+            "finished_at": 48762.2831346,
+            "agent_ids": [
+              "reliability-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 0.5909,
+            "branch_duration_ms": [
+              0.5904
+            ],
+            "speedup_ratio": 1.0
+          }
+        ],
+        "loop_steps_by_agent": {
+          "reliability-agent": 2
+        },
+        "tool_calls_by_agent": {
+          "reliability-agent": 2
+        },
+        "called_agents": [
+          "reliability-agent"
+        ],
+        "replan_targets": [],
+        "verification_version": 0,
+        "finding_versions": {},
+        "fix_stale_inputs": 0,
+        "skill_invocations": {}
       },
+      "architecture": "six-agent-v2",
+      "called_agents": [
+        "reliability-agent"
+      ],
+      "graph_revision": 1,
+      "graph_shapes": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "6931c087dcf1445b9777892c5b536449"
+          ],
+          "metadata": {}
+        }
+      ],
+      "loop_steps_by_agent": {
+        "reliability-agent": 2
+      },
+      "parallel_batches": [
+        {
+          "batch_id": "batch-1",
+          "parallel_width": 1,
+          "started_at": 48762.2825437,
+          "finished_at": 48762.2831346,
+          "agent_ids": [
+            "reliability-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 0.5909,
+          "branch_duration_ms": [
+            0.5904
+          ],
+          "speedup_ratio": 1.0
+        }
+      ],
+      "replan_count": 0,
+      "replan_targets": [],
+      "feature_flags": {
+        "planner": true,
+        "targeted_replan": true,
+        "critic": true,
+        "verifier": true,
+        "parallel_scheduler": true,
+        "deep_loop": true
+      },
+      "skill_invocations": {},
+      "expected_findings": [
+        {
+          "cwe": "CWE-328",
+          "end_line": 3,
+          "path": "src/change_29.py",
+          "rule_id": "SEC-WEAK-HASH",
+          "severity": "medium",
+          "start_line": 3
+        }
+      ],
+      "prediction_details": [],
+      "unmatched_expected_indices": [
+        0
+      ],
+      "unmatched_predicted_indices": [],
       "matches": []
     },
     {
@@ -390,14 +1105,20 @@
       "severity_hits": 0,
       "high_total": 0,
       "high_hits": 0,
+      "high_risk_total": 0,
+      "high_risk_hits": 0,
+      "high_risk_misses": 0,
+      "critical_total": 0,
+      "critical_hits": 0,
+      "critical_misses": 0,
       "clean_hit": false,
       "execution_success": true,
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 160.89559999818448,
-      "agent_steps": 0,
-      "tool_calls": 0,
+      "latency_ms": 44.098799997300375,
+      "agent_steps": 2,
+      "tool_calls": 2,
       "recovery_attempts": 0,
       "recovery_successes": 0,
       "policy_denials": 0,
@@ -406,7 +1127,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 18,
+      "trace_event_count": 24,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -427,41 +1148,213 @@
       },
       "error": null,
       "collaboration": {
-        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
-        "roles": [
-          "planner-agent",
-          "specialists",
-          "critic-agent",
-          "reflection-agent",
-          "evidence-agent",
-          "verifier-agent",
-          "arbiter-agent"
+        "task_type": "review.coordinate",
+        "agent_id": "coordinator",
+        "accepted_findings": [],
+        "rejected_findings": [],
+        "count": 0,
+        "rejected_count": 0,
+        "graph_revision": 1,
+        "replan_count": 0,
+        "delegated_tasks": 1,
+        "architecture": "six-agent-v2",
+        "rationale_codes": [
+          "CLEAN_BASELINE"
         ],
-        "planned_assignments": 1,
-        "dialogue_rounds": 0,
-        "messages": 5,
-        "retries": 0,
-        "handoffs": 0,
-        "agents": [
+        "collaborations": [
+          "reliability-agent"
+        ],
+        "graph_mutations": [],
+        "task_graph": {
+          "graph_id": "e5bc4f291e4a4c088d224ffabfe7fc8a",
+          "revision": 1,
+          "mutation_history": [],
+          "nodes": {
+            "spec0": {
+              "node_id": "spec0",
+              "task_type": "review.reliability",
+              "objective": "review changed lines for reliability",
+              "target_capabilities": [],
+              "dependencies": [],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "787f06b4b4af45c686ed49ffbf31d7d1"
+              ],
+              "agent_id": "reliability-agent",
+              "serial": false,
+              "metadata": {}
+            }
+          }
+        },
+        "graph_shapes": [
           {
-            "agent": "code-quality",
+            "node_id": "spec0",
+            "task_type": "review.reliability",
+            "dependencies": [],
             "status": "completed",
-            "attempts": 1,
-            "substituted_for": "",
-            "loop_steps": 0,
-            "loop_stop_reason": "one-shot",
-            "context_compressed": false,
-            "memories_recalled": 0
+            "artifact_ids": [
+              "787f06b4b4af45c686ed49ffbf31d7d1"
+            ],
+            "metadata": {}
           }
         ],
-        "agent_loop_steps": 0,
-        "context_compressions": 0,
-        "memories_recalled": 0,
-        "proposed_findings": 0,
-        "approved_findings": 0,
-        "rejected_findings": 0,
-        "finding_sources": {}
+        "runtime_events": [
+          {
+            "kind": "FINDINGS_EMITTED",
+            "node_id": "spec0",
+            "artifact_id": "787f06b4b4af45c686ed49ffbf31d7d1",
+            "detail": {
+              "count": 0,
+              "recheck": false,
+              "changed_artifact_ids": []
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "spec0",
+            "artifact_id": "787f06b4b4af45c686ed49ffbf31d7d1",
+            "detail": {
+              "agent_id": "reliability-agent",
+              "task_type": "review.reliability"
+            }
+          }
+        ],
+        "runtime_artifacts": [
+          {
+            "artifact_id": "787f06b4b4af45c686ed49ffbf31d7d1",
+            "producer_node": "spec0",
+            "agent_id": "reliability-agent",
+            "task_type": "review.reliability",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [],
+            "content": {
+              "task_type": "review.reliability",
+              "agent_id": "reliability-agent",
+              "count": 0,
+              "findings": [],
+              "confidence": 0.0,
+              "_a2a_metadata": [
+                {
+                  "task_type": "review.reliability",
+                  "stop_reason": "final",
+                  "steps": 2,
+                  "plan_versions": 0,
+                  "decision_count": 2,
+                  "correlation_id": "bc8407246481480c91c2dd0e04dc78b9"
+                }
+              ]
+            },
+            "finding_versions": {}
+          }
+        ],
+        "superseded_artifacts": [],
+        "feature_flags_snapshot": {
+          "planner": true,
+          "targeted_replan": true,
+          "critic": true,
+          "verifier": true,
+          "parallel_scheduler": true,
+          "deep_loop": true
+        },
+        "parallel_batches": [
+          {
+            "batch_id": "batch-1",
+            "parallel_width": 1,
+            "started_at": 48762.3349314,
+            "finished_at": 48762.3356203,
+            "agent_ids": [
+              "reliability-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 0.6889,
+            "branch_duration_ms": [
+              0.6882
+            ],
+            "speedup_ratio": 1.0
+          }
+        ],
+        "loop_steps_by_agent": {
+          "reliability-agent": 2
+        },
+        "tool_calls_by_agent": {
+          "reliability-agent": 2
+        },
+        "called_agents": [
+          "reliability-agent"
+        ],
+        "replan_targets": [],
+        "verification_version": 0,
+        "finding_versions": {},
+        "fix_stale_inputs": 0,
+        "skill_invocations": {}
       },
+      "architecture": "six-agent-v2",
+      "called_agents": [
+        "reliability-agent"
+      ],
+      "graph_revision": 1,
+      "graph_shapes": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "787f06b4b4af45c686ed49ffbf31d7d1"
+          ],
+          "metadata": {}
+        }
+      ],
+      "loop_steps_by_agent": {
+        "reliability-agent": 2
+      },
+      "parallel_batches": [
+        {
+          "batch_id": "batch-1",
+          "parallel_width": 1,
+          "started_at": 48762.3349314,
+          "finished_at": 48762.3356203,
+          "agent_ids": [
+            "reliability-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 0.6889,
+          "branch_duration_ms": [
+            0.6882
+          ],
+          "speedup_ratio": 1.0
+        }
+      ],
+      "replan_count": 0,
+      "replan_targets": [],
+      "feature_flags": {
+        "planner": true,
+        "targeted_replan": true,
+        "critic": true,
+        "verifier": true,
+        "parallel_scheduler": true,
+        "deep_loop": true
+      },
+      "skill_invocations": {},
+      "expected_findings": [
+        {
+          "cwe": "CWE-601",
+          "end_line": 3,
+          "path": "src/change_39.py",
+          "rule_id": "SEC-OPEN-REDIRECT",
+          "severity": "medium",
+          "start_line": 3
+        }
+      ],
+      "prediction_details": [],
+      "unmatched_expected_indices": [
+        0
+      ],
+      "unmatched_predicted_indices": [],
       "matches": []
     },
     {
@@ -477,14 +1370,20 @@
       "severity_hits": 0,
       "high_total": 0,
       "high_hits": 0,
+      "high_risk_total": 0,
+      "high_risk_hits": 0,
+      "high_risk_misses": 0,
+      "critical_total": 0,
+      "critical_hits": 0,
+      "critical_misses": 0,
       "clean_hit": true,
       "execution_success": true,
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 161.43510000256356,
-      "agent_steps": 0,
-      "tool_calls": 0,
+      "latency_ms": 44.80920000059996,
+      "agent_steps": 2,
+      "tool_calls": 2,
       "recovery_attempts": 0,
       "recovery_successes": 0,
       "policy_denials": 0,
@@ -493,7 +1392,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 18,
+      "trace_event_count": 24,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -514,41 +1413,202 @@
       },
       "error": null,
       "collaboration": {
-        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
-        "roles": [
-          "planner-agent",
-          "specialists",
-          "critic-agent",
-          "reflection-agent",
-          "evidence-agent",
-          "verifier-agent",
-          "arbiter-agent"
+        "task_type": "review.coordinate",
+        "agent_id": "coordinator",
+        "accepted_findings": [],
+        "rejected_findings": [],
+        "count": 0,
+        "rejected_count": 0,
+        "graph_revision": 1,
+        "replan_count": 0,
+        "delegated_tasks": 1,
+        "architecture": "six-agent-v2",
+        "rationale_codes": [
+          "CLEAN_BASELINE"
         ],
-        "planned_assignments": 1,
-        "dialogue_rounds": 0,
-        "messages": 5,
-        "retries": 0,
-        "handoffs": 0,
-        "agents": [
+        "collaborations": [
+          "reliability-agent"
+        ],
+        "graph_mutations": [],
+        "task_graph": {
+          "graph_id": "a4f95e8768874d41b72fe83dd28b44f3",
+          "revision": 1,
+          "mutation_history": [],
+          "nodes": {
+            "spec0": {
+              "node_id": "spec0",
+              "task_type": "review.reliability",
+              "objective": "review changed lines for reliability",
+              "target_capabilities": [],
+              "dependencies": [],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "9cc009d7233345e6886e07416d7be07a"
+              ],
+              "agent_id": "reliability-agent",
+              "serial": false,
+              "metadata": {}
+            }
+          }
+        },
+        "graph_shapes": [
           {
-            "agent": "code-quality",
+            "node_id": "spec0",
+            "task_type": "review.reliability",
+            "dependencies": [],
             "status": "completed",
-            "attempts": 1,
-            "substituted_for": "",
-            "loop_steps": 0,
-            "loop_stop_reason": "one-shot",
-            "context_compressed": false,
-            "memories_recalled": 0
+            "artifact_ids": [
+              "9cc009d7233345e6886e07416d7be07a"
+            ],
+            "metadata": {}
           }
         ],
-        "agent_loop_steps": 0,
-        "context_compressions": 0,
-        "memories_recalled": 0,
-        "proposed_findings": 0,
-        "approved_findings": 0,
-        "rejected_findings": 0,
-        "finding_sources": {}
+        "runtime_events": [
+          {
+            "kind": "FINDINGS_EMITTED",
+            "node_id": "spec0",
+            "artifact_id": "9cc009d7233345e6886e07416d7be07a",
+            "detail": {
+              "count": 0,
+              "recheck": false,
+              "changed_artifact_ids": []
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "spec0",
+            "artifact_id": "9cc009d7233345e6886e07416d7be07a",
+            "detail": {
+              "agent_id": "reliability-agent",
+              "task_type": "review.reliability"
+            }
+          }
+        ],
+        "runtime_artifacts": [
+          {
+            "artifact_id": "9cc009d7233345e6886e07416d7be07a",
+            "producer_node": "spec0",
+            "agent_id": "reliability-agent",
+            "task_type": "review.reliability",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [],
+            "content": {
+              "task_type": "review.reliability",
+              "agent_id": "reliability-agent",
+              "count": 0,
+              "findings": [],
+              "confidence": 0.0,
+              "_a2a_metadata": [
+                {
+                  "task_type": "review.reliability",
+                  "stop_reason": "final",
+                  "steps": 2,
+                  "plan_versions": 0,
+                  "decision_count": 2,
+                  "correlation_id": "8f997fab09ed48c88ffb7132f8182048"
+                }
+              ]
+            },
+            "finding_versions": {}
+          }
+        ],
+        "superseded_artifacts": [],
+        "feature_flags_snapshot": {
+          "planner": true,
+          "targeted_replan": true,
+          "critic": true,
+          "verifier": true,
+          "parallel_scheduler": true,
+          "deep_loop": true
+        },
+        "parallel_batches": [
+          {
+            "batch_id": "batch-1",
+            "parallel_width": 1,
+            "started_at": 48762.3889545,
+            "finished_at": 48762.3896015,
+            "agent_ids": [
+              "reliability-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 0.647,
+            "branch_duration_ms": [
+              0.6466
+            ],
+            "speedup_ratio": 1.0
+          }
+        ],
+        "loop_steps_by_agent": {
+          "reliability-agent": 2
+        },
+        "tool_calls_by_agent": {
+          "reliability-agent": 2
+        },
+        "called_agents": [
+          "reliability-agent"
+        ],
+        "replan_targets": [],
+        "verification_version": 0,
+        "finding_versions": {},
+        "fix_stale_inputs": 0,
+        "skill_invocations": {}
       },
+      "architecture": "six-agent-v2",
+      "called_agents": [
+        "reliability-agent"
+      ],
+      "graph_revision": 1,
+      "graph_shapes": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "9cc009d7233345e6886e07416d7be07a"
+          ],
+          "metadata": {}
+        }
+      ],
+      "loop_steps_by_agent": {
+        "reliability-agent": 2
+      },
+      "parallel_batches": [
+        {
+          "batch_id": "batch-1",
+          "parallel_width": 1,
+          "started_at": 48762.3889545,
+          "finished_at": 48762.3896015,
+          "agent_ids": [
+            "reliability-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 0.647,
+          "branch_duration_ms": [
+            0.6466
+          ],
+          "speedup_ratio": 1.0
+        }
+      ],
+      "replan_count": 0,
+      "replan_targets": [],
+      "feature_flags": {
+        "planner": true,
+        "targeted_replan": true,
+        "critic": true,
+        "verifier": true,
+        "parallel_scheduler": true,
+        "deep_loop": true
+      },
+      "skill_invocations": {},
+      "expected_findings": [],
+      "prediction_details": [],
+      "unmatched_expected_indices": [],
+      "unmatched_predicted_indices": [],
       "matches": []
     },
     {
@@ -564,14 +1624,20 @@
       "severity_hits": 0,
       "high_total": 0,
       "high_hits": 0,
+      "high_risk_total": 0,
+      "high_risk_hits": 0,
+      "high_risk_misses": 0,
+      "critical_total": 0,
+      "critical_hits": 0,
+      "critical_misses": 0,
       "clean_hit": true,
       "execution_success": true,
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 159.9452999944333,
-      "agent_steps": 0,
-      "tool_calls": 0,
+      "latency_ms": 48.72179999802029,
+      "agent_steps": 2,
+      "tool_calls": 2,
       "recovery_attempts": 0,
       "recovery_successes": 0,
       "policy_denials": 0,
@@ -580,7 +1646,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 18,
+      "trace_event_count": 24,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -601,41 +1667,202 @@
       },
       "error": null,
       "collaboration": {
-        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
-        "roles": [
-          "planner-agent",
-          "specialists",
-          "critic-agent",
-          "reflection-agent",
-          "evidence-agent",
-          "verifier-agent",
-          "arbiter-agent"
+        "task_type": "review.coordinate",
+        "agent_id": "coordinator",
+        "accepted_findings": [],
+        "rejected_findings": [],
+        "count": 0,
+        "rejected_count": 0,
+        "graph_revision": 1,
+        "replan_count": 0,
+        "delegated_tasks": 1,
+        "architecture": "six-agent-v2",
+        "rationale_codes": [
+          "CLEAN_BASELINE"
         ],
-        "planned_assignments": 1,
-        "dialogue_rounds": 0,
-        "messages": 5,
-        "retries": 0,
-        "handoffs": 0,
-        "agents": [
+        "collaborations": [
+          "reliability-agent"
+        ],
+        "graph_mutations": [],
+        "task_graph": {
+          "graph_id": "161aeb36e9ff428782db8564369947e8",
+          "revision": 1,
+          "mutation_history": [],
+          "nodes": {
+            "spec0": {
+              "node_id": "spec0",
+              "task_type": "review.reliability",
+              "objective": "review changed lines for reliability",
+              "target_capabilities": [],
+              "dependencies": [],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "f3431925a0544228b8f9942b98441cb0"
+              ],
+              "agent_id": "reliability-agent",
+              "serial": false,
+              "metadata": {}
+            }
+          }
+        },
+        "graph_shapes": [
           {
-            "agent": "code-quality",
+            "node_id": "spec0",
+            "task_type": "review.reliability",
+            "dependencies": [],
             "status": "completed",
-            "attempts": 1,
-            "substituted_for": "",
-            "loop_steps": 0,
-            "loop_stop_reason": "one-shot",
-            "context_compressed": false,
-            "memories_recalled": 0
+            "artifact_ids": [
+              "f3431925a0544228b8f9942b98441cb0"
+            ],
+            "metadata": {}
           }
         ],
-        "agent_loop_steps": 0,
-        "context_compressions": 0,
-        "memories_recalled": 0,
-        "proposed_findings": 0,
-        "approved_findings": 0,
-        "rejected_findings": 0,
-        "finding_sources": {}
+        "runtime_events": [
+          {
+            "kind": "FINDINGS_EMITTED",
+            "node_id": "spec0",
+            "artifact_id": "f3431925a0544228b8f9942b98441cb0",
+            "detail": {
+              "count": 0,
+              "recheck": false,
+              "changed_artifact_ids": []
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "spec0",
+            "artifact_id": "f3431925a0544228b8f9942b98441cb0",
+            "detail": {
+              "agent_id": "reliability-agent",
+              "task_type": "review.reliability"
+            }
+          }
+        ],
+        "runtime_artifacts": [
+          {
+            "artifact_id": "f3431925a0544228b8f9942b98441cb0",
+            "producer_node": "spec0",
+            "agent_id": "reliability-agent",
+            "task_type": "review.reliability",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [],
+            "content": {
+              "task_type": "review.reliability",
+              "agent_id": "reliability-agent",
+              "count": 0,
+              "findings": [],
+              "confidence": 0.0,
+              "_a2a_metadata": [
+                {
+                  "task_type": "review.reliability",
+                  "stop_reason": "final",
+                  "steps": 2,
+                  "plan_versions": 0,
+                  "decision_count": 2,
+                  "correlation_id": "f2888cb16c0b4ec9b377e5ef7e7fb991"
+                }
+              ]
+            },
+            "finding_versions": {}
+          }
+        ],
+        "superseded_artifacts": [],
+        "feature_flags_snapshot": {
+          "planner": true,
+          "targeted_replan": true,
+          "critic": true,
+          "verifier": true,
+          "parallel_scheduler": true,
+          "deep_loop": true
+        },
+        "parallel_batches": [
+          {
+            "batch_id": "batch-1",
+            "parallel_width": 1,
+            "started_at": 48762.442687,
+            "finished_at": 48762.4433357,
+            "agent_ids": [
+              "reliability-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 0.6487,
+            "branch_duration_ms": [
+              0.6481
+            ],
+            "speedup_ratio": 1.0
+          }
+        ],
+        "loop_steps_by_agent": {
+          "reliability-agent": 2
+        },
+        "tool_calls_by_agent": {
+          "reliability-agent": 2
+        },
+        "called_agents": [
+          "reliability-agent"
+        ],
+        "replan_targets": [],
+        "verification_version": 0,
+        "finding_versions": {},
+        "fix_stale_inputs": 0,
+        "skill_invocations": {}
       },
+      "architecture": "six-agent-v2",
+      "called_agents": [
+        "reliability-agent"
+      ],
+      "graph_revision": 1,
+      "graph_shapes": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "f3431925a0544228b8f9942b98441cb0"
+          ],
+          "metadata": {}
+        }
+      ],
+      "loop_steps_by_agent": {
+        "reliability-agent": 2
+      },
+      "parallel_batches": [
+        {
+          "batch_id": "batch-1",
+          "parallel_width": 1,
+          "started_at": 48762.442687,
+          "finished_at": 48762.4433357,
+          "agent_ids": [
+            "reliability-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 0.6487,
+          "branch_duration_ms": [
+            0.6481
+          ],
+          "speedup_ratio": 1.0
+        }
+      ],
+      "replan_count": 0,
+      "replan_targets": [],
+      "feature_flags": {
+        "planner": true,
+        "targeted_replan": true,
+        "critic": true,
+        "verifier": true,
+        "parallel_scheduler": true,
+        "deep_loop": true
+      },
+      "skill_invocations": {},
+      "expected_findings": [],
+      "prediction_details": [],
+      "unmatched_expected_indices": [],
+      "unmatched_predicted_indices": [],
       "matches": []
     },
     {
@@ -651,14 +1878,20 @@
       "severity_hits": 0,
       "high_total": 0,
       "high_hits": 0,
+      "high_risk_total": 0,
+      "high_risk_hits": 0,
+      "high_risk_misses": 0,
+      "critical_total": 0,
+      "critical_hits": 0,
+      "critical_misses": 0,
       "clean_hit": true,
       "execution_success": true,
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 166.6423999995459,
-      "agent_steps": 0,
-      "tool_calls": 0,
+      "latency_ms": 51.99010000069393,
+      "agent_steps": 2,
+      "tool_calls": 2,
       "recovery_attempts": 0,
       "recovery_successes": 0,
       "policy_denials": 0,
@@ -667,7 +1900,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 18,
+      "trace_event_count": 24,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -688,41 +1921,202 @@
       },
       "error": null,
       "collaboration": {
-        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
-        "roles": [
-          "planner-agent",
-          "specialists",
-          "critic-agent",
-          "reflection-agent",
-          "evidence-agent",
-          "verifier-agent",
-          "arbiter-agent"
+        "task_type": "review.coordinate",
+        "agent_id": "coordinator",
+        "accepted_findings": [],
+        "rejected_findings": [],
+        "count": 0,
+        "rejected_count": 0,
+        "graph_revision": 1,
+        "replan_count": 0,
+        "delegated_tasks": 1,
+        "architecture": "six-agent-v2",
+        "rationale_codes": [
+          "CLEAN_BASELINE"
         ],
-        "planned_assignments": 1,
-        "dialogue_rounds": 0,
-        "messages": 5,
-        "retries": 0,
-        "handoffs": 0,
-        "agents": [
+        "collaborations": [
+          "reliability-agent"
+        ],
+        "graph_mutations": [],
+        "task_graph": {
+          "graph_id": "85c39cd357b945a99b6e46070cbe9250",
+          "revision": 1,
+          "mutation_history": [],
+          "nodes": {
+            "spec0": {
+              "node_id": "spec0",
+              "task_type": "review.reliability",
+              "objective": "review changed lines for reliability",
+              "target_capabilities": [],
+              "dependencies": [],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "5b58e1f3608e4050b5583377491edef5"
+              ],
+              "agent_id": "reliability-agent",
+              "serial": false,
+              "metadata": {}
+            }
+          }
+        },
+        "graph_shapes": [
           {
-            "agent": "code-quality",
+            "node_id": "spec0",
+            "task_type": "review.reliability",
+            "dependencies": [],
             "status": "completed",
-            "attempts": 1,
-            "substituted_for": "",
-            "loop_steps": 0,
-            "loop_stop_reason": "one-shot",
-            "context_compressed": false,
-            "memories_recalled": 0
+            "artifact_ids": [
+              "5b58e1f3608e4050b5583377491edef5"
+            ],
+            "metadata": {}
           }
         ],
-        "agent_loop_steps": 0,
-        "context_compressions": 0,
-        "memories_recalled": 0,
-        "proposed_findings": 0,
-        "approved_findings": 0,
-        "rejected_findings": 0,
-        "finding_sources": {}
+        "runtime_events": [
+          {
+            "kind": "FINDINGS_EMITTED",
+            "node_id": "spec0",
+            "artifact_id": "5b58e1f3608e4050b5583377491edef5",
+            "detail": {
+              "count": 0,
+              "recheck": false,
+              "changed_artifact_ids": []
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "spec0",
+            "artifact_id": "5b58e1f3608e4050b5583377491edef5",
+            "detail": {
+              "agent_id": "reliability-agent",
+              "task_type": "review.reliability"
+            }
+          }
+        ],
+        "runtime_artifacts": [
+          {
+            "artifact_id": "5b58e1f3608e4050b5583377491edef5",
+            "producer_node": "spec0",
+            "agent_id": "reliability-agent",
+            "task_type": "review.reliability",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [],
+            "content": {
+              "task_type": "review.reliability",
+              "agent_id": "reliability-agent",
+              "count": 0,
+              "findings": [],
+              "confidence": 0.0,
+              "_a2a_metadata": [
+                {
+                  "task_type": "review.reliability",
+                  "stop_reason": "final",
+                  "steps": 2,
+                  "plan_versions": 0,
+                  "decision_count": 2,
+                  "correlation_id": "0d57e79573aa431a9afddda3c2fc01b0"
+                }
+              ]
+            },
+            "finding_versions": {}
+          }
+        ],
+        "superseded_artifacts": [],
+        "feature_flags_snapshot": {
+          "planner": true,
+          "targeted_replan": true,
+          "critic": true,
+          "verifier": true,
+          "parallel_scheduler": true,
+          "deep_loop": true
+        },
+        "parallel_batches": [
+          {
+            "batch_id": "batch-1",
+            "parallel_width": 1,
+            "started_at": 48762.5054036,
+            "finished_at": 48762.5061061,
+            "agent_ids": [
+              "reliability-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 0.7025,
+            "branch_duration_ms": [
+              0.7019
+            ],
+            "speedup_ratio": 1.0
+          }
+        ],
+        "loop_steps_by_agent": {
+          "reliability-agent": 2
+        },
+        "tool_calls_by_agent": {
+          "reliability-agent": 2
+        },
+        "called_agents": [
+          "reliability-agent"
+        ],
+        "replan_targets": [],
+        "verification_version": 0,
+        "finding_versions": {},
+        "fix_stale_inputs": 0,
+        "skill_invocations": {}
       },
+      "architecture": "six-agent-v2",
+      "called_agents": [
+        "reliability-agent"
+      ],
+      "graph_revision": 1,
+      "graph_shapes": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "5b58e1f3608e4050b5583377491edef5"
+          ],
+          "metadata": {}
+        }
+      ],
+      "loop_steps_by_agent": {
+        "reliability-agent": 2
+      },
+      "parallel_batches": [
+        {
+          "batch_id": "batch-1",
+          "parallel_width": 1,
+          "started_at": 48762.5054036,
+          "finished_at": 48762.5061061,
+          "agent_ids": [
+            "reliability-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 0.7025,
+          "branch_duration_ms": [
+            0.7019
+          ],
+          "speedup_ratio": 1.0
+        }
+      ],
+      "replan_count": 0,
+      "replan_targets": [],
+      "feature_flags": {
+        "planner": true,
+        "targeted_replan": true,
+        "critic": true,
+        "verifier": true,
+        "parallel_scheduler": true,
+        "deep_loop": true
+      },
+      "skill_invocations": {},
+      "expected_findings": [],
+      "prediction_details": [],
+      "unmatched_expected_indices": [],
+      "unmatched_predicted_indices": [],
       "matches": []
     },
     {
@@ -738,14 +2132,20 @@
       "severity_hits": 0,
       "high_total": 0,
       "high_hits": 0,
+      "high_risk_total": 0,
+      "high_risk_hits": 0,
+      "high_risk_misses": 0,
+      "critical_total": 0,
+      "critical_hits": 0,
+      "critical_misses": 0,
       "clean_hit": true,
       "execution_success": true,
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 160.65469999739435,
-      "agent_steps": 0,
-      "tool_calls": 0,
+      "latency_ms": 44.44340000191005,
+      "agent_steps": 2,
+      "tool_calls": 2,
       "recovery_attempts": 0,
       "recovery_successes": 0,
       "policy_denials": 0,
@@ -754,7 +2154,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 18,
+      "trace_event_count": 24,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -775,41 +2175,202 @@
       },
       "error": null,
       "collaboration": {
-        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
-        "roles": [
-          "planner-agent",
-          "specialists",
-          "critic-agent",
-          "reflection-agent",
-          "evidence-agent",
-          "verifier-agent",
-          "arbiter-agent"
+        "task_type": "review.coordinate",
+        "agent_id": "coordinator",
+        "accepted_findings": [],
+        "rejected_findings": [],
+        "count": 0,
+        "rejected_count": 0,
+        "graph_revision": 1,
+        "replan_count": 0,
+        "delegated_tasks": 1,
+        "architecture": "six-agent-v2",
+        "rationale_codes": [
+          "CLEAN_BASELINE"
         ],
-        "planned_assignments": 1,
-        "dialogue_rounds": 0,
-        "messages": 5,
-        "retries": 0,
-        "handoffs": 0,
-        "agents": [
+        "collaborations": [
+          "reliability-agent"
+        ],
+        "graph_mutations": [],
+        "task_graph": {
+          "graph_id": "a3e86ffeeb2a42a9b142e9cd46ea8eb2",
+          "revision": 1,
+          "mutation_history": [],
+          "nodes": {
+            "spec0": {
+              "node_id": "spec0",
+              "task_type": "review.reliability",
+              "objective": "review changed lines for reliability",
+              "target_capabilities": [],
+              "dependencies": [],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "415d490ad3ee44ec956370aec13a05c2"
+              ],
+              "agent_id": "reliability-agent",
+              "serial": false,
+              "metadata": {}
+            }
+          }
+        },
+        "graph_shapes": [
           {
-            "agent": "code-quality",
+            "node_id": "spec0",
+            "task_type": "review.reliability",
+            "dependencies": [],
             "status": "completed",
-            "attempts": 1,
-            "substituted_for": "",
-            "loop_steps": 0,
-            "loop_stop_reason": "one-shot",
-            "context_compressed": false,
-            "memories_recalled": 0
+            "artifact_ids": [
+              "415d490ad3ee44ec956370aec13a05c2"
+            ],
+            "metadata": {}
           }
         ],
-        "agent_loop_steps": 0,
-        "context_compressions": 0,
-        "memories_recalled": 0,
-        "proposed_findings": 0,
-        "approved_findings": 0,
-        "rejected_findings": 0,
-        "finding_sources": {}
+        "runtime_events": [
+          {
+            "kind": "FINDINGS_EMITTED",
+            "node_id": "spec0",
+            "artifact_id": "415d490ad3ee44ec956370aec13a05c2",
+            "detail": {
+              "count": 0,
+              "recheck": false,
+              "changed_artifact_ids": []
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "spec0",
+            "artifact_id": "415d490ad3ee44ec956370aec13a05c2",
+            "detail": {
+              "agent_id": "reliability-agent",
+              "task_type": "review.reliability"
+            }
+          }
+        ],
+        "runtime_artifacts": [
+          {
+            "artifact_id": "415d490ad3ee44ec956370aec13a05c2",
+            "producer_node": "spec0",
+            "agent_id": "reliability-agent",
+            "task_type": "review.reliability",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [],
+            "content": {
+              "task_type": "review.reliability",
+              "agent_id": "reliability-agent",
+              "count": 0,
+              "findings": [],
+              "confidence": 0.0,
+              "_a2a_metadata": [
+                {
+                  "task_type": "review.reliability",
+                  "stop_reason": "final",
+                  "steps": 2,
+                  "plan_versions": 0,
+                  "decision_count": 2,
+                  "correlation_id": "1c2bf927730e4156be2d496948a6a646"
+                }
+              ]
+            },
+            "finding_versions": {}
+          }
+        ],
+        "superseded_artifacts": [],
+        "feature_flags_snapshot": {
+          "planner": true,
+          "targeted_replan": true,
+          "critic": true,
+          "verifier": true,
+          "parallel_scheduler": true,
+          "deep_loop": true
+        },
+        "parallel_batches": [
+          {
+            "batch_id": "batch-1",
+            "parallel_width": 1,
+            "started_at": 48762.5625758,
+            "finished_at": 48762.5632502,
+            "agent_ids": [
+              "reliability-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 0.6744,
+            "branch_duration_ms": [
+              0.6739
+            ],
+            "speedup_ratio": 1.0
+          }
+        ],
+        "loop_steps_by_agent": {
+          "reliability-agent": 2
+        },
+        "tool_calls_by_agent": {
+          "reliability-agent": 2
+        },
+        "called_agents": [
+          "reliability-agent"
+        ],
+        "replan_targets": [],
+        "verification_version": 0,
+        "finding_versions": {},
+        "fix_stale_inputs": 0,
+        "skill_invocations": {}
       },
+      "architecture": "six-agent-v2",
+      "called_agents": [
+        "reliability-agent"
+      ],
+      "graph_revision": 1,
+      "graph_shapes": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "415d490ad3ee44ec956370aec13a05c2"
+          ],
+          "metadata": {}
+        }
+      ],
+      "loop_steps_by_agent": {
+        "reliability-agent": 2
+      },
+      "parallel_batches": [
+        {
+          "batch_id": "batch-1",
+          "parallel_width": 1,
+          "started_at": 48762.5625758,
+          "finished_at": 48762.5632502,
+          "agent_ids": [
+            "reliability-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 0.6744,
+          "branch_duration_ms": [
+            0.6739
+          ],
+          "speedup_ratio": 1.0
+        }
+      ],
+      "replan_count": 0,
+      "replan_targets": [],
+      "feature_flags": {
+        "planner": true,
+        "targeted_replan": true,
+        "critic": true,
+        "verifier": true,
+        "parallel_scheduler": true,
+        "deep_loop": true
+      },
+      "skill_invocations": {},
+      "expected_findings": [],
+      "prediction_details": [],
+      "unmatched_expected_indices": [],
+      "unmatched_predicted_indices": [],
       "matches": []
     },
     {
@@ -825,14 +2386,20 @@
       "severity_hits": 0,
       "high_total": 0,
       "high_hits": 0,
+      "high_risk_total": 0,
+      "high_risk_hits": 0,
+      "high_risk_misses": 0,
+      "critical_total": 0,
+      "critical_hits": 0,
+      "critical_misses": 0,
       "clean_hit": true,
       "execution_success": true,
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 162.1683999983361,
-      "agent_steps": 0,
-      "tool_calls": 0,
+      "latency_ms": 46.136199998727534,
+      "agent_steps": 2,
+      "tool_calls": 2,
       "recovery_attempts": 0,
       "recovery_successes": 0,
       "policy_denials": 0,
@@ -841,7 +2408,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 18,
+      "trace_event_count": 24,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -862,41 +2429,202 @@
       },
       "error": null,
       "collaboration": {
-        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
-        "roles": [
-          "planner-agent",
-          "specialists",
-          "critic-agent",
-          "reflection-agent",
-          "evidence-agent",
-          "verifier-agent",
-          "arbiter-agent"
+        "task_type": "review.coordinate",
+        "agent_id": "coordinator",
+        "accepted_findings": [],
+        "rejected_findings": [],
+        "count": 0,
+        "rejected_count": 0,
+        "graph_revision": 1,
+        "replan_count": 0,
+        "delegated_tasks": 1,
+        "architecture": "six-agent-v2",
+        "rationale_codes": [
+          "CLEAN_BASELINE"
         ],
-        "planned_assignments": 1,
-        "dialogue_rounds": 0,
-        "messages": 5,
-        "retries": 0,
-        "handoffs": 0,
-        "agents": [
+        "collaborations": [
+          "reliability-agent"
+        ],
+        "graph_mutations": [],
+        "task_graph": {
+          "graph_id": "49a1cc8e5b2a43ca99e9a527b13a2952",
+          "revision": 1,
+          "mutation_history": [],
+          "nodes": {
+            "spec0": {
+              "node_id": "spec0",
+              "task_type": "review.reliability",
+              "objective": "review changed lines for reliability",
+              "target_capabilities": [],
+              "dependencies": [],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "42d67453d4dd454d915dbf65656d84ac"
+              ],
+              "agent_id": "reliability-agent",
+              "serial": false,
+              "metadata": {}
+            }
+          }
+        },
+        "graph_shapes": [
           {
-            "agent": "code-quality",
+            "node_id": "spec0",
+            "task_type": "review.reliability",
+            "dependencies": [],
             "status": "completed",
-            "attempts": 1,
-            "substituted_for": "",
-            "loop_steps": 0,
-            "loop_stop_reason": "one-shot",
-            "context_compressed": false,
-            "memories_recalled": 0
+            "artifact_ids": [
+              "42d67453d4dd454d915dbf65656d84ac"
+            ],
+            "metadata": {}
           }
         ],
-        "agent_loop_steps": 0,
-        "context_compressions": 0,
-        "memories_recalled": 0,
-        "proposed_findings": 0,
-        "approved_findings": 0,
-        "rejected_findings": 0,
-        "finding_sources": {}
+        "runtime_events": [
+          {
+            "kind": "FINDINGS_EMITTED",
+            "node_id": "spec0",
+            "artifact_id": "42d67453d4dd454d915dbf65656d84ac",
+            "detail": {
+              "count": 0,
+              "recheck": false,
+              "changed_artifact_ids": []
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "spec0",
+            "artifact_id": "42d67453d4dd454d915dbf65656d84ac",
+            "detail": {
+              "agent_id": "reliability-agent",
+              "task_type": "review.reliability"
+            }
+          }
+        ],
+        "runtime_artifacts": [
+          {
+            "artifact_id": "42d67453d4dd454d915dbf65656d84ac",
+            "producer_node": "spec0",
+            "agent_id": "reliability-agent",
+            "task_type": "review.reliability",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [],
+            "content": {
+              "task_type": "review.reliability",
+              "agent_id": "reliability-agent",
+              "count": 0,
+              "findings": [],
+              "confidence": 0.0,
+              "_a2a_metadata": [
+                {
+                  "task_type": "review.reliability",
+                  "stop_reason": "final",
+                  "steps": 2,
+                  "plan_versions": 0,
+                  "decision_count": 2,
+                  "correlation_id": "0b7972ce2e554588b1cb94e297a655d4"
+                }
+              ]
+            },
+            "finding_versions": {}
+          }
+        ],
+        "superseded_artifacts": [],
+        "feature_flags_snapshot": {
+          "planner": true,
+          "targeted_replan": true,
+          "critic": true,
+          "verifier": true,
+          "parallel_scheduler": true,
+          "deep_loop": true
+        },
+        "parallel_batches": [
+          {
+            "batch_id": "batch-1",
+            "parallel_width": 1,
+            "started_at": 48762.6158479,
+            "finished_at": 48762.6164507,
+            "agent_ids": [
+              "reliability-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 0.6028,
+            "branch_duration_ms": [
+              0.6023
+            ],
+            "speedup_ratio": 1.0
+          }
+        ],
+        "loop_steps_by_agent": {
+          "reliability-agent": 2
+        },
+        "tool_calls_by_agent": {
+          "reliability-agent": 2
+        },
+        "called_agents": [
+          "reliability-agent"
+        ],
+        "replan_targets": [],
+        "verification_version": 0,
+        "finding_versions": {},
+        "fix_stale_inputs": 0,
+        "skill_invocations": {}
       },
+      "architecture": "six-agent-v2",
+      "called_agents": [
+        "reliability-agent"
+      ],
+      "graph_revision": 1,
+      "graph_shapes": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "42d67453d4dd454d915dbf65656d84ac"
+          ],
+          "metadata": {}
+        }
+      ],
+      "loop_steps_by_agent": {
+        "reliability-agent": 2
+      },
+      "parallel_batches": [
+        {
+          "batch_id": "batch-1",
+          "parallel_width": 1,
+          "started_at": 48762.6158479,
+          "finished_at": 48762.6164507,
+          "agent_ids": [
+            "reliability-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 0.6028,
+          "branch_duration_ms": [
+            0.6023
+          ],
+          "speedup_ratio": 1.0
+        }
+      ],
+      "replan_count": 0,
+      "replan_targets": [],
+      "feature_flags": {
+        "planner": true,
+        "targeted_replan": true,
+        "critic": true,
+        "verifier": true,
+        "parallel_scheduler": true,
+        "deep_loop": true
+      },
+      "skill_invocations": {},
+      "expected_findings": [],
+      "prediction_details": [],
+      "unmatched_expected_indices": [],
+      "unmatched_predicted_indices": [],
       "matches": []
     },
     {
@@ -912,14 +2640,20 @@
       "severity_hits": 0,
       "high_total": 0,
       "high_hits": 0,
+      "high_risk_total": 0,
+      "high_risk_hits": 0,
+      "high_risk_misses": 0,
+      "critical_total": 0,
+      "critical_hits": 0,
+      "critical_misses": 0,
       "clean_hit": true,
       "execution_success": true,
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 162.80330000154208,
-      "agent_steps": 0,
-      "tool_calls": 0,
+      "latency_ms": 45.18589999497635,
+      "agent_steps": 2,
+      "tool_calls": 2,
       "recovery_attempts": 0,
       "recovery_successes": 0,
       "policy_denials": 0,
@@ -928,7 +2662,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 18,
+      "trace_event_count": 24,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -949,41 +2683,202 @@
       },
       "error": null,
       "collaboration": {
-        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
-        "roles": [
-          "planner-agent",
-          "specialists",
-          "critic-agent",
-          "reflection-agent",
-          "evidence-agent",
-          "verifier-agent",
-          "arbiter-agent"
+        "task_type": "review.coordinate",
+        "agent_id": "coordinator",
+        "accepted_findings": [],
+        "rejected_findings": [],
+        "count": 0,
+        "rejected_count": 0,
+        "graph_revision": 1,
+        "replan_count": 0,
+        "delegated_tasks": 1,
+        "architecture": "six-agent-v2",
+        "rationale_codes": [
+          "CLEAN_BASELINE"
         ],
-        "planned_assignments": 1,
-        "dialogue_rounds": 0,
-        "messages": 5,
-        "retries": 0,
-        "handoffs": 0,
-        "agents": [
+        "collaborations": [
+          "reliability-agent"
+        ],
+        "graph_mutations": [],
+        "task_graph": {
+          "graph_id": "768e857a49eb4337882ade784683d0d6",
+          "revision": 1,
+          "mutation_history": [],
+          "nodes": {
+            "spec0": {
+              "node_id": "spec0",
+              "task_type": "review.reliability",
+              "objective": "review changed lines for reliability",
+              "target_capabilities": [],
+              "dependencies": [],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "1656bbf506b743dd94dd0ca2f6932a2b"
+              ],
+              "agent_id": "reliability-agent",
+              "serial": false,
+              "metadata": {}
+            }
+          }
+        },
+        "graph_shapes": [
           {
-            "agent": "code-quality",
+            "node_id": "spec0",
+            "task_type": "review.reliability",
+            "dependencies": [],
             "status": "completed",
-            "attempts": 1,
-            "substituted_for": "",
-            "loop_steps": 0,
-            "loop_stop_reason": "one-shot",
-            "context_compressed": false,
-            "memories_recalled": 0
+            "artifact_ids": [
+              "1656bbf506b743dd94dd0ca2f6932a2b"
+            ],
+            "metadata": {}
           }
         ],
-        "agent_loop_steps": 0,
-        "context_compressions": 0,
-        "memories_recalled": 0,
-        "proposed_findings": 0,
-        "approved_findings": 0,
-        "rejected_findings": 0,
-        "finding_sources": {}
+        "runtime_events": [
+          {
+            "kind": "FINDINGS_EMITTED",
+            "node_id": "spec0",
+            "artifact_id": "1656bbf506b743dd94dd0ca2f6932a2b",
+            "detail": {
+              "count": 0,
+              "recheck": false,
+              "changed_artifact_ids": []
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "spec0",
+            "artifact_id": "1656bbf506b743dd94dd0ca2f6932a2b",
+            "detail": {
+              "agent_id": "reliability-agent",
+              "task_type": "review.reliability"
+            }
+          }
+        ],
+        "runtime_artifacts": [
+          {
+            "artifact_id": "1656bbf506b743dd94dd0ca2f6932a2b",
+            "producer_node": "spec0",
+            "agent_id": "reliability-agent",
+            "task_type": "review.reliability",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [],
+            "content": {
+              "task_type": "review.reliability",
+              "agent_id": "reliability-agent",
+              "count": 0,
+              "findings": [],
+              "confidence": 0.0,
+              "_a2a_metadata": [
+                {
+                  "task_type": "review.reliability",
+                  "stop_reason": "final",
+                  "steps": 2,
+                  "plan_versions": 0,
+                  "decision_count": 2,
+                  "correlation_id": "309acfc72f934dafb6ced10968854bd4"
+                }
+              ]
+            },
+            "finding_versions": {}
+          }
+        ],
+        "superseded_artifacts": [],
+        "feature_flags_snapshot": {
+          "planner": true,
+          "targeted_replan": true,
+          "critic": true,
+          "verifier": true,
+          "parallel_scheduler": true,
+          "deep_loop": true
+        },
+        "parallel_batches": [
+          {
+            "batch_id": "batch-1",
+            "parallel_width": 1,
+            "started_at": 48762.6697867,
+            "finished_at": 48762.6703638,
+            "agent_ids": [
+              "reliability-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 0.5771,
+            "branch_duration_ms": [
+              0.5766
+            ],
+            "speedup_ratio": 1.0
+          }
+        ],
+        "loop_steps_by_agent": {
+          "reliability-agent": 2
+        },
+        "tool_calls_by_agent": {
+          "reliability-agent": 2
+        },
+        "called_agents": [
+          "reliability-agent"
+        ],
+        "replan_targets": [],
+        "verification_version": 0,
+        "finding_versions": {},
+        "fix_stale_inputs": 0,
+        "skill_invocations": {}
       },
+      "architecture": "six-agent-v2",
+      "called_agents": [
+        "reliability-agent"
+      ],
+      "graph_revision": 1,
+      "graph_shapes": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "1656bbf506b743dd94dd0ca2f6932a2b"
+          ],
+          "metadata": {}
+        }
+      ],
+      "loop_steps_by_agent": {
+        "reliability-agent": 2
+      },
+      "parallel_batches": [
+        {
+          "batch_id": "batch-1",
+          "parallel_width": 1,
+          "started_at": 48762.6697867,
+          "finished_at": 48762.6703638,
+          "agent_ids": [
+            "reliability-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 0.5771,
+          "branch_duration_ms": [
+            0.5766
+          ],
+          "speedup_ratio": 1.0
+        }
+      ],
+      "replan_count": 0,
+      "replan_targets": [],
+      "feature_flags": {
+        "planner": true,
+        "targeted_replan": true,
+        "critic": true,
+        "verifier": true,
+        "parallel_scheduler": true,
+        "deep_loop": true
+      },
+      "skill_invocations": {},
+      "expected_findings": [],
+      "prediction_details": [],
+      "unmatched_expected_indices": [],
+      "unmatched_predicted_indices": [],
       "matches": []
     },
     {
@@ -999,14 +2894,20 @@
       "severity_hits": 0,
       "high_total": 1,
       "high_hits": 0,
+      "high_risk_total": 1,
+      "high_risk_hits": 0,
+      "high_risk_misses": 1,
+      "critical_total": 0,
+      "critical_hits": 0,
+      "critical_misses": 0,
       "clean_hit": false,
       "execution_success": true,
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 170.8336000010604,
-      "agent_steps": 0,
-      "tool_calls": 0,
+      "latency_ms": 46.196399998734705,
+      "agent_steps": 2,
+      "tool_calls": 2,
       "recovery_attempts": 0,
       "recovery_successes": 0,
       "policy_denials": 0,
@@ -1015,7 +2916,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 18,
+      "trace_event_count": 24,
       "policy_id": "baseline-medium",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -1037,41 +2938,213 @@
       },
       "error": null,
       "collaboration": {
-        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
-        "roles": [
-          "planner-agent",
-          "specialists",
-          "critic-agent",
-          "reflection-agent",
-          "evidence-agent",
-          "verifier-agent",
-          "arbiter-agent"
+        "task_type": "review.coordinate",
+        "agent_id": "coordinator",
+        "accepted_findings": [],
+        "rejected_findings": [],
+        "count": 0,
+        "rejected_count": 0,
+        "graph_revision": 1,
+        "replan_count": 0,
+        "delegated_tasks": 1,
+        "architecture": "six-agent-v2",
+        "rationale_codes": [
+          "CLEAN_BASELINE"
         ],
-        "planned_assignments": 1,
-        "dialogue_rounds": 1,
-        "messages": 5,
-        "retries": 0,
-        "handoffs": 0,
-        "agents": [
+        "collaborations": [
+          "reliability-agent"
+        ],
+        "graph_mutations": [],
+        "task_graph": {
+          "graph_id": "5a7b2250b44d4f79ba046e446f5251c1",
+          "revision": 1,
+          "mutation_history": [],
+          "nodes": {
+            "spec0": {
+              "node_id": "spec0",
+              "task_type": "review.reliability",
+              "objective": "review changed lines for reliability",
+              "target_capabilities": [],
+              "dependencies": [],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "6f9f7f74b8644c2f8516dce14c4fd3e3"
+              ],
+              "agent_id": "reliability-agent",
+              "serial": false,
+              "metadata": {}
+            }
+          }
+        },
+        "graph_shapes": [
           {
-            "agent": "code-quality",
+            "node_id": "spec0",
+            "task_type": "review.reliability",
+            "dependencies": [],
             "status": "completed",
-            "attempts": 1,
-            "substituted_for": "",
-            "loop_steps": 0,
-            "loop_stop_reason": "one-shot",
-            "context_compressed": false,
-            "memories_recalled": 0
+            "artifact_ids": [
+              "6f9f7f74b8644c2f8516dce14c4fd3e3"
+            ],
+            "metadata": {}
           }
         ],
-        "agent_loop_steps": 0,
-        "context_compressions": 0,
-        "memories_recalled": 0,
-        "proposed_findings": 0,
-        "approved_findings": 0,
-        "rejected_findings": 0,
-        "finding_sources": {}
+        "runtime_events": [
+          {
+            "kind": "FINDINGS_EMITTED",
+            "node_id": "spec0",
+            "artifact_id": "6f9f7f74b8644c2f8516dce14c4fd3e3",
+            "detail": {
+              "count": 0,
+              "recheck": false,
+              "changed_artifact_ids": []
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "spec0",
+            "artifact_id": "6f9f7f74b8644c2f8516dce14c4fd3e3",
+            "detail": {
+              "agent_id": "reliability-agent",
+              "task_type": "review.reliability"
+            }
+          }
+        ],
+        "runtime_artifacts": [
+          {
+            "artifact_id": "6f9f7f74b8644c2f8516dce14c4fd3e3",
+            "producer_node": "spec0",
+            "agent_id": "reliability-agent",
+            "task_type": "review.reliability",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [],
+            "content": {
+              "task_type": "review.reliability",
+              "agent_id": "reliability-agent",
+              "count": 0,
+              "findings": [],
+              "confidence": 0.0,
+              "_a2a_metadata": [
+                {
+                  "task_type": "review.reliability",
+                  "stop_reason": "final",
+                  "steps": 2,
+                  "plan_versions": 0,
+                  "decision_count": 2,
+                  "correlation_id": "58ed1d69fdc846bdb95a87cc23832174"
+                }
+              ]
+            },
+            "finding_versions": {}
+          }
+        ],
+        "superseded_artifacts": [],
+        "feature_flags_snapshot": {
+          "planner": true,
+          "targeted_replan": true,
+          "critic": true,
+          "verifier": true,
+          "parallel_scheduler": true,
+          "deep_loop": true
+        },
+        "parallel_batches": [
+          {
+            "batch_id": "batch-1",
+            "parallel_width": 1,
+            "started_at": 48762.7232606,
+            "finished_at": 48762.7247082,
+            "agent_ids": [
+              "reliability-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 1.4476,
+            "branch_duration_ms": [
+              1.4471
+            ],
+            "speedup_ratio": 1.0
+          }
+        ],
+        "loop_steps_by_agent": {
+          "reliability-agent": 2
+        },
+        "tool_calls_by_agent": {
+          "reliability-agent": 2
+        },
+        "called_agents": [
+          "reliability-agent"
+        ],
+        "replan_targets": [],
+        "verification_version": 0,
+        "finding_versions": {},
+        "fix_stale_inputs": 0,
+        "skill_invocations": {}
       },
+      "architecture": "six-agent-v2",
+      "called_agents": [
+        "reliability-agent"
+      ],
+      "graph_revision": 1,
+      "graph_shapes": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "6f9f7f74b8644c2f8516dce14c4fd3e3"
+          ],
+          "metadata": {}
+        }
+      ],
+      "loop_steps_by_agent": {
+        "reliability-agent": 2
+      },
+      "parallel_batches": [
+        {
+          "batch_id": "batch-1",
+          "parallel_width": 1,
+          "started_at": 48762.7232606,
+          "finished_at": 48762.7247082,
+          "agent_ids": [
+            "reliability-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 1.4476,
+          "branch_duration_ms": [
+            1.4471
+          ],
+          "speedup_ratio": 1.0
+        }
+      ],
+      "replan_count": 0,
+      "replan_targets": [],
+      "feature_flags": {
+        "planner": true,
+        "targeted_replan": true,
+        "critic": true,
+        "verifier": true,
+        "parallel_scheduler": true,
+        "deep_loop": true
+      },
+      "skill_invocations": {},
+      "expected_findings": [
+        {
+          "cwe": "CWE-798",
+          "end_line": 3,
+          "path": "src/change_10.py",
+          "rule_id": "SEC-HARDCODED-SECRET",
+          "severity": "high",
+          "start_line": 3
+        }
+      ],
+      "prediction_details": [],
+      "unmatched_expected_indices": [
+        0
+      ],
+      "unmatched_predicted_indices": [],
       "matches": []
     },
     {
@@ -1080,21 +3153,27 @@
       "pull_request": 1002,
       "split": "holdout",
       "expected": 1,
-      "predicted": 0,
-      "tp": 0,
+      "predicted": 1,
+      "tp": 1,
       "fp": 0,
-      "fn": 1,
-      "severity_hits": 0,
+      "fn": 0,
+      "severity_hits": 1,
       "high_total": 0,
       "high_hits": 0,
+      "high_risk_total": 0,
+      "high_risk_hits": 0,
+      "high_risk_misses": 0,
+      "critical_total": 0,
+      "critical_hits": 0,
+      "critical_misses": 0,
       "clean_hit": false,
       "execution_success": true,
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 243.20129999978235,
-      "agent_steps": 0,
-      "tool_calls": 0,
+      "latency_ms": 47.74339999858057,
+      "agent_steps": 12,
+      "tool_calls": 12,
       "recovery_attempts": 0,
       "recovery_successes": 0,
       "policy_denials": 0,
@@ -1103,7 +3182,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 18,
+      "trace_event_count": 24,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -1124,42 +3203,629 @@
       },
       "error": null,
       "collaboration": {
-        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
-        "roles": [
-          "planner-agent",
-          "specialists",
-          "critic-agent",
-          "reflection-agent",
-          "evidence-agent",
-          "verifier-agent",
-          "arbiter-agent"
-        ],
-        "planned_assignments": 1,
-        "dialogue_rounds": 0,
-        "messages": 5,
-        "retries": 0,
-        "handoffs": 0,
-        "agents": [
+        "task_type": "review.coordinate",
+        "agent_id": "coordinator",
+        "accepted_findings": [
           {
-            "agent": "code-quality",
-            "status": "completed",
-            "attempts": 1,
-            "substituted_for": "",
-            "loop_steps": 0,
-            "loop_stop_reason": "one-shot",
-            "context_compressed": false,
-            "memories_recalled": 0
+            "analyzer": null,
+            "confidence": 0.9,
+            "evidence": "except Exception:",
+            "explanation": "宽泛捕获会隐藏真实故障，使调用方误以为操作成功。",
+            "fix": "仅捕获可处理的异常，记录必要上下文，并让不可恢复错误向上传播。",
+            "line": 4,
+            "path": "src/change_20.py",
+            "rule_id": "REL-EMPTY-EXCEPT",
+            "severity": "medium",
+            "source_skill": null,
+            "test": "加入依赖失败测试，断言错误可观察且不会返回伪成功。",
+            "title": "异常被宽泛捕获",
+            "deep_evidence": {
+              "inspect_execution_path": {
+                "guarded": false,
+                "has_try": false,
+                "has_except": true
+              }
+            },
+            "finding_id": "REL-EMPTY-EXCEPT:src/change_20.py:4",
+            "finding_version": 1,
+            "artifact_id": "3ca7aa28de7f46c09f729b6c8725451e"
           }
         ],
-        "agent_loop_steps": 0,
-        "context_compressions": 0,
-        "memories_recalled": 0,
-        "proposed_findings": 0,
-        "approved_findings": 0,
-        "rejected_findings": 0,
-        "finding_sources": {}
+        "rejected_findings": [],
+        "count": 1,
+        "rejected_count": 0,
+        "graph_revision": 3,
+        "replan_count": 0,
+        "delegated_tasks": 3,
+        "architecture": "six-agent-v2",
+        "rationale_codes": [
+          "EXCEPTION_PATH_CHANGED"
+        ],
+        "collaborations": [
+          "reliability-agent",
+          "critic-agent",
+          "verifier-agent"
+        ],
+        "graph_mutations": [],
+        "task_graph": {
+          "graph_id": "febdcdd92a234a40b3db413f91bad353",
+          "revision": 3,
+          "mutation_history": [
+            {
+              "op": "add",
+              "node": "critic",
+              "reason": "LOW_CONFIDENCE",
+              "graph_revision": 2
+            },
+            {
+              "op": "add",
+              "node": "verifier-v1",
+              "reason": "EXPECTED_FINDINGS",
+              "graph_revision": 3
+            }
+          ],
+          "nodes": {
+            "critic": {
+              "node_id": "critic",
+              "task_type": "critique.findings",
+              "objective": "challenge current findings and evidence",
+              "target_capabilities": [],
+              "dependencies": [
+                "spec0"
+              ],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "8f80fd3d824d4fe09b5432615c078ab0"
+              ],
+              "agent_id": "critic-agent",
+              "serial": false,
+              "metadata": {}
+            },
+            "spec0": {
+              "node_id": "spec0",
+              "task_type": "review.reliability",
+              "objective": "review changed lines for reliability",
+              "target_capabilities": [],
+              "dependencies": [],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "3ca7aa28de7f46c09f729b6c8725451e"
+              ],
+              "agent_id": "reliability-agent",
+              "serial": false,
+              "metadata": {}
+            },
+            "verifier-v1": {
+              "node_id": "verifier-v1",
+              "task_type": "verify.findings",
+              "objective": "verify latest finding versions",
+              "target_capabilities": [],
+              "dependencies": [
+                "critic"
+              ],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "977ef906e28f40cbabdf773c738da3b3"
+              ],
+              "agent_id": "verifier-agent",
+              "serial": false,
+              "metadata": {
+                "finding_versions": {
+                  "REL-EMPTY-EXCEPT:src/change_20.py:4": 1
+                }
+              }
+            }
+          }
+        },
+        "graph_shapes": [
+          {
+            "node_id": "spec0",
+            "task_type": "review.reliability",
+            "dependencies": [],
+            "status": "completed",
+            "artifact_ids": [
+              "3ca7aa28de7f46c09f729b6c8725451e"
+            ],
+            "metadata": {}
+          },
+          {
+            "node_id": "critic",
+            "task_type": "critique.findings",
+            "dependencies": [
+              "spec0"
+            ],
+            "status": "completed",
+            "artifact_ids": [
+              "8f80fd3d824d4fe09b5432615c078ab0"
+            ],
+            "metadata": {}
+          },
+          {
+            "node_id": "verifier-v1",
+            "task_type": "verify.findings",
+            "dependencies": [
+              "critic"
+            ],
+            "status": "completed",
+            "artifact_ids": [
+              "977ef906e28f40cbabdf773c738da3b3"
+            ],
+            "metadata": {
+              "finding_versions": {
+                "REL-EMPTY-EXCEPT:src/change_20.py:4": 1
+              }
+            }
+          }
+        ],
+        "runtime_events": [
+          {
+            "kind": "FINDINGS_EMITTED",
+            "node_id": "spec0",
+            "artifact_id": "3ca7aa28de7f46c09f729b6c8725451e",
+            "detail": {
+              "count": 1,
+              "recheck": false,
+              "changed_artifact_ids": []
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "spec0",
+            "artifact_id": "3ca7aa28de7f46c09f729b6c8725451e",
+            "detail": {
+              "agent_id": "reliability-agent",
+              "task_type": "review.reliability"
+            }
+          },
+          {
+            "kind": "GRAPH_MUTATED",
+            "node_id": "critic",
+            "artifact_id": "",
+            "detail": {
+              "op": "add",
+              "reason": "LOW_CONFIDENCE",
+              "graph_revision": 2
+            }
+          },
+          {
+            "kind": "CRITIQUE_EMITTED",
+            "node_id": "critic",
+            "artifact_id": "8f80fd3d824d4fe09b5432615c078ab0",
+            "detail": {
+              "replan_requests": 0
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "critic",
+            "artifact_id": "8f80fd3d824d4fe09b5432615c078ab0",
+            "detail": {
+              "agent_id": "critic-agent",
+              "task_type": "critique.findings"
+            }
+          },
+          {
+            "kind": "GRAPH_MUTATED",
+            "node_id": "verifier-v1",
+            "artifact_id": "",
+            "detail": {
+              "op": "add",
+              "reason": "EXPECTED_FINDINGS",
+              "graph_revision": 3
+            }
+          },
+          {
+            "kind": "VERIFICATION_COMPLETED",
+            "node_id": "verifier-v1",
+            "artifact_id": "977ef906e28f40cbabdf773c738da3b3",
+            "detail": {
+              "verification_version": 1
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "verifier-v1",
+            "artifact_id": "977ef906e28f40cbabdf773c738da3b3",
+            "detail": {
+              "agent_id": "verifier-agent",
+              "task_type": "verify.findings"
+            }
+          }
+        ],
+        "runtime_artifacts": [
+          {
+            "artifact_id": "3ca7aa28de7f46c09f729b6c8725451e",
+            "producer_node": "spec0",
+            "agent_id": "reliability-agent",
+            "task_type": "review.reliability",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [],
+            "content": {
+              "task_type": "review.reliability",
+              "agent_id": "reliability-agent",
+              "count": 1,
+              "findings": [
+                {
+                  "analyzer": null,
+                  "confidence": 0.9,
+                  "evidence": "except Exception:",
+                  "explanation": "宽泛捕获会隐藏真实故障，使调用方误以为操作成功。",
+                  "fix": "仅捕获可处理的异常，记录必要上下文，并让不可恢复错误向上传播。",
+                  "line": 4,
+                  "path": "src/change_20.py",
+                  "rule_id": "REL-EMPTY-EXCEPT",
+                  "severity": "medium",
+                  "source_skill": null,
+                  "test": "加入依赖失败测试，断言错误可观察且不会返回伪成功。",
+                  "title": "异常被宽泛捕获",
+                  "deep_evidence": {
+                    "inspect_execution_path": {
+                      "guarded": false,
+                      "has_try": false,
+                      "has_except": true
+                    }
+                  },
+                  "finding_id": "REL-EMPTY-EXCEPT:src/change_20.py:4",
+                  "finding_version": 1,
+                  "artifact_id": "3ca7aa28de7f46c09f729b6c8725451e"
+                }
+              ],
+              "confidence": 0.9,
+              "_a2a_metadata": [
+                {
+                  "task_type": "review.reliability",
+                  "stop_reason": "final",
+                  "steps": 4,
+                  "plan_versions": 0,
+                  "decision_count": 4,
+                  "correlation_id": "3ef5a7414c88473db6e3a13f1894faaa"
+                }
+              ]
+            },
+            "finding_versions": {
+              "REL-EMPTY-EXCEPT:src/change_20.py:4": 1
+            }
+          },
+          {
+            "artifact_id": "8f80fd3d824d4fe09b5432615c078ab0",
+            "producer_node": "critic",
+            "agent_id": "critic-agent",
+            "task_type": "critique.findings",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [
+              "3ca7aa28de7f46c09f729b6c8725451e"
+            ],
+            "content": {
+              "task_type": "critique.findings",
+              "agent_id": "critic-agent",
+              "accepted_findings": [
+                {
+                  "analyzer": null,
+                  "confidence": 0.9,
+                  "evidence": "except Exception:",
+                  "explanation": "宽泛捕获会隐藏真实故障，使调用方误以为操作成功。",
+                  "fix": "仅捕获可处理的异常，记录必要上下文，并让不可恢复错误向上传播。",
+                  "line": 4,
+                  "path": "src/change_20.py",
+                  "rule_id": "REL-EMPTY-EXCEPT",
+                  "severity": "medium",
+                  "source_skill": null,
+                  "test": "加入依赖失败测试，断言错误可观察且不会返回伪成功。",
+                  "title": "异常被宽泛捕获",
+                  "deep_evidence": {
+                    "inspect_execution_path": {
+                      "guarded": false,
+                      "has_try": false,
+                      "has_except": true
+                    }
+                  },
+                  "finding_id": "REL-EMPTY-EXCEPT:src/change_20.py:4",
+                  "finding_version": 1,
+                  "artifact_id": "3ca7aa28de7f46c09f729b6c8725451e"
+                }
+              ],
+              "rejected_findings": [],
+              "conflicts": [],
+              "questions": [],
+              "missing_evidence": [],
+              "replan_requests": [],
+              "findings": [],
+              "_a2a_metadata": [
+                {
+                  "task_type": "critique.findings",
+                  "stop_reason": "final",
+                  "steps": 5,
+                  "plan_versions": 0,
+                  "decision_count": 5,
+                  "correlation_id": "9ba1280020f84752a4dbd55b4680005e"
+                }
+              ]
+            }
+          },
+          {
+            "artifact_id": "977ef906e28f40cbabdf773c738da3b3",
+            "producer_node": "verifier-v1",
+            "agent_id": "verifier-agent",
+            "task_type": "verify.findings",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [
+              "8f80fd3d824d4fe09b5432615c078ab0"
+            ],
+            "content": {
+              "task_type": "verify.findings",
+              "agent_id": "verifier-agent",
+              "count": 1,
+              "decisions": {
+                "REL-EMPTY-EXCEPT:src/change_20.py:4": {
+                  "finding_id": "REL-EMPTY-EXCEPT:src/change_20.py:4",
+                  "verified": true,
+                  "evidence": "except Exception:",
+                  "attempted_strategies": [
+                    "run_targeted_test"
+                  ],
+                  "remaining_strategies": [
+                    "verify_rule_signature",
+                    "semantic_verify"
+                  ],
+                  "verification_method": "run_targeted_test",
+                  "verification_strategy": "run_targeted_test",
+                  "confidence": 1.0,
+                  "failure_reason": "",
+                  "verification_version": 1,
+                  "finding_version": 1
+                }
+              },
+              "findings": [],
+              "_a2a_metadata": [
+                {
+                  "task_type": "verify.findings",
+                  "stop_reason": "final",
+                  "steps": 3,
+                  "plan_versions": 0,
+                  "decision_count": 3,
+                  "correlation_id": "56b149ca32984f789db50a6f150fe7ae"
+                }
+              ]
+            },
+            "verification_version": 1
+          }
+        ],
+        "superseded_artifacts": [],
+        "feature_flags_snapshot": {
+          "planner": true,
+          "targeted_replan": true,
+          "critic": true,
+          "verifier": true,
+          "parallel_scheduler": true,
+          "deep_loop": true
+        },
+        "parallel_batches": [
+          {
+            "batch_id": "batch-1",
+            "parallel_width": 1,
+            "started_at": 48762.777353,
+            "finished_at": 48762.778808,
+            "agent_ids": [
+              "reliability-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 1.455,
+            "branch_duration_ms": [
+              1.4538
+            ],
+            "speedup_ratio": 1.0
+          },
+          {
+            "batch_id": "batch-2",
+            "parallel_width": 1,
+            "started_at": 48762.7790244,
+            "finished_at": 48762.7797746,
+            "agent_ids": [
+              "critic-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 0.7502,
+            "branch_duration_ms": [
+              0.7468
+            ],
+            "speedup_ratio": 1.0
+          },
+          {
+            "batch_id": "batch-3",
+            "parallel_width": 1,
+            "started_at": 48762.7799585,
+            "finished_at": 48762.7804152,
+            "agent_ids": [
+              "verifier-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 0.4567,
+            "branch_duration_ms": [
+              0.4562
+            ],
+            "speedup_ratio": 1.0
+          }
+        ],
+        "loop_steps_by_agent": {
+          "reliability-agent": 4,
+          "critic-agent": 5,
+          "verifier-agent": 3
+        },
+        "tool_calls_by_agent": {
+          "reliability-agent": 4,
+          "critic-agent": 5,
+          "verifier-agent": 3
+        },
+        "called_agents": [
+          "reliability-agent",
+          "critic-agent",
+          "verifier-agent"
+        ],
+        "replan_targets": [],
+        "verification_version": 1,
+        "finding_versions": {
+          "REL-EMPTY-EXCEPT:src/change_20.py:4": 1
+        },
+        "fix_stale_inputs": 0,
+        "skill_invocations": {}
       },
-      "matches": []
+      "architecture": "six-agent-v2",
+      "called_agents": [
+        "reliability-agent",
+        "critic-agent",
+        "verifier-agent"
+      ],
+      "graph_revision": 3,
+      "graph_shapes": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "3ca7aa28de7f46c09f729b6c8725451e"
+          ],
+          "metadata": {}
+        },
+        {
+          "node_id": "critic",
+          "task_type": "critique.findings",
+          "dependencies": [
+            "spec0"
+          ],
+          "status": "completed",
+          "artifact_ids": [
+            "8f80fd3d824d4fe09b5432615c078ab0"
+          ],
+          "metadata": {}
+        },
+        {
+          "node_id": "verifier-v1",
+          "task_type": "verify.findings",
+          "dependencies": [
+            "critic"
+          ],
+          "status": "completed",
+          "artifact_ids": [
+            "977ef906e28f40cbabdf773c738da3b3"
+          ],
+          "metadata": {
+            "finding_versions": {
+              "REL-EMPTY-EXCEPT:src/change_20.py:4": 1
+            }
+          }
+        }
+      ],
+      "loop_steps_by_agent": {
+        "reliability-agent": 4,
+        "critic-agent": 5,
+        "verifier-agent": 3
+      },
+      "parallel_batches": [
+        {
+          "batch_id": "batch-1",
+          "parallel_width": 1,
+          "started_at": 48762.777353,
+          "finished_at": 48762.778808,
+          "agent_ids": [
+            "reliability-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 1.455,
+          "branch_duration_ms": [
+            1.4538
+          ],
+          "speedup_ratio": 1.0
+        },
+        {
+          "batch_id": "batch-2",
+          "parallel_width": 1,
+          "started_at": 48762.7790244,
+          "finished_at": 48762.7797746,
+          "agent_ids": [
+            "critic-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 0.7502,
+          "branch_duration_ms": [
+            0.7468
+          ],
+          "speedup_ratio": 1.0
+        },
+        {
+          "batch_id": "batch-3",
+          "parallel_width": 1,
+          "started_at": 48762.7799585,
+          "finished_at": 48762.7804152,
+          "agent_ids": [
+            "verifier-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 0.4567,
+          "branch_duration_ms": [
+            0.4562
+          ],
+          "speedup_ratio": 1.0
+        }
+      ],
+      "replan_count": 0,
+      "replan_targets": [],
+      "feature_flags": {
+        "planner": true,
+        "targeted_replan": true,
+        "critic": true,
+        "verifier": true,
+        "parallel_scheduler": true,
+        "deep_loop": true
+      },
+      "skill_invocations": {},
+      "expected_findings": [
+        {
+          "cwe": "CWE-703",
+          "end_line": 4,
+          "path": "src/change_20.py",
+          "rule_id": "REL-EMPTY-EXCEPT",
+          "severity": "medium",
+          "start_line": 4
+        }
+      ],
+      "prediction_details": [
+        {
+          "rule_id": "REL-EMPTY-EXCEPT",
+          "severity": "medium",
+          "title": "异常被宽泛捕获",
+          "explanation": "宽泛捕获会隐藏真实故障，使调用方误以为操作成功。",
+          "path": "src/change_20.py",
+          "line": 4,
+          "evidence": "except Exception:",
+          "fix": "仅捕获可处理的异常，记录必要上下文，并让不可恢复错误向上传播。",
+          "test": "加入依赖失败测试，断言错误可观察且不会返回伪成功。",
+          "confidence": 0.9,
+          "source_skill": null,
+          "analyzer": null
+        }
+      ],
+      "unmatched_expected_indices": [],
+      "unmatched_predicted_indices": [],
+      "matches": [
+        {
+          "expected_index": 0,
+          "predicted_index": 0,
+          "cwe": "CWE-703"
+        }
+      ]
     },
     {
       "id": "pr-0093",
@@ -1174,14 +3840,20 @@
       "severity_hits": 0,
       "high_total": 0,
       "high_hits": 0,
+      "high_risk_total": 0,
+      "high_risk_hits": 0,
+      "high_risk_misses": 0,
+      "critical_total": 0,
+      "critical_hits": 0,
+      "critical_misses": 0,
       "clean_hit": false,
       "execution_success": true,
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 182.61530000017956,
-      "agent_steps": 0,
-      "tool_calls": 0,
+      "latency_ms": 45.664199999009725,
+      "agent_steps": 2,
+      "tool_calls": 2,
       "recovery_attempts": 0,
       "recovery_successes": 0,
       "policy_denials": 0,
@@ -1190,7 +3862,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 18,
+      "trace_event_count": 24,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -1211,41 +3883,213 @@
       },
       "error": null,
       "collaboration": {
-        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
-        "roles": [
-          "planner-agent",
-          "specialists",
-          "critic-agent",
-          "reflection-agent",
-          "evidence-agent",
-          "verifier-agent",
-          "arbiter-agent"
+        "task_type": "review.coordinate",
+        "agent_id": "coordinator",
+        "accepted_findings": [],
+        "rejected_findings": [],
+        "count": 0,
+        "rejected_count": 0,
+        "graph_revision": 1,
+        "replan_count": 0,
+        "delegated_tasks": 1,
+        "architecture": "six-agent-v2",
+        "rationale_codes": [
+          "CLEAN_BASELINE"
         ],
-        "planned_assignments": 1,
-        "dialogue_rounds": 0,
-        "messages": 5,
-        "retries": 0,
-        "handoffs": 0,
-        "agents": [
+        "collaborations": [
+          "reliability-agent"
+        ],
+        "graph_mutations": [],
+        "task_graph": {
+          "graph_id": "3349060ff3114433981ab1106e006cce",
+          "revision": 1,
+          "mutation_history": [],
+          "nodes": {
+            "spec0": {
+              "node_id": "spec0",
+              "task_type": "review.reliability",
+              "objective": "review changed lines for reliability",
+              "target_capabilities": [],
+              "dependencies": [],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "e43369c548e54f6cb687b9cf8775eebf"
+              ],
+              "agent_id": "reliability-agent",
+              "serial": false,
+              "metadata": {}
+            }
+          }
+        },
+        "graph_shapes": [
           {
-            "agent": "code-quality",
+            "node_id": "spec0",
+            "task_type": "review.reliability",
+            "dependencies": [],
             "status": "completed",
-            "attempts": 1,
-            "substituted_for": "",
-            "loop_steps": 0,
-            "loop_stop_reason": "one-shot",
-            "context_compressed": false,
-            "memories_recalled": 0
+            "artifact_ids": [
+              "e43369c548e54f6cb687b9cf8775eebf"
+            ],
+            "metadata": {}
           }
         ],
-        "agent_loop_steps": 0,
-        "context_compressions": 0,
-        "memories_recalled": 0,
-        "proposed_findings": 0,
-        "approved_findings": 0,
-        "rejected_findings": 0,
-        "finding_sources": {}
+        "runtime_events": [
+          {
+            "kind": "FINDINGS_EMITTED",
+            "node_id": "spec0",
+            "artifact_id": "e43369c548e54f6cb687b9cf8775eebf",
+            "detail": {
+              "count": 0,
+              "recheck": false,
+              "changed_artifact_ids": []
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "spec0",
+            "artifact_id": "e43369c548e54f6cb687b9cf8775eebf",
+            "detail": {
+              "agent_id": "reliability-agent",
+              "task_type": "review.reliability"
+            }
+          }
+        ],
+        "runtime_artifacts": [
+          {
+            "artifact_id": "e43369c548e54f6cb687b9cf8775eebf",
+            "producer_node": "spec0",
+            "agent_id": "reliability-agent",
+            "task_type": "review.reliability",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [],
+            "content": {
+              "task_type": "review.reliability",
+              "agent_id": "reliability-agent",
+              "count": 0,
+              "findings": [],
+              "confidence": 0.0,
+              "_a2a_metadata": [
+                {
+                  "task_type": "review.reliability",
+                  "stop_reason": "final",
+                  "steps": 2,
+                  "plan_versions": 0,
+                  "decision_count": 2,
+                  "correlation_id": "e37a2ed46f104a0c9ba43f19aadfe254"
+                }
+              ]
+            },
+            "finding_versions": {}
+          }
+        ],
+        "superseded_artifacts": [],
+        "feature_flags_snapshot": {
+          "planner": true,
+          "targeted_replan": true,
+          "critic": true,
+          "verifier": true,
+          "parallel_scheduler": true,
+          "deep_loop": true
+        },
+        "parallel_batches": [
+          {
+            "batch_id": "batch-1",
+            "parallel_width": 1,
+            "started_at": 48762.8340742,
+            "finished_at": 48762.8347108,
+            "agent_ids": [
+              "reliability-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 0.6366,
+            "branch_duration_ms": [
+              0.6362
+            ],
+            "speedup_ratio": 1.0
+          }
+        ],
+        "loop_steps_by_agent": {
+          "reliability-agent": 2
+        },
+        "tool_calls_by_agent": {
+          "reliability-agent": 2
+        },
+        "called_agents": [
+          "reliability-agent"
+        ],
+        "replan_targets": [],
+        "verification_version": 0,
+        "finding_versions": {},
+        "fix_stale_inputs": 0,
+        "skill_invocations": {}
       },
+      "architecture": "six-agent-v2",
+      "called_agents": [
+        "reliability-agent"
+      ],
+      "graph_revision": 1,
+      "graph_shapes": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "e43369c548e54f6cb687b9cf8775eebf"
+          ],
+          "metadata": {}
+        }
+      ],
+      "loop_steps_by_agent": {
+        "reliability-agent": 2
+      },
+      "parallel_batches": [
+        {
+          "batch_id": "batch-1",
+          "parallel_width": 1,
+          "started_at": 48762.8340742,
+          "finished_at": 48762.8347108,
+          "agent_ids": [
+            "reliability-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 0.6366,
+          "branch_duration_ms": [
+            0.6362
+          ],
+          "speedup_ratio": 1.0
+        }
+      ],
+      "replan_count": 0,
+      "replan_targets": [],
+      "feature_flags": {
+        "planner": true,
+        "targeted_replan": true,
+        "critic": true,
+        "verifier": true,
+        "parallel_scheduler": true,
+        "deep_loop": true
+      },
+      "skill_invocations": {},
+      "expected_findings": [
+        {
+          "cwe": "CWE-377",
+          "end_line": 3,
+          "path": "src/change_30.py",
+          "rule_id": "SEC-INSECURE-TEMPFILE",
+          "severity": "medium",
+          "start_line": 3
+        }
+      ],
+      "prediction_details": [],
+      "unmatched_expected_indices": [
+        0
+      ],
+      "unmatched_predicted_indices": [],
       "matches": []
     },
     {
@@ -1261,14 +4105,20 @@
       "severity_hits": 0,
       "high_total": 0,
       "high_hits": 0,
+      "high_risk_total": 0,
+      "high_risk_hits": 0,
+      "high_risk_misses": 0,
+      "critical_total": 0,
+      "critical_hits": 0,
+      "critical_misses": 0,
       "clean_hit": false,
       "execution_success": true,
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 160.54369999619666,
-      "agent_steps": 0,
-      "tool_calls": 0,
+      "latency_ms": 47.26430000300752,
+      "agent_steps": 2,
+      "tool_calls": 2,
       "recovery_attempts": 0,
       "recovery_successes": 0,
       "policy_denials": 0,
@@ -1277,7 +4127,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 18,
+      "trace_event_count": 24,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -1298,41 +4148,213 @@
       },
       "error": null,
       "collaboration": {
-        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
-        "roles": [
-          "planner-agent",
-          "specialists",
-          "critic-agent",
-          "reflection-agent",
-          "evidence-agent",
-          "verifier-agent",
-          "arbiter-agent"
+        "task_type": "review.coordinate",
+        "agent_id": "coordinator",
+        "accepted_findings": [],
+        "rejected_findings": [],
+        "count": 0,
+        "rejected_count": 0,
+        "graph_revision": 1,
+        "replan_count": 0,
+        "delegated_tasks": 1,
+        "architecture": "six-agent-v2",
+        "rationale_codes": [
+          "CLEAN_BASELINE"
         ],
-        "planned_assignments": 1,
-        "dialogue_rounds": 0,
-        "messages": 5,
-        "retries": 0,
-        "handoffs": 0,
-        "agents": [
+        "collaborations": [
+          "reliability-agent"
+        ],
+        "graph_mutations": [],
+        "task_graph": {
+          "graph_id": "634039d722554430a2b8145071c6488a",
+          "revision": 1,
+          "mutation_history": [],
+          "nodes": {
+            "spec0": {
+              "node_id": "spec0",
+              "task_type": "review.reliability",
+              "objective": "review changed lines for reliability",
+              "target_capabilities": [],
+              "dependencies": [],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "04bc70b79636474d9debf0f499ac7f9f"
+              ],
+              "agent_id": "reliability-agent",
+              "serial": false,
+              "metadata": {}
+            }
+          }
+        },
+        "graph_shapes": [
           {
-            "agent": "code-quality",
+            "node_id": "spec0",
+            "task_type": "review.reliability",
+            "dependencies": [],
             "status": "completed",
-            "attempts": 1,
-            "substituted_for": "",
-            "loop_steps": 0,
-            "loop_stop_reason": "one-shot",
-            "context_compressed": false,
-            "memories_recalled": 0
+            "artifact_ids": [
+              "04bc70b79636474d9debf0f499ac7f9f"
+            ],
+            "metadata": {}
           }
         ],
-        "agent_loop_steps": 0,
-        "context_compressions": 0,
-        "memories_recalled": 0,
-        "proposed_findings": 0,
-        "approved_findings": 0,
-        "rejected_findings": 0,
-        "finding_sources": {}
+        "runtime_events": [
+          {
+            "kind": "FINDINGS_EMITTED",
+            "node_id": "spec0",
+            "artifact_id": "04bc70b79636474d9debf0f499ac7f9f",
+            "detail": {
+              "count": 0,
+              "recheck": false,
+              "changed_artifact_ids": []
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "spec0",
+            "artifact_id": "04bc70b79636474d9debf0f499ac7f9f",
+            "detail": {
+              "agent_id": "reliability-agent",
+              "task_type": "review.reliability"
+            }
+          }
+        ],
+        "runtime_artifacts": [
+          {
+            "artifact_id": "04bc70b79636474d9debf0f499ac7f9f",
+            "producer_node": "spec0",
+            "agent_id": "reliability-agent",
+            "task_type": "review.reliability",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [],
+            "content": {
+              "task_type": "review.reliability",
+              "agent_id": "reliability-agent",
+              "count": 0,
+              "findings": [],
+              "confidence": 0.0,
+              "_a2a_metadata": [
+                {
+                  "task_type": "review.reliability",
+                  "stop_reason": "final",
+                  "steps": 2,
+                  "plan_versions": 0,
+                  "decision_count": 2,
+                  "correlation_id": "06641afeb91b46d68c7db12b9110929a"
+                }
+              ]
+            },
+            "finding_versions": {}
+          }
+        ],
+        "superseded_artifacts": [],
+        "feature_flags_snapshot": {
+          "planner": true,
+          "targeted_replan": true,
+          "critic": true,
+          "verifier": true,
+          "parallel_scheduler": true,
+          "deep_loop": true
+        },
+        "parallel_batches": [
+          {
+            "batch_id": "batch-1",
+            "parallel_width": 1,
+            "started_at": 48762.8898151,
+            "finished_at": 48762.8905766,
+            "agent_ids": [
+              "reliability-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 0.7615,
+            "branch_duration_ms": [
+              0.7608
+            ],
+            "speedup_ratio": 1.0
+          }
+        ],
+        "loop_steps_by_agent": {
+          "reliability-agent": 2
+        },
+        "tool_calls_by_agent": {
+          "reliability-agent": 2
+        },
+        "called_agents": [
+          "reliability-agent"
+        ],
+        "replan_targets": [],
+        "verification_version": 0,
+        "finding_versions": {},
+        "fix_stale_inputs": 0,
+        "skill_invocations": {}
       },
+      "architecture": "six-agent-v2",
+      "called_agents": [
+        "reliability-agent"
+      ],
+      "graph_revision": 1,
+      "graph_shapes": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "04bc70b79636474d9debf0f499ac7f9f"
+          ],
+          "metadata": {}
+        }
+      ],
+      "loop_steps_by_agent": {
+        "reliability-agent": 2
+      },
+      "parallel_batches": [
+        {
+          "batch_id": "batch-1",
+          "parallel_width": 1,
+          "started_at": 48762.8898151,
+          "finished_at": 48762.8905766,
+          "agent_ids": [
+            "reliability-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 0.7615,
+          "branch_duration_ms": [
+            0.7608
+          ],
+          "speedup_ratio": 1.0
+        }
+      ],
+      "replan_count": 0,
+      "replan_targets": [],
+      "feature_flags": {
+        "planner": true,
+        "targeted_replan": true,
+        "critic": true,
+        "verifier": true,
+        "parallel_scheduler": true,
+        "deep_loop": true
+      },
+      "skill_invocations": {},
+      "expected_findings": [
+        {
+          "cwe": "CWE-117",
+          "end_line": 3,
+          "path": "src/change_40.py",
+          "rule_id": "SEC-LOG-FORGING",
+          "severity": "low",
+          "start_line": 3
+        }
+      ],
+      "prediction_details": [],
+      "unmatched_expected_indices": [
+        0
+      ],
+      "unmatched_predicted_indices": [],
       "matches": []
     },
     {
@@ -1348,14 +4370,20 @@
       "severity_hits": 0,
       "high_total": 0,
       "high_hits": 0,
+      "high_risk_total": 0,
+      "high_risk_hits": 0,
+      "high_risk_misses": 0,
+      "critical_total": 0,
+      "critical_hits": 0,
+      "critical_misses": 0,
       "clean_hit": true,
       "execution_success": true,
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 159.85150000051362,
-      "agent_steps": 0,
-      "tool_calls": 0,
+      "latency_ms": 44.947999995201826,
+      "agent_steps": 2,
+      "tool_calls": 2,
       "recovery_attempts": 0,
       "recovery_successes": 0,
       "policy_denials": 0,
@@ -1364,7 +4392,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 18,
+      "trace_event_count": 24,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -1385,41 +4413,202 @@
       },
       "error": null,
       "collaboration": {
-        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
-        "roles": [
-          "planner-agent",
-          "specialists",
-          "critic-agent",
-          "reflection-agent",
-          "evidence-agent",
-          "verifier-agent",
-          "arbiter-agent"
+        "task_type": "review.coordinate",
+        "agent_id": "coordinator",
+        "accepted_findings": [],
+        "rejected_findings": [],
+        "count": 0,
+        "rejected_count": 0,
+        "graph_revision": 1,
+        "replan_count": 0,
+        "delegated_tasks": 1,
+        "architecture": "six-agent-v2",
+        "rationale_codes": [
+          "CLEAN_BASELINE"
         ],
-        "planned_assignments": 1,
-        "dialogue_rounds": 0,
-        "messages": 5,
-        "retries": 0,
-        "handoffs": 0,
-        "agents": [
+        "collaborations": [
+          "reliability-agent"
+        ],
+        "graph_mutations": [],
+        "task_graph": {
+          "graph_id": "9338a2b72ee849f2a7f234924a068287",
+          "revision": 1,
+          "mutation_history": [],
+          "nodes": {
+            "spec0": {
+              "node_id": "spec0",
+              "task_type": "review.reliability",
+              "objective": "review changed lines for reliability",
+              "target_capabilities": [],
+              "dependencies": [],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "345a7f786dce441c900696cd690d97d3"
+              ],
+              "agent_id": "reliability-agent",
+              "serial": false,
+              "metadata": {}
+            }
+          }
+        },
+        "graph_shapes": [
           {
-            "agent": "code-quality",
+            "node_id": "spec0",
+            "task_type": "review.reliability",
+            "dependencies": [],
             "status": "completed",
-            "attempts": 1,
-            "substituted_for": "",
-            "loop_steps": 0,
-            "loop_stop_reason": "one-shot",
-            "context_compressed": false,
-            "memories_recalled": 0
+            "artifact_ids": [
+              "345a7f786dce441c900696cd690d97d3"
+            ],
+            "metadata": {}
           }
         ],
-        "agent_loop_steps": 0,
-        "context_compressions": 0,
-        "memories_recalled": 0,
-        "proposed_findings": 0,
-        "approved_findings": 0,
-        "rejected_findings": 0,
-        "finding_sources": {}
+        "runtime_events": [
+          {
+            "kind": "FINDINGS_EMITTED",
+            "node_id": "spec0",
+            "artifact_id": "345a7f786dce441c900696cd690d97d3",
+            "detail": {
+              "count": 0,
+              "recheck": false,
+              "changed_artifact_ids": []
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "spec0",
+            "artifact_id": "345a7f786dce441c900696cd690d97d3",
+            "detail": {
+              "agent_id": "reliability-agent",
+              "task_type": "review.reliability"
+            }
+          }
+        ],
+        "runtime_artifacts": [
+          {
+            "artifact_id": "345a7f786dce441c900696cd690d97d3",
+            "producer_node": "spec0",
+            "agent_id": "reliability-agent",
+            "task_type": "review.reliability",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [],
+            "content": {
+              "task_type": "review.reliability",
+              "agent_id": "reliability-agent",
+              "count": 0,
+              "findings": [],
+              "confidence": 0.0,
+              "_a2a_metadata": [
+                {
+                  "task_type": "review.reliability",
+                  "stop_reason": "final",
+                  "steps": 2,
+                  "plan_versions": 0,
+                  "decision_count": 2,
+                  "correlation_id": "72841e171b964adc9750ae16bd7f2189"
+                }
+              ]
+            },
+            "finding_versions": {}
+          }
+        ],
+        "superseded_artifacts": [],
+        "feature_flags_snapshot": {
+          "planner": true,
+          "targeted_replan": true,
+          "critic": true,
+          "verifier": true,
+          "parallel_scheduler": true,
+          "deep_loop": true
+        },
+        "parallel_batches": [
+          {
+            "batch_id": "batch-1",
+            "parallel_width": 1,
+            "started_at": 48762.945298,
+            "finished_at": 48762.9458795,
+            "agent_ids": [
+              "reliability-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 0.5815,
+            "branch_duration_ms": [
+              0.581
+            ],
+            "speedup_ratio": 1.0
+          }
+        ],
+        "loop_steps_by_agent": {
+          "reliability-agent": 2
+        },
+        "tool_calls_by_agent": {
+          "reliability-agent": 2
+        },
+        "called_agents": [
+          "reliability-agent"
+        ],
+        "replan_targets": [],
+        "verification_version": 0,
+        "finding_versions": {},
+        "fix_stale_inputs": 0,
+        "skill_invocations": {}
       },
+      "architecture": "six-agent-v2",
+      "called_agents": [
+        "reliability-agent"
+      ],
+      "graph_revision": 1,
+      "graph_shapes": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "345a7f786dce441c900696cd690d97d3"
+          ],
+          "metadata": {}
+        }
+      ],
+      "loop_steps_by_agent": {
+        "reliability-agent": 2
+      },
+      "parallel_batches": [
+        {
+          "batch_id": "batch-1",
+          "parallel_width": 1,
+          "started_at": 48762.945298,
+          "finished_at": 48762.9458795,
+          "agent_ids": [
+            "reliability-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 0.5815,
+          "branch_duration_ms": [
+            0.581
+          ],
+          "speedup_ratio": 1.0
+        }
+      ],
+      "replan_count": 0,
+      "replan_targets": [],
+      "feature_flags": {
+        "planner": true,
+        "targeted_replan": true,
+        "critic": true,
+        "verifier": true,
+        "parallel_scheduler": true,
+        "deep_loop": true
+      },
+      "skill_invocations": {},
+      "expected_findings": [],
+      "prediction_details": [],
+      "unmatched_expected_indices": [],
+      "unmatched_predicted_indices": [],
       "matches": []
     },
     {
@@ -1435,14 +4624,20 @@
       "severity_hits": 0,
       "high_total": 0,
       "high_hits": 0,
+      "high_risk_total": 0,
+      "high_risk_hits": 0,
+      "high_risk_misses": 0,
+      "critical_total": 0,
+      "critical_hits": 0,
+      "critical_misses": 0,
       "clean_hit": true,
       "execution_success": true,
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 161.1639999973704,
-      "agent_steps": 0,
-      "tool_calls": 0,
+      "latency_ms": 48.071799996250775,
+      "agent_steps": 2,
+      "tool_calls": 2,
       "recovery_attempts": 0,
       "recovery_successes": 0,
       "policy_denials": 0,
@@ -1451,7 +4646,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 18,
+      "trace_event_count": 24,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -1472,41 +4667,202 @@
       },
       "error": null,
       "collaboration": {
-        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
-        "roles": [
-          "planner-agent",
-          "specialists",
-          "critic-agent",
-          "reflection-agent",
-          "evidence-agent",
-          "verifier-agent",
-          "arbiter-agent"
+        "task_type": "review.coordinate",
+        "agent_id": "coordinator",
+        "accepted_findings": [],
+        "rejected_findings": [],
+        "count": 0,
+        "rejected_count": 0,
+        "graph_revision": 1,
+        "replan_count": 0,
+        "delegated_tasks": 1,
+        "architecture": "six-agent-v2",
+        "rationale_codes": [
+          "CLEAN_BASELINE"
         ],
-        "planned_assignments": 1,
-        "dialogue_rounds": 0,
-        "messages": 5,
-        "retries": 0,
-        "handoffs": 0,
-        "agents": [
+        "collaborations": [
+          "reliability-agent"
+        ],
+        "graph_mutations": [],
+        "task_graph": {
+          "graph_id": "4021651d42e946da811636e6f68055b0",
+          "revision": 1,
+          "mutation_history": [],
+          "nodes": {
+            "spec0": {
+              "node_id": "spec0",
+              "task_type": "review.reliability",
+              "objective": "review changed lines for reliability",
+              "target_capabilities": [],
+              "dependencies": [],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "b6485180efd04ca0820af829023def78"
+              ],
+              "agent_id": "reliability-agent",
+              "serial": false,
+              "metadata": {}
+            }
+          }
+        },
+        "graph_shapes": [
           {
-            "agent": "code-quality",
+            "node_id": "spec0",
+            "task_type": "review.reliability",
+            "dependencies": [],
             "status": "completed",
-            "attempts": 1,
-            "substituted_for": "",
-            "loop_steps": 0,
-            "loop_stop_reason": "one-shot",
-            "context_compressed": false,
-            "memories_recalled": 0
+            "artifact_ids": [
+              "b6485180efd04ca0820af829023def78"
+            ],
+            "metadata": {}
           }
         ],
-        "agent_loop_steps": 0,
-        "context_compressions": 0,
-        "memories_recalled": 0,
-        "proposed_findings": 0,
-        "approved_findings": 0,
-        "rejected_findings": 0,
-        "finding_sources": {}
+        "runtime_events": [
+          {
+            "kind": "FINDINGS_EMITTED",
+            "node_id": "spec0",
+            "artifact_id": "b6485180efd04ca0820af829023def78",
+            "detail": {
+              "count": 0,
+              "recheck": false,
+              "changed_artifact_ids": []
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "spec0",
+            "artifact_id": "b6485180efd04ca0820af829023def78",
+            "detail": {
+              "agent_id": "reliability-agent",
+              "task_type": "review.reliability"
+            }
+          }
+        ],
+        "runtime_artifacts": [
+          {
+            "artifact_id": "b6485180efd04ca0820af829023def78",
+            "producer_node": "spec0",
+            "agent_id": "reliability-agent",
+            "task_type": "review.reliability",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [],
+            "content": {
+              "task_type": "review.reliability",
+              "agent_id": "reliability-agent",
+              "count": 0,
+              "findings": [],
+              "confidence": 0.0,
+              "_a2a_metadata": [
+                {
+                  "task_type": "review.reliability",
+                  "stop_reason": "final",
+                  "steps": 2,
+                  "plan_versions": 0,
+                  "decision_count": 2,
+                  "correlation_id": "024b4df1c6474389b0ef617bd78ebfea"
+                }
+              ]
+            },
+            "finding_versions": {}
+          }
+        ],
+        "superseded_artifacts": [],
+        "feature_flags_snapshot": {
+          "planner": true,
+          "targeted_replan": true,
+          "critic": true,
+          "verifier": true,
+          "parallel_scheduler": true,
+          "deep_loop": true
+        },
+        "parallel_batches": [
+          {
+            "batch_id": "batch-1",
+            "parallel_width": 1,
+            "started_at": 48763.0015892,
+            "finished_at": 48763.0021894,
+            "agent_ids": [
+              "reliability-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 0.6002,
+            "branch_duration_ms": [
+              0.5998
+            ],
+            "speedup_ratio": 1.0
+          }
+        ],
+        "loop_steps_by_agent": {
+          "reliability-agent": 2
+        },
+        "tool_calls_by_agent": {
+          "reliability-agent": 2
+        },
+        "called_agents": [
+          "reliability-agent"
+        ],
+        "replan_targets": [],
+        "verification_version": 0,
+        "finding_versions": {},
+        "fix_stale_inputs": 0,
+        "skill_invocations": {}
       },
+      "architecture": "six-agent-v2",
+      "called_agents": [
+        "reliability-agent"
+      ],
+      "graph_revision": 1,
+      "graph_shapes": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "b6485180efd04ca0820af829023def78"
+          ],
+          "metadata": {}
+        }
+      ],
+      "loop_steps_by_agent": {
+        "reliability-agent": 2
+      },
+      "parallel_batches": [
+        {
+          "batch_id": "batch-1",
+          "parallel_width": 1,
+          "started_at": 48763.0015892,
+          "finished_at": 48763.0021894,
+          "agent_ids": [
+            "reliability-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 0.6002,
+          "branch_duration_ms": [
+            0.5998
+          ],
+          "speedup_ratio": 1.0
+        }
+      ],
+      "replan_count": 0,
+      "replan_targets": [],
+      "feature_flags": {
+        "planner": true,
+        "targeted_replan": true,
+        "critic": true,
+        "verifier": true,
+        "parallel_scheduler": true,
+        "deep_loop": true
+      },
+      "skill_invocations": {},
+      "expected_findings": [],
+      "prediction_details": [],
+      "unmatched_expected_indices": [],
+      "unmatched_predicted_indices": [],
       "matches": []
     },
     {
@@ -1522,14 +4878,20 @@
       "severity_hits": 0,
       "high_total": 0,
       "high_hits": 0,
+      "high_risk_total": 0,
+      "high_risk_hits": 0,
+      "high_risk_misses": 0,
+      "critical_total": 0,
+      "critical_hits": 0,
+      "critical_misses": 0,
       "clean_hit": true,
       "execution_success": true,
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 164.0486999967834,
-      "agent_steps": 0,
-      "tool_calls": 0,
+      "latency_ms": 46.34449999866774,
+      "agent_steps": 2,
+      "tool_calls": 2,
       "recovery_attempts": 0,
       "recovery_successes": 0,
       "policy_denials": 0,
@@ -1538,7 +4900,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 18,
+      "trace_event_count": 24,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -1559,41 +4921,202 @@
       },
       "error": null,
       "collaboration": {
-        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
-        "roles": [
-          "planner-agent",
-          "specialists",
-          "critic-agent",
-          "reflection-agent",
-          "evidence-agent",
-          "verifier-agent",
-          "arbiter-agent"
+        "task_type": "review.coordinate",
+        "agent_id": "coordinator",
+        "accepted_findings": [],
+        "rejected_findings": [],
+        "count": 0,
+        "rejected_count": 0,
+        "graph_revision": 1,
+        "replan_count": 0,
+        "delegated_tasks": 1,
+        "architecture": "six-agent-v2",
+        "rationale_codes": [
+          "CLEAN_BASELINE"
         ],
-        "planned_assignments": 1,
-        "dialogue_rounds": 0,
-        "messages": 5,
-        "retries": 0,
-        "handoffs": 0,
-        "agents": [
+        "collaborations": [
+          "reliability-agent"
+        ],
+        "graph_mutations": [],
+        "task_graph": {
+          "graph_id": "c0153ef3707342bbbf3f84334b18e82a",
+          "revision": 1,
+          "mutation_history": [],
+          "nodes": {
+            "spec0": {
+              "node_id": "spec0",
+              "task_type": "review.reliability",
+              "objective": "review changed lines for reliability",
+              "target_capabilities": [],
+              "dependencies": [],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "4636ca8ee0f54284830dacecfbfb41c0"
+              ],
+              "agent_id": "reliability-agent",
+              "serial": false,
+              "metadata": {}
+            }
+          }
+        },
+        "graph_shapes": [
           {
-            "agent": "code-quality",
+            "node_id": "spec0",
+            "task_type": "review.reliability",
+            "dependencies": [],
             "status": "completed",
-            "attempts": 1,
-            "substituted_for": "",
-            "loop_steps": 0,
-            "loop_stop_reason": "one-shot",
-            "context_compressed": false,
-            "memories_recalled": 0
+            "artifact_ids": [
+              "4636ca8ee0f54284830dacecfbfb41c0"
+            ],
+            "metadata": {}
           }
         ],
-        "agent_loop_steps": 0,
-        "context_compressions": 0,
-        "memories_recalled": 0,
-        "proposed_findings": 0,
-        "approved_findings": 0,
-        "rejected_findings": 0,
-        "finding_sources": {}
+        "runtime_events": [
+          {
+            "kind": "FINDINGS_EMITTED",
+            "node_id": "spec0",
+            "artifact_id": "4636ca8ee0f54284830dacecfbfb41c0",
+            "detail": {
+              "count": 0,
+              "recheck": false,
+              "changed_artifact_ids": []
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "spec0",
+            "artifact_id": "4636ca8ee0f54284830dacecfbfb41c0",
+            "detail": {
+              "agent_id": "reliability-agent",
+              "task_type": "review.reliability"
+            }
+          }
+        ],
+        "runtime_artifacts": [
+          {
+            "artifact_id": "4636ca8ee0f54284830dacecfbfb41c0",
+            "producer_node": "spec0",
+            "agent_id": "reliability-agent",
+            "task_type": "review.reliability",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [],
+            "content": {
+              "task_type": "review.reliability",
+              "agent_id": "reliability-agent",
+              "count": 0,
+              "findings": [],
+              "confidence": 0.0,
+              "_a2a_metadata": [
+                {
+                  "task_type": "review.reliability",
+                  "stop_reason": "final",
+                  "steps": 2,
+                  "plan_versions": 0,
+                  "decision_count": 2,
+                  "correlation_id": "afb601c9ccf34d90a0da7b1cb9d1881d"
+                }
+              ]
+            },
+            "finding_versions": {}
+          }
+        ],
+        "superseded_artifacts": [],
+        "feature_flags_snapshot": {
+          "planner": true,
+          "targeted_replan": true,
+          "critic": true,
+          "verifier": true,
+          "parallel_scheduler": true,
+          "deep_loop": true
+        },
+        "parallel_batches": [
+          {
+            "batch_id": "batch-1",
+            "parallel_width": 1,
+            "started_at": 48763.0564016,
+            "finished_at": 48763.0570454,
+            "agent_ids": [
+              "reliability-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 0.6438,
+            "branch_duration_ms": [
+              0.6432
+            ],
+            "speedup_ratio": 1.0
+          }
+        ],
+        "loop_steps_by_agent": {
+          "reliability-agent": 2
+        },
+        "tool_calls_by_agent": {
+          "reliability-agent": 2
+        },
+        "called_agents": [
+          "reliability-agent"
+        ],
+        "replan_targets": [],
+        "verification_version": 0,
+        "finding_versions": {},
+        "fix_stale_inputs": 0,
+        "skill_invocations": {}
       },
+      "architecture": "six-agent-v2",
+      "called_agents": [
+        "reliability-agent"
+      ],
+      "graph_revision": 1,
+      "graph_shapes": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "4636ca8ee0f54284830dacecfbfb41c0"
+          ],
+          "metadata": {}
+        }
+      ],
+      "loop_steps_by_agent": {
+        "reliability-agent": 2
+      },
+      "parallel_batches": [
+        {
+          "batch_id": "batch-1",
+          "parallel_width": 1,
+          "started_at": 48763.0564016,
+          "finished_at": 48763.0570454,
+          "agent_ids": [
+            "reliability-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 0.6438,
+          "branch_duration_ms": [
+            0.6432
+          ],
+          "speedup_ratio": 1.0
+        }
+      ],
+      "replan_count": 0,
+      "replan_targets": [],
+      "feature_flags": {
+        "planner": true,
+        "targeted_replan": true,
+        "critic": true,
+        "verifier": true,
+        "parallel_scheduler": true,
+        "deep_loop": true
+      },
+      "skill_invocations": {},
+      "expected_findings": [],
+      "prediction_details": [],
+      "unmatched_expected_indices": [],
+      "unmatched_predicted_indices": [],
       "matches": []
     },
     {
@@ -1609,14 +5132,20 @@
       "severity_hits": 0,
       "high_total": 0,
       "high_hits": 0,
+      "high_risk_total": 0,
+      "high_risk_hits": 0,
+      "high_risk_misses": 0,
+      "critical_total": 0,
+      "critical_hits": 0,
+      "critical_misses": 0,
       "clean_hit": true,
       "execution_success": true,
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 162.06409999722382,
-      "agent_steps": 0,
-      "tool_calls": 0,
+      "latency_ms": 45.55449999315897,
+      "agent_steps": 2,
+      "tool_calls": 2,
       "recovery_attempts": 0,
       "recovery_successes": 0,
       "policy_denials": 0,
@@ -1625,7 +5154,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 18,
+      "trace_event_count": 24,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -1646,41 +5175,202 @@
       },
       "error": null,
       "collaboration": {
-        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
-        "roles": [
-          "planner-agent",
-          "specialists",
-          "critic-agent",
-          "reflection-agent",
-          "evidence-agent",
-          "verifier-agent",
-          "arbiter-agent"
+        "task_type": "review.coordinate",
+        "agent_id": "coordinator",
+        "accepted_findings": [],
+        "rejected_findings": [],
+        "count": 0,
+        "rejected_count": 0,
+        "graph_revision": 1,
+        "replan_count": 0,
+        "delegated_tasks": 1,
+        "architecture": "six-agent-v2",
+        "rationale_codes": [
+          "CLEAN_BASELINE"
         ],
-        "planned_assignments": 1,
-        "dialogue_rounds": 0,
-        "messages": 5,
-        "retries": 0,
-        "handoffs": 0,
-        "agents": [
+        "collaborations": [
+          "reliability-agent"
+        ],
+        "graph_mutations": [],
+        "task_graph": {
+          "graph_id": "b301efe8be7c4248a20fa54981069b09",
+          "revision": 1,
+          "mutation_history": [],
+          "nodes": {
+            "spec0": {
+              "node_id": "spec0",
+              "task_type": "review.reliability",
+              "objective": "review changed lines for reliability",
+              "target_capabilities": [],
+              "dependencies": [],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "9ef3af7a3ce04a098156a95eb61858d1"
+              ],
+              "agent_id": "reliability-agent",
+              "serial": false,
+              "metadata": {}
+            }
+          }
+        },
+        "graph_shapes": [
           {
-            "agent": "code-quality",
+            "node_id": "spec0",
+            "task_type": "review.reliability",
+            "dependencies": [],
             "status": "completed",
-            "attempts": 1,
-            "substituted_for": "",
-            "loop_steps": 0,
-            "loop_stop_reason": "one-shot",
-            "context_compressed": false,
-            "memories_recalled": 0
+            "artifact_ids": [
+              "9ef3af7a3ce04a098156a95eb61858d1"
+            ],
+            "metadata": {}
           }
         ],
-        "agent_loop_steps": 0,
-        "context_compressions": 0,
-        "memories_recalled": 0,
-        "proposed_findings": 0,
-        "approved_findings": 0,
-        "rejected_findings": 0,
-        "finding_sources": {}
+        "runtime_events": [
+          {
+            "kind": "FINDINGS_EMITTED",
+            "node_id": "spec0",
+            "artifact_id": "9ef3af7a3ce04a098156a95eb61858d1",
+            "detail": {
+              "count": 0,
+              "recheck": false,
+              "changed_artifact_ids": []
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "spec0",
+            "artifact_id": "9ef3af7a3ce04a098156a95eb61858d1",
+            "detail": {
+              "agent_id": "reliability-agent",
+              "task_type": "review.reliability"
+            }
+          }
+        ],
+        "runtime_artifacts": [
+          {
+            "artifact_id": "9ef3af7a3ce04a098156a95eb61858d1",
+            "producer_node": "spec0",
+            "agent_id": "reliability-agent",
+            "task_type": "review.reliability",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [],
+            "content": {
+              "task_type": "review.reliability",
+              "agent_id": "reliability-agent",
+              "count": 0,
+              "findings": [],
+              "confidence": 0.0,
+              "_a2a_metadata": [
+                {
+                  "task_type": "review.reliability",
+                  "stop_reason": "final",
+                  "steps": 2,
+                  "plan_versions": 0,
+                  "decision_count": 2,
+                  "correlation_id": "da6a447aa8604b54befc793da6a55ec3"
+                }
+              ]
+            },
+            "finding_versions": {}
+          }
+        ],
+        "superseded_artifacts": [],
+        "feature_flags_snapshot": {
+          "planner": true,
+          "targeted_replan": true,
+          "critic": true,
+          "verifier": true,
+          "parallel_scheduler": true,
+          "deep_loop": true
+        },
+        "parallel_batches": [
+          {
+            "batch_id": "batch-1",
+            "parallel_width": 1,
+            "started_at": 48763.111879,
+            "finished_at": 48763.1124567,
+            "agent_ids": [
+              "reliability-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 0.5777,
+            "branch_duration_ms": [
+              0.5772
+            ],
+            "speedup_ratio": 1.0
+          }
+        ],
+        "loop_steps_by_agent": {
+          "reliability-agent": 2
+        },
+        "tool_calls_by_agent": {
+          "reliability-agent": 2
+        },
+        "called_agents": [
+          "reliability-agent"
+        ],
+        "replan_targets": [],
+        "verification_version": 0,
+        "finding_versions": {},
+        "fix_stale_inputs": 0,
+        "skill_invocations": {}
       },
+      "architecture": "six-agent-v2",
+      "called_agents": [
+        "reliability-agent"
+      ],
+      "graph_revision": 1,
+      "graph_shapes": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "9ef3af7a3ce04a098156a95eb61858d1"
+          ],
+          "metadata": {}
+        }
+      ],
+      "loop_steps_by_agent": {
+        "reliability-agent": 2
+      },
+      "parallel_batches": [
+        {
+          "batch_id": "batch-1",
+          "parallel_width": 1,
+          "started_at": 48763.111879,
+          "finished_at": 48763.1124567,
+          "agent_ids": [
+            "reliability-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 0.5777,
+          "branch_duration_ms": [
+            0.5772
+          ],
+          "speedup_ratio": 1.0
+        }
+      ],
+      "replan_count": 0,
+      "replan_targets": [],
+      "feature_flags": {
+        "planner": true,
+        "targeted_replan": true,
+        "critic": true,
+        "verifier": true,
+        "parallel_scheduler": true,
+        "deep_loop": true
+      },
+      "skill_invocations": {},
+      "expected_findings": [],
+      "prediction_details": [],
+      "unmatched_expected_indices": [],
+      "unmatched_predicted_indices": [],
       "matches": []
     },
     {
@@ -1696,14 +5386,20 @@
       "severity_hits": 0,
       "high_total": 0,
       "high_hits": 0,
+      "high_risk_total": 0,
+      "high_risk_hits": 0,
+      "high_risk_misses": 0,
+      "critical_total": 0,
+      "critical_hits": 0,
+      "critical_misses": 0,
       "clean_hit": true,
       "execution_success": true,
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 167.69030000432394,
-      "agent_steps": 0,
-      "tool_calls": 0,
+      "latency_ms": 113.34260000148788,
+      "agent_steps": 2,
+      "tool_calls": 2,
       "recovery_attempts": 0,
       "recovery_successes": 0,
       "policy_denials": 0,
@@ -1712,7 +5408,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 18,
+      "trace_event_count": 24,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -1733,41 +5429,202 @@
       },
       "error": null,
       "collaboration": {
-        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
-        "roles": [
-          "planner-agent",
-          "specialists",
-          "critic-agent",
-          "reflection-agent",
-          "evidence-agent",
-          "verifier-agent",
-          "arbiter-agent"
+        "task_type": "review.coordinate",
+        "agent_id": "coordinator",
+        "accepted_findings": [],
+        "rejected_findings": [],
+        "count": 0,
+        "rejected_count": 0,
+        "graph_revision": 1,
+        "replan_count": 0,
+        "delegated_tasks": 1,
+        "architecture": "six-agent-v2",
+        "rationale_codes": [
+          "CLEAN_BASELINE"
         ],
-        "planned_assignments": 1,
-        "dialogue_rounds": 0,
-        "messages": 5,
-        "retries": 0,
-        "handoffs": 0,
-        "agents": [
+        "collaborations": [
+          "reliability-agent"
+        ],
+        "graph_mutations": [],
+        "task_graph": {
+          "graph_id": "26c3c160b65844899ec91716d0338759",
+          "revision": 1,
+          "mutation_history": [],
+          "nodes": {
+            "spec0": {
+              "node_id": "spec0",
+              "task_type": "review.reliability",
+              "objective": "review changed lines for reliability",
+              "target_capabilities": [],
+              "dependencies": [],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "aaeb2de3e4ae4b44b275ecd7ddea6b2f"
+              ],
+              "agent_id": "reliability-agent",
+              "serial": false,
+              "metadata": {}
+            }
+          }
+        },
+        "graph_shapes": [
           {
-            "agent": "code-quality",
+            "node_id": "spec0",
+            "task_type": "review.reliability",
+            "dependencies": [],
             "status": "completed",
-            "attempts": 1,
-            "substituted_for": "",
-            "loop_steps": 0,
-            "loop_stop_reason": "one-shot",
-            "context_compressed": false,
-            "memories_recalled": 0
+            "artifact_ids": [
+              "aaeb2de3e4ae4b44b275ecd7ddea6b2f"
+            ],
+            "metadata": {}
           }
         ],
-        "agent_loop_steps": 0,
-        "context_compressions": 0,
-        "memories_recalled": 0,
-        "proposed_findings": 0,
-        "approved_findings": 0,
-        "rejected_findings": 0,
-        "finding_sources": {}
+        "runtime_events": [
+          {
+            "kind": "FINDINGS_EMITTED",
+            "node_id": "spec0",
+            "artifact_id": "aaeb2de3e4ae4b44b275ecd7ddea6b2f",
+            "detail": {
+              "count": 0,
+              "recheck": false,
+              "changed_artifact_ids": []
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "spec0",
+            "artifact_id": "aaeb2de3e4ae4b44b275ecd7ddea6b2f",
+            "detail": {
+              "agent_id": "reliability-agent",
+              "task_type": "review.reliability"
+            }
+          }
+        ],
+        "runtime_artifacts": [
+          {
+            "artifact_id": "aaeb2de3e4ae4b44b275ecd7ddea6b2f",
+            "producer_node": "spec0",
+            "agent_id": "reliability-agent",
+            "task_type": "review.reliability",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [],
+            "content": {
+              "task_type": "review.reliability",
+              "agent_id": "reliability-agent",
+              "count": 0,
+              "findings": [],
+              "confidence": 0.0,
+              "_a2a_metadata": [
+                {
+                  "task_type": "review.reliability",
+                  "stop_reason": "final",
+                  "steps": 2,
+                  "plan_versions": 0,
+                  "decision_count": 2,
+                  "correlation_id": "00e81b55709d425ca97c36fd49a622a9"
+                }
+              ]
+            },
+            "finding_versions": {}
+          }
+        ],
+        "superseded_artifacts": [],
+        "feature_flags_snapshot": {
+          "planner": true,
+          "targeted_replan": true,
+          "critic": true,
+          "verifier": true,
+          "parallel_scheduler": true,
+          "deep_loop": true
+        },
+        "parallel_batches": [
+          {
+            "batch_id": "batch-1",
+            "parallel_width": 1,
+            "started_at": 48763.2340795,
+            "finished_at": 48763.2346491,
+            "agent_ids": [
+              "reliability-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 0.5696,
+            "branch_duration_ms": [
+              0.5691
+            ],
+            "speedup_ratio": 1.0
+          }
+        ],
+        "loop_steps_by_agent": {
+          "reliability-agent": 2
+        },
+        "tool_calls_by_agent": {
+          "reliability-agent": 2
+        },
+        "called_agents": [
+          "reliability-agent"
+        ],
+        "replan_targets": [],
+        "verification_version": 0,
+        "finding_versions": {},
+        "fix_stale_inputs": 0,
+        "skill_invocations": {}
       },
+      "architecture": "six-agent-v2",
+      "called_agents": [
+        "reliability-agent"
+      ],
+      "graph_revision": 1,
+      "graph_shapes": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "aaeb2de3e4ae4b44b275ecd7ddea6b2f"
+          ],
+          "metadata": {}
+        }
+      ],
+      "loop_steps_by_agent": {
+        "reliability-agent": 2
+      },
+      "parallel_batches": [
+        {
+          "batch_id": "batch-1",
+          "parallel_width": 1,
+          "started_at": 48763.2340795,
+          "finished_at": 48763.2346491,
+          "agent_ids": [
+            "reliability-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 0.5696,
+          "branch_duration_ms": [
+            0.5691
+          ],
+          "speedup_ratio": 1.0
+        }
+      ],
+      "replan_count": 0,
+      "replan_targets": [],
+      "feature_flags": {
+        "planner": true,
+        "targeted_replan": true,
+        "critic": true,
+        "verifier": true,
+        "parallel_scheduler": true,
+        "deep_loop": true
+      },
+      "skill_invocations": {},
+      "expected_findings": [],
+      "prediction_details": [],
+      "unmatched_expected_indices": [],
+      "unmatched_predicted_indices": [],
       "matches": []
     },
     {
@@ -1783,14 +5640,20 @@
       "severity_hits": 0,
       "high_total": 0,
       "high_hits": 0,
+      "high_risk_total": 0,
+      "high_risk_hits": 0,
+      "high_risk_misses": 0,
+      "critical_total": 0,
+      "critical_hits": 0,
+      "critical_misses": 0,
       "clean_hit": true,
       "execution_success": true,
       "repair_attempted": 0,
       "repair_passed": 0,
       "e2e_success": false,
-      "latency_ms": 165.70599999977276,
-      "agent_steps": 0,
-      "tool_calls": 0,
+      "latency_ms": 47.49029999948107,
+      "agent_steps": 2,
+      "tool_calls": 2,
       "recovery_attempts": 0,
       "recovery_successes": 0,
       "policy_denials": 0,
@@ -1799,7 +5662,7 @@
       "side_effect_blocks": 0,
       "decision_trace_created": true,
       "replay_snapshot_created": true,
-      "trace_event_count": 18,
+      "trace_event_count": 24,
       "policy_id": "baseline-low",
       "policy_version": 1,
       "deployment_lane": "baseline",
@@ -1820,41 +5683,202 @@
       },
       "error": null,
       "collaboration": {
-        "protocol": "plan-challenge-revise-evidence-verify-arbitrate",
-        "roles": [
-          "planner-agent",
-          "specialists",
-          "critic-agent",
-          "reflection-agent",
-          "evidence-agent",
-          "verifier-agent",
-          "arbiter-agent"
+        "task_type": "review.coordinate",
+        "agent_id": "coordinator",
+        "accepted_findings": [],
+        "rejected_findings": [],
+        "count": 0,
+        "rejected_count": 0,
+        "graph_revision": 1,
+        "replan_count": 0,
+        "delegated_tasks": 1,
+        "architecture": "six-agent-v2",
+        "rationale_codes": [
+          "CLEAN_BASELINE"
         ],
-        "planned_assignments": 1,
-        "dialogue_rounds": 0,
-        "messages": 5,
-        "retries": 0,
-        "handoffs": 0,
-        "agents": [
+        "collaborations": [
+          "reliability-agent"
+        ],
+        "graph_mutations": [],
+        "task_graph": {
+          "graph_id": "8b912d21f0904ba9ab18613047e07d3e",
+          "revision": 1,
+          "mutation_history": [],
+          "nodes": {
+            "spec0": {
+              "node_id": "spec0",
+              "task_type": "review.reliability",
+              "objective": "review changed lines for reliability",
+              "target_capabilities": [],
+              "dependencies": [],
+              "status": "completed",
+              "attempt": 0,
+              "artifact_ids": [
+                "cf76e5354bd44f7283cb434ba5ba98a1"
+              ],
+              "agent_id": "reliability-agent",
+              "serial": false,
+              "metadata": {}
+            }
+          }
+        },
+        "graph_shapes": [
           {
-            "agent": "code-quality",
+            "node_id": "spec0",
+            "task_type": "review.reliability",
+            "dependencies": [],
             "status": "completed",
-            "attempts": 1,
-            "substituted_for": "",
-            "loop_steps": 0,
-            "loop_stop_reason": "one-shot",
-            "context_compressed": false,
-            "memories_recalled": 0
+            "artifact_ids": [
+              "cf76e5354bd44f7283cb434ba5ba98a1"
+            ],
+            "metadata": {}
           }
         ],
-        "agent_loop_steps": 0,
-        "context_compressions": 0,
-        "memories_recalled": 0,
-        "proposed_findings": 0,
-        "approved_findings": 0,
-        "rejected_findings": 0,
-        "finding_sources": {}
+        "runtime_events": [
+          {
+            "kind": "FINDINGS_EMITTED",
+            "node_id": "spec0",
+            "artifact_id": "cf76e5354bd44f7283cb434ba5ba98a1",
+            "detail": {
+              "count": 0,
+              "recheck": false,
+              "changed_artifact_ids": []
+            }
+          },
+          {
+            "kind": "AGENT_COMPLETED",
+            "node_id": "spec0",
+            "artifact_id": "cf76e5354bd44f7283cb434ba5ba98a1",
+            "detail": {
+              "agent_id": "reliability-agent",
+              "task_type": "review.reliability"
+            }
+          }
+        ],
+        "runtime_artifacts": [
+          {
+            "artifact_id": "cf76e5354bd44f7283cb434ba5ba98a1",
+            "producer_node": "spec0",
+            "agent_id": "reliability-agent",
+            "task_type": "review.reliability",
+            "status": "completed",
+            "artifact_version": 1,
+            "input_artifact_ids": [],
+            "content": {
+              "task_type": "review.reliability",
+              "agent_id": "reliability-agent",
+              "count": 0,
+              "findings": [],
+              "confidence": 0.0,
+              "_a2a_metadata": [
+                {
+                  "task_type": "review.reliability",
+                  "stop_reason": "final",
+                  "steps": 2,
+                  "plan_versions": 0,
+                  "decision_count": 2,
+                  "correlation_id": "0a8e5c6ef64e44ec81a7aa75f944585a"
+                }
+              ]
+            },
+            "finding_versions": {}
+          }
+        ],
+        "superseded_artifacts": [],
+        "feature_flags_snapshot": {
+          "planner": true,
+          "targeted_replan": true,
+          "critic": true,
+          "verifier": true,
+          "parallel_scheduler": true,
+          "deep_loop": true
+        },
+        "parallel_batches": [
+          {
+            "batch_id": "batch-1",
+            "parallel_width": 1,
+            "started_at": 48763.2909185,
+            "finished_at": 48763.2914733,
+            "agent_ids": [
+              "reliability-agent"
+            ],
+            "success_count": 1,
+            "failure_count": 0,
+            "duration_ms": 0.5548,
+            "branch_duration_ms": [
+              0.5544
+            ],
+            "speedup_ratio": 1.0
+          }
+        ],
+        "loop_steps_by_agent": {
+          "reliability-agent": 2
+        },
+        "tool_calls_by_agent": {
+          "reliability-agent": 2
+        },
+        "called_agents": [
+          "reliability-agent"
+        ],
+        "replan_targets": [],
+        "verification_version": 0,
+        "finding_versions": {},
+        "fix_stale_inputs": 0,
+        "skill_invocations": {}
       },
+      "architecture": "six-agent-v2",
+      "called_agents": [
+        "reliability-agent"
+      ],
+      "graph_revision": 1,
+      "graph_shapes": [
+        {
+          "node_id": "spec0",
+          "task_type": "review.reliability",
+          "dependencies": [],
+          "status": "completed",
+          "artifact_ids": [
+            "cf76e5354bd44f7283cb434ba5ba98a1"
+          ],
+          "metadata": {}
+        }
+      ],
+      "loop_steps_by_agent": {
+        "reliability-agent": 2
+      },
+      "parallel_batches": [
+        {
+          "batch_id": "batch-1",
+          "parallel_width": 1,
+          "started_at": 48763.2909185,
+          "finished_at": 48763.2914733,
+          "agent_ids": [
+            "reliability-agent"
+          ],
+          "success_count": 1,
+          "failure_count": 0,
+          "duration_ms": 0.5548,
+          "branch_duration_ms": [
+            0.5544
+          ],
+          "speedup_ratio": 1.0
+        }
+      ],
+      "replan_count": 0,
+      "replan_targets": [],
+      "feature_flags": {
+        "planner": true,
+        "targeted_replan": true,
+        "critic": true,
+        "verifier": true,
+        "parallel_scheduler": true,
+        "deep_loop": true
+      },
+      "skill_invocations": {},
+      "expected_findings": [],
+      "prediction_details": [],
+      "unmatched_expected_indices": [],
+      "unmatched_predicted_indices": [],
       "matches": []
     }
   ]

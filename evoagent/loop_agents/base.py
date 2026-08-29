@@ -77,7 +77,8 @@ class BaseLoopAgent:
         from .tools import registry_for_task
         try:
             return registry_for_task(
-                self.agent_id, task, allowed_tools=list(self.tool_allowlist))
+                self.agent_id, task, allowed_tools=list(self.tool_allowlist),
+                tool_context_config=getattr(self, "tool_context_config", None))
         except Exception:  # noqa: BLE001 - fall back to the bound registry
             return None
 

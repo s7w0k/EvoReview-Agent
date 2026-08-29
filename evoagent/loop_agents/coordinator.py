@@ -89,8 +89,10 @@ class CoordinatorAgent(BaseLoopAgent):
                  feature_flags: Optional[MultiAgentFeatureFlags] = None):
         super().__init__(
             max_steps or 16, timeout_seconds or 60,
-            execution_policy=(execution_policy if hasattr(
-                execution_policy, "budget") else None),
+            # The task policy governs routing and tools.  Coordinator protocol
+            # overhead (semantic summary, risk profile, delegation and final)
+            # must not consume the reviewed task's specialist step budget.
+            execution_policy=None,
             tools=tools, bus=bus,
         )
         self.delegator = delegator

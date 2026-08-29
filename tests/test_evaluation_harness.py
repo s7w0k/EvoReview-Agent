@@ -60,25 +60,37 @@ class EndToEndEvaluationTests(unittest.TestCase):
         candidate = EndToEndEvaluationHarness(repairer=FixtureRepairer()).run(
             candidate_reviewer(), cases
         )
-        self.assertEqual((25, 5, 15), (
+        self.assertEqual((25, 0, 15), (
             baseline["metrics"]["tp"],
             baseline["metrics"]["fp"],
             baseline["metrics"]["fn"],
         ))
-        self.assertEqual((33, 7, 7), (
+        self.assertEqual((33, 2, 7), (
             candidate["metrics"]["tp"],
             candidate["metrics"]["fp"],
             candidate["metrics"]["fn"],
         ))
-        self.assertEqual(0.7143, baseline["metrics"]["f1"])
-        self.assertEqual(0.825, candidate["metrics"]["f1"])
+        # FP reductions with TP/FN kept: baseline 5->0 (f1 0.7143->0.7692,
+        # clean 1.0) and candidate 7->2 (f1 0.825->0.88, clean 0.9667) come from
+        # SEC-HARDCODED-SECRET no longer reporting benign placeholder credentials
+        # and the SEC-INSECURE-COOKIE/OPEN-REDIRECT precision fixes.
+        self.assertAlmostEqual(0.7692, baseline["metrics"]["f1"], places=4)
+        self.assertEqual(0.88, candidate["metrics"]["f1"])
         self.assertEqual(0.9474, candidate["metrics"]["high_risk_recall"])
-        self.assertEqual(0.9167, candidate["metrics"]["clean_accuracy"])
+        self.assertEqual(0.9667, candidate["metrics"]["clean_accuracy"])
         self.assertEqual(1.0, candidate["metrics"]["execution_success_rate"])
         self.assertEqual(0.7879, candidate["metrics"]["safe_fix_rate"])
         self.assertEqual(0.65, candidate["metrics"]["e2e_security_fix_rate"])
         gate = comparison_summary(baseline, candidate)["release_gate"]
-        self.assertTrue(gate["quantitative_passed"])
+        # The FP fixes made the (single-agent) baseline perfectly clean (1.0), so
+        # the higher-recall candidate's 0.9667 trips clean_accuracy_non_regression
+        # even though every *improvement* door passes. Assert the meaningful doors
+        # explicitly rather than the blanket quantitative gate.
+        self.assertTrue(gate["gates"]["validation_f1_improvement"]["passed"])
+        self.assertTrue(gate["gates"]["high_risk_recall_non_regression"]["passed"])
+        self.assertTrue(gate["gates"]["execution_success"]["passed"])
+        self.assertFalse(gate["gates"]["clean_accuracy_non_regression"]["passed"])
+        self.assertFalse(gate["quantitative_passed"])
         self.assertFalse(gate["production_activation_allowed"])
         self.assertFalse(gate["passed"])
 

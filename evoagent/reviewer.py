@@ -4,7 +4,7 @@ import socket
 import urllib.error
 import urllib.request
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from .diff_parser import ParsedDiff
 from .errors import (
@@ -51,7 +51,7 @@ class LocalRuleReviewer(Reviewer):
         (
             "SEC-HARDCODED-SECRET",
             Severity.HIGH,
-            re.compile(r"(?i)\b(password|passwd|api[_-]?key|secret|token)\b\s*=\s*['\"][^'\"]{4,}['\"]"),
+            re.compile(r"(?i)\b(password|passwd|api[_-]?key|secret|token)\b\s*=\s*['\"](?![^'\"]*(?:placeholder|example|changeme|dummy|sample|redacted|your[_-]?[a-z]+|xxxx+|test[-_ ]?value))[^'\"]{4,}['\"]"),
             "疑似硬编码凭据",
             "凭据进入代码仓库后可能通过历史记录、构建日志或制品泄露。",
             "从密钥管理服务或环境变量读取，并立即轮换已经提交的凭据。",
@@ -112,6 +112,145 @@ class LocalRuleReviewer(Reviewer):
         return findings
 
 
+EXTENDED_RULES: Tuple[Tuple[str, Severity, re.Pattern, str, str, str, str], ...] = (
+        (
+            "SEC-PATH-TRAVERSAL",
+            Severity.HIGH,
+            re.compile(r"(?:os\.path\.join|pathlib\.Path\s*\(|open\s*\(|with\s+open\s*\()\s*[^)\n]*(?:request|args|getenv|argv|username|filename|user_input|user_path)"),
+            "外部输入参与文件路径拼接",
+            "将外部数据直接拼接到文件系统路径可能造成路径穿越，读取或写入受限位置之外的文件。",
+            "基于固定允许目录解析路径并经过规范化后校验是否仍在允许范围；拒绝 ../ 与绝对路径。",
+            "加入 ../ 、绝对路径与符号链接测试，断言无法逃逸允许目录。",
+        ),
+        (
+            "SEC-YAML-LOAD",
+            Severity.HIGH,
+            re.compile(r"(?:yaml\.load\s*\(|yaml\.unsafe_load\s*\(|yaml\.load_all\s*\(|load\s*\(\s*[^)]*Loader)"),
+            "不安全的 YAML 反序列化",
+            "yaml.load/unsafe_load 可构造任意 Python 对象，存在反序列化代码执行风险。",
+            "改用 yaml.safe_load；对无法避免的自定义 tag 采用受约束的 SafeLoader。",
+            "加入包含 !!python/object 的恶意 YAML 测试，断言不会被实例化为任意类。",
+        ),
+        (
+            "SEC-PICKLE-LOAD",
+            Severity.HIGH,
+            re.compile(r"pickle\.load\s*\(|pickle\.loads\s*\(|cPickle\.load\s*\(|marshal\.load"),
+            "不安全的 pickle 反序列化",
+            "pickle.load/loads 可执行任意对象构造链，来自不可信来源的数据存在代码执行风险。",
+            "不信任来源数据；使用 JSON/AVRO 等安全序列化格式，或对反序列化执行数字签名认证。",
+            "加入包含 __reduce__ 的恶意 pickle 载荷，断言不会构造任意可执行对象。",
+        ),
+        (
+            "SEC-WEAK-HASH",
+            Severity.MEDIUM,
+            re.compile(r"\b(?:md5|sha1)\s*\("),
+            "弱哈希用于安全敏感用途",
+            "MD5/SHA1 存在已知碰撞攻击，用于口令或签名校验会削弱完整性保证。",
+            "口令存储改用 bcrypt/argon2；完整性校验改用 SHA-256 或 HMAC-SHA256。",
+            "加入碰撞敏感与盐值复用测试，断言口令不会以明文或弱哈希落盘。",
+        ),
+        (
+            "SEC-WEAK-RANDOM",
+            Severity.MEDIUM,
+            re.compile(r"random\.(?:random|randint|uniform|choice)\s*\(|np\.random\.random\s*\(|np\.random\.randint"),
+            "安全 token 误用普通伪随机数",
+            "普通 random 不做密码学安全保证，用于 token/salt/nonce 可被预测。",
+            "token/salt/nonce 改用 secrets.token_* 或 os.urandom。",
+            "加入可重复序列复现测试，断言安全随机值来自密码学安全源。",
+        ),
+        (
+            "SEC-INSECURE-TEMPFILE",
+            Severity.MEDIUM,
+            re.compile(r"tempfile\.mktemp\s*\(|os\.tmpnam\s*\(|\b/tmp/\w*\.\w+"),
+            "不安全的临时文件创建",
+            "使用可预测名称创建临时文件会引入符号链接/权限竞态风险。",
+            "改用 tempfile.NamedTemporaryFile(delete=True) 或 secrets 命名并设置仅属主权限。",
+            "加入并行创建与符号链接抢占测试，断言临时文件不可被预创建接管。",
+        ),
+        (
+            "SEC-ASSERT-AUTH",
+            Severity.MEDIUM,
+            re.compile(r"assert\s+(?:user|auth|role|permission|is_admin|token|session)"),
+            "用断言执行授权检查",
+            "断言在某些环境被优化移除（python -O），用断言做授权检查会造成权限绕过。",
+            "改用显式的 if 判断并抛出安全异常，禁止依赖 assert 进行鉴权。",
+            "加入在 -O 模式下的越权访问测试，断言授权仍被强制校验。",
+        ),
+        (
+            "SEC-INSECURE-COOKIE",
+            Severity.MEDIUM,
+            re.compile(r"(?i)(?:\.set_cookie\s*\((?![^)]*secure\s*=\s*True)|Set-Cookie\s*:(?![^;\r\n]*;\s*secure)|set_cookie\s*\([^)]*secure\s*=\s*False)"),
+            "Cookie 缺少安全属性",
+            "未设置 Secure/HttpOnly/SameSite 的敏感 Cookie 可能被中间人或脚本窃取。",
+            "为会话/Cookie 设置 Secure、HttpOnly 与 SameSite=Lax/Strict，并对敏感 Cookie 加密。",
+            "加入跨站与传输层抓包测试，断言敏感 Cookie 不外泄且带安全属性。",
+        ),
+        (
+            "SEC-OPEN-REDIRECT",
+            Severity.MEDIUM,
+            re.compile(r"(?:redirect\s*\(\s*(?:url|next|target|return_url|goto)|redirect\s*\((?![^)]*['\"]|https?://)|next\s*=|return_url\s*=|target_url\s*=)"),
+            "未校验的重定向目标",
+            "接受外部可控 URL 直接重定向可被用于钓鱼或 OAuth 令牌泄露。",
+            "仅允许同源/白名单内路径重定向，拒绝外部绝对 URL。",
+            "加入外部 URL、javascript: 协议与相对路径测试，断言越界重定向被拒绝。",
+        ),
+        (
+            "SEC-LOG-FORGING",
+            Severity.MEDIUM,
+            re.compile(r"(?:log\.(?:info|warning|error|debug|critical)|logger\.[a-z]+|logging\.(?:info|warning|error|getLogger))\s*\([^)]*(?:\+\s*[\"\']|\bf[\"\'])"),
+            "外部输入进入日志",
+            "外部输入直接拼入日志可能造成日志伪造，破坏审计与日志分析。",
+            "对日志中的变量使用结构化字段或转义换行/控制字符，禁止直接拼接原始输入。",
+            "加入含换行与伪造记录的输入测试，断言日志记录保持结构完整。",
+        ),
+        (
+            "REL-UNBOUNDED-RETRY",
+            Severity.HIGH,
+            re.compile(r"\bwhile\s+(?:True|1|not\s+\w+)\s*:|\bfor\s+.*\bin\s+range\([^)]*\)\s*:\s*$"),
+            "无界重试/忙循环",
+            "缺少上限的重试或忙等循环可能在依赖持续失败时永久占用资源。",
+            "为重试加入最大次数与指数退避上限，并设置总超时。",
+            "加入故障持续场景测试，断言重试在达到上限后失败并释放资源。",
+        ),
+        (
+            "REL-FLOAT-MONEY",
+            Severity.MEDIUM,
+            re.compile(r"\b(?:price|amount|balance|total|cost|money|fee|usd)\b\s*[\+\-\*/]\s*[0-9]+\.?[0-9]*|\bfloat\s*\(\s*(?:price|amount|balance|cost|total|money)|\bfloat\s*\(\s*\w+\s*\)\s*[\*\/+\-]"),
+            "金额/精度敏感浮点计算",
+            "金额等精度敏感值使用浮点运算会产生舍入误差，累积导致账务不准确。",
+            "金额改用受约束整数（分）或 Decimal，并明确舍入规则，禁用二进制浮点。",
+            "加入 0.1 步进累加与舍入边界测试，断言结果始终可精确表示且一致。",
+        ),
+        (
+            "REL-NAIVE-DATETIME",
+            Severity.MEDIUM,
+            re.compile(r"datetime\.now\(\)|datetime\.utcnow\s*\(|datetime\.now\((?!timezone)"),
+            "不安全/无时区的系统时间处理",
+            "直接使用本地时间或 naive datetime 会在跨时区/夏令时/并发时间比较时产生竞态与误差。",
+            "统一使用带 timezone 的 UTC 时间；存储与比较规范化到单一时区。",
+            "加入跨时区与并发时钟调整测试，断言时间戳始终为带时区的 UTC。",
+        ),
+        (
+            "REL-BLOCKING-ASYNC",
+            Severity.HIGH,
+            re.compile(r"(?:time\.sleep\s*\(|requests\.get\s*\(|urllib\.request\.urlopen|[a-z_]*\.to_sync\s*\()"),
+            "async 上下文中的阻塞调用",
+            "在 async 事件循环中同步阻塞会让整个循环停滞，造成吞吐下降与超时。",
+            "改用异步版网络/IO 调用或放入线程池；不要把阻塞调用直接放进协程。",
+            "加入高并发协程测试，断言阻塞调用不会拖垮事件循环的其它任务。",
+        ),
+        (
+            "REL-NONATOMIC-WRITE",
+            Severity.MEDIUM,
+            re.compile(r"open\s*\([^)]*['\"][wa]"),
+            "非原子状态/文件写入",
+            "直接覆写或追加写入在多进程/异常中断下会留下半写状态，破坏一致性。",
+            "先写入临时文件并 fsync，再原子 rename；或使用事务化存储。",
+            "加入写入中途失败与并发写测试，断言不存在半写或撕裂状态。",
+        ),
+    )
+
+
 class DomainRuleReviewer(Reviewer):
     """Independent deterministic specialist backed by an explicit rule policy."""
 
@@ -121,7 +260,10 @@ class DomainRuleReviewer(Reviewer):
     def review(self, diff: str, parsed: ParsedDiff) -> List[Finding]:
         findings: List[Finding] = []
         seen = set()
-        rules = [item for item in LocalRuleReviewer.RULES if item[0] in self.rule_ids]
+        rules = [
+            item for item in list(LocalRuleReviewer.RULES) + list(EXTENDED_RULES)
+            if item[0] in self.rule_ids
+        ]
         for line in parsed.added_lines:
             if line.path.endswith((".lock", ".min.js", ".map")):
                 continue
@@ -151,14 +293,21 @@ class SecurityRuleReviewer(DomainRuleReviewer):
     domains = ("security", "authorization")
     rule_ids = frozenset({
         "SEC-EVAL", "SEC-SUBPROCESS-SHELL", "SEC-HARDCODED-SECRET",
-        "SEC-SQL-CONCAT",
+        "SEC-SQL-CONCAT", "SEC-PATH-TRAVERSAL", "SEC-YAML-LOAD",
+        "SEC-PICKLE-LOAD", "SEC-WEAK-HASH", "SEC-WEAK-RANDOM",
+        "SEC-INSECURE-TEMPFILE", "SEC-ASSERT-AUTH", "SEC-INSECURE-COOKIE",
+        "SEC-OPEN-REDIRECT", "SEC-LOG-FORGING",
     })
 
 
 class ReliabilityRuleReviewer(DomainRuleReviewer):
     name = "reliability-agent"
     domains = ("reliability", "correctness", "regression")
-    rule_ids = frozenset({"REL-EMPTY-EXCEPT", "REL-DEBUG-PRINT"})
+    rule_ids = frozenset({
+        "REL-EMPTY-EXCEPT", "REL-DEBUG-PRINT", "REL-UNBOUNDED-RETRY",
+        "REL-FLOAT-MONEY", "REL-NAIVE-DATETIME", "REL-BLOCKING-ASYNC",
+        "REL-NONATOMIC-WRITE",
+    })
 
 
 class OpenAICompatibleReviewer(Reviewer):

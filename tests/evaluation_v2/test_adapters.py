@@ -18,10 +18,63 @@ from evoagent.evaluation_v2.adapters import (  # noqa: E402
     EvaluationExecutionResult,
     LegacyMultiAgentEvaluationAdapter,
     SingleAgentEvaluationAdapter,
+    build_evaluation_leader,
 )
 from evoagent.models import Finding, Severity  # noqa: E402
+from evoagent.skill_evolution import DeclarativeSkillReviewer  # noqa: E402
 
 from helpers import make_clean_case, make_risk_case  # noqa: E402
+
+
+class _CapturingService:
+    """Stub that captures the tool-context composed by build_evaluation_leader."""
+
+    def __init__(self):
+        self.captured = None
+
+    def _build_leader(self, reviewers, execution_policy=None, tool_context_config=None):
+        self.captured = tool_context_config or {}
+        return object()
+
+
+class LeaderDomainCompositionTests(unittest.TestCase):
+    def _skill(self, domain):
+        return DeclarativeSkillReviewer({
+            'name': 'evolved-%s' % domain, 'description': 'x',
+            'rules': [{
+                'rule_id': 'CWE-703', 'severity': 'medium',
+                'match': 'except Exception:', 'domain': domain,
+            }],
+        }, version=1)
+
+    def test_security_candidate_joins_security_reviewers(self):
+        svc = _CapturingService()
+        candidate = self._skill('security')
+        build_evaluation_leader(svc, None, evolved_skill=candidate,
+                                candidate_id='cand-sec', reviewers=[])
+        cfg = svc.captured
+        self.assertIn('cand-sec', cfg['security_reviewer_ids'])
+        self.assertNotIn('cand-sec', cfg['reliability_reviewer_ids'])
+
+    def test_reliability_candidate_joins_reliability_reviewers(self):
+        svc = _CapturingService()
+        candidate = self._skill('reliability')
+        build_evaluation_leader(svc, None, evolved_skill=candidate,
+                                candidate_id='cand-rel', reviewers=[])
+        cfg = svc.captured
+        self.assertNotIn('cand-rel', cfg['security_reviewer_ids'])
+        self.assertIn('cand-rel', cfg['reliability_reviewer_ids'])
+        self.assertEqual(['reliability-rule@1', 'cand-rel'],
+                         cfg['reliability_reviewer_ids'])
+
+    def test_shared_candidate_joins_both_reviewers(self):
+        svc = _CapturingService()
+        candidate = self._skill('shared')
+        build_evaluation_leader(svc, None, evolved_skill=candidate,
+                                candidate_id='cand-sh', reviewers=[])
+        cfg = svc.captured
+        self.assertIn('cand-sh', cfg['security_reviewer_ids'])
+        self.assertIn('cand-sh', cfg['reliability_reviewer_ids'])
 
 
 class AdapterContractTests(unittest.TestCase):

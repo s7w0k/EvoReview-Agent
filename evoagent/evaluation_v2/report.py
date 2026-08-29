@@ -89,6 +89,7 @@ def build_report(
     systems: Dict[str, dict],
     evolution: Dict[str, Any],
     deployment: Dict[str, Any],
+    ci_hard_gates: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Assemble the final report in the section-15 JSON shape.
 
@@ -105,6 +106,7 @@ def build_report(
         },
         "evolution": evolution,
         "deployment": deployment,
+        "ci_hard_gates": dict(ci_hard_gates or {}),
     }
 
 
@@ -123,8 +125,30 @@ def render_markdown(report: Dict[str, Any], dataset_label: str = "") -> str:
     systems = report["systems"]
     evolution = report["evolution"]
     deployment = report["deployment"]
+    ci_hard_gates = report.get("ci_hard_gates") or {}
 
     lines.append("# EvoReview-Agent — Evaluation Harness V2 Report")
+    lines.append("")
+
+    # ---- Architecture proof -------------------------------------------------
+    lines.append("## Architecture Proof")
+    lines.append("")
+    lines.append("| System | Runtime | Candidate Skill |")
+    lines.append("|---|---|---|")
+    architecture_rows = (
+        ("Single Agent", "LocalRuleReviewer", "No"),
+        ("Legacy Multi-Agent", "Legacy MultiAgentCoordinator", "No"),
+        ("Current", _runtime(systems.get("current_harness") or {}).get(
+            "architecture") or "—", "No"),
+        ("Self-Evolved", _runtime(systems.get("evolved_candidate") or {}).get(
+            "architecture") or "—", str((evolution.get("candidate_manifest") or {}).get(
+                "candidate_id") or "—")),
+    )
+    for row in architecture_rows:
+        lines.append("| %s | %s | %s |" % row)
+    lines.append("")
+    lines.append("- Current architecture = `%s`" % architecture_rows[2][1])
+    lines.append("- Self-Evolved architecture = `%s`" % architecture_rows[3][1])
     lines.append("")
     if dataset_label:
         lines.append("> %s" % dataset_label)
@@ -156,15 +180,21 @@ def render_markdown(report: Dict[str, Any], dataset_label: str = "") -> str:
                 cell = _pct(value)
             row.append(cell)
         lines.append("| " + " | ".join(row) + " |")
-    # Extra rows unique to V2.
-    crit_row = ["Critical Misses"]
-    for skey in SYSTEM_ORDER:
-        if skey not in systems:
-            continue
-        det = _det(systems[skey])
-        misses = (det.get("high_total") or 0) - (det.get("high_hits") or 0)
-        crit_row.append(_int(misses))
-    lines.append("| " + " | ".join(crit_row) + " |")
+    # Explicit severity accounting prevents high-risk misses from being
+    # mislabeled as critical misses.
+    for key, label in (
+        ("high_risk_total", "High-risk Total"),
+        ("high_risk_hits", "High-risk Hits"),
+        ("high_risk_misses", "High-risk Misses"),
+        ("critical_total", "Critical Total"),
+        ("critical_hits", "Critical Hits"),
+        ("critical_misses", "Critical Misses"),
+    ):
+        row = [label]
+        for skey in SYSTEM_ORDER:
+            if skey in systems:
+                row.append(_int(_det(systems[skey]).get(key)))
+        lines.append("| " + " | ".join(row) + " |")
     p95_row = ["P95 Latency (ms)"]
     for skey in SYSTEM_ORDER:
         if skey not in systems:
@@ -198,10 +228,13 @@ def render_markdown(report: Dict[str, Any], dataset_label: str = "") -> str:
                    _pct(stable_val.get(key)), _pct(evolved_val.get(key)),
                    _pct(stable_ho.get(key)), _pct(evolved_ho.get(key))]
             lines.append("| " + " | ".join(row) + " |")
-        crit_row2 = ["Critical Misses",
-                     _int(_critical(stable_val)), _int(_critical(evolved_val)),
-                     _int(_critical(stable_ho)), _int(_critical(evolved_ho))]
-        lines.append("| " + " | ".join(crit_row2) + " |")
+        for key, label in (
+            ("high_risk_misses", "High-risk Misses"),
+            ("critical_misses", "Critical Misses"),
+        ):
+            row = [label, _int(stable_val.get(key)), _int(evolved_val.get(key)),
+                   _int(stable_ho.get(key)), _int(evolved_ho.get(key))]
+            lines.append("| " + " | ".join(row) + " |")
         lines.append("")
 
     # ---- Holdout Deltas (resume value) --------------------------------------
@@ -302,11 +335,26 @@ def render_markdown(report: Dict[str, Any], dataset_label: str = "") -> str:
             lines.append("  - traffic share after rollback: %s · previous-good restored: %s" % (
                 rollback.get("traffic_share_after"), rollback.get("previous_good_restored")))
         lines.append("")
+    if ci_hard_gates:
+        lines.append("## Evaluation V2 CI Hard Gates")
+        lines.append("")
+        lines.append("| Gate | Result | Detail |")
+        lines.append("|---|---:|---|")
+        for name, spec in (ci_hard_gates.get("gates") or {}).items():
+            lines.append("| %s | **%s** | %s |" % (
+                name, "PASS" if spec.get("passed") else "FAIL",
+                spec.get("detail") or ""))
+        lines.append("")
+        lines.append("**Overall CI Hard Gate: %s**" % (
+            "PASS" if ci_hard_gates.get("passed") else "FAIL"))
+        lines.append("")
     return "\n".join(lines)
 
 
 def _critical(det: Dict[str, Any]) -> int:
-    return int((det.get("high_total") or 0) - (det.get("high_hits") or 0))
+    if "critical_misses" in det:
+        return int(det.get("critical_misses") or 0)
+    return int((det.get("critical_total") or 0) - (det.get("critical_hits") or 0))
 
 
 # --------------------------------------------------------------------------- #
@@ -319,9 +367,12 @@ def write_report(
     evolution: Dict[str, Any],
     deployment: Dict[str, Any],
     dataset_label: str = "",
+    ci_hard_gates: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     os.makedirs(out_dir, exist_ok=True)
-    report = build_report(dataset_info, systems, evolution, deployment)
+    report = build_report(
+        dataset_info, systems, evolution, deployment,
+        ci_hard_gates=ci_hard_gates)
     with open(os.path.join(out_dir, "evaluation-report.json"), "w",
               encoding="utf-8") as handle:
         json.dump(report, handle, ensure_ascii=False, default=str, indent=2)

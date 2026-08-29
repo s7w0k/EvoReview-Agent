@@ -14,6 +14,7 @@ final artifact is built only from those observations.
 """
 from typing import Any, Dict, List, Optional
 
+from ..finding_identity import canonical_family
 from ..models import Severity
 from .base import BaseLoopAgent
 from .stepper import (
@@ -30,7 +31,8 @@ def _merge_findings(groups: List[List[Dict[str, Any]]]) -> List[Dict[str, Any]]:
     for group in groups:
         for finding in group:
             key = "%s:%s:%s" % (
-                finding.get("rule_id"), finding.get("path"), finding.get("line"))
+                canonical_family(str(finding.get("rule_id", ""))),
+                finding.get("path"), finding.get("line"))
             current = merged.get(key)
             # keep the higher-severity / higher-confidence copy
             if current is None or _severity_rank(finding) <= _severity_rank(current):

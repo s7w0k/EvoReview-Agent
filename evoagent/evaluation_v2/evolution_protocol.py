@@ -12,7 +12,7 @@ pattern, not a case id or a fixed line number.
 """
 import re
 from dataclasses import asdict, dataclass, field
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from evoagent.diff_parser import parse_unified_diff
 from evoagent.skill_evolution import DeclarativeSkillReviewer, validate_artifact
@@ -41,6 +41,7 @@ class FrozenCandidateManifest:
     validation_dataset_sha256: str
     created_from_split: str
     gate_result: str
+    disposition: Optional[str] = None
     gates: Dict[str, Any] = field(default_factory=dict)
     artifact: Dict[str, Any] = field(default_factory=dict)
 
@@ -220,10 +221,33 @@ def _critical_metrics(case_results: List[dict]) -> Dict[str, int]:
     total_critical = 0
     caught_critical = 0
     for result in case_results:
-        # high + critical expected findings that were caught.
-        total_critical += result.get("high_total", 0)
-        caught_critical += result.get("high_hits", 0)
-    return {"high_total": total_critical, "high_hits": caught_critical}
+        # Compatibility fallback is only for old frozen fixtures.  New V2
+        # results always carry critical-only counters.
+        total_critical += result.get(
+            "critical_total", result.get("high_total", 0))
+        caught_critical += result.get(
+            "critical_hits", result.get("high_hits", 0))
+    return {
+        "critical_total": total_critical,
+        "critical_hits": caught_critical,
+        "critical_misses": total_critical - caught_critical,
+    }
+
+
+def _stable_tp_retention(stable: Dict[str, Any], evolved: Dict[str, Any]) -> float:
+    evolved_by_id = {
+        item.get("id"): item for item in evolved.get("case_results") or []}
+    stable_tp = 0
+    retained = 0
+    for item in stable.get("case_results") or []:
+        matches = item.get("matches") or []
+        stable_tp += len(matches)
+        evolved_matches = {
+            match.get("expected_index") for match in
+            (evolved_by_id.get(item.get("id"), {}).get("matches") or [])}
+        retained += sum(
+            match.get("expected_index") in evolved_matches for match in matches)
+    return round(retained / stable_tp, 4) if stable_tp else 1.0
 
 
 def safety_gates(stable: Dict[str, Any], evolved: Dict[str, Any]) -> Dict[str, Any]:
@@ -244,29 +268,62 @@ def safety_gates(stable: Dict[str, Any], evolved: Dict[str, Any]) -> Dict[str, A
     e_crit = _critical_metrics(evolved["case_results"])
 
     e_success = evolved["metrics"]["runtime"]["execution_success_rate"]
+    stable_tp_retention = _stable_tp_retention(stable, evolved)
+
+    f1_delta = e_f1 - s_f1
+    hr_delta = e_hr - s_hr
+    material = (f1_delta >= 0.02) or (hr_delta >= 0.05)
 
     gates = {
-        "Validation Improvement": gate(
-            "validation_improvement", e_f1 >= s_f1,
-            "candidate F1 %.4f >= stable F1 %.4f" % (e_f1, s_f1)),
+        "Material Improvement": gate(
+            "material_improvement", material,
+            "candidate F1 delta %+.4f (>= +0.02) or HR-Recall delta %+.4f "
+            "(>= +0.05)" % (f1_delta, hr_delta)),
         "High-risk Non-regression": gate(
             "high_risk", e_hr >= s_hr,
             "candidate HR-Recall %.4f >= stable %.4f" % (e_hr, s_hr)),
         "Critical Miss Non-regression": gate(
-            "critical", e_crit["high_hits"] >= s_crit["high_hits"],
-            "candidate critical hits %d >= stable %d" % (e_crit["high_hits"], s_crit["high_hits"])),
+            "critical",
+            e_crit["critical_misses"] <= s_crit["critical_misses"],
+            "candidate critical misses %d <= stable %d" % (
+                e_crit["critical_misses"], s_crit["critical_misses"])),
         "Clean Accuracy Non-regression": gate(
             "clean", e_clean >= s_clean - 0.02,
             "candidate clean %.4f >= stable %.4f - 0.02" % (e_clean, s_clean)),
         "Catastrophic Forgetting": gate(
-            "forgetting", e_hr >= s_hr - 0.0,
-            "no high-risk recall drop beyond threshold"),
+            "forgetting", e_hr >= s_hr and stable_tp_retention >= 1.0,
+            "high-risk non-regression and stable TP retention %.4f" %
+            stable_tp_retention),
         "Runtime Safety": gate(
             "runtime", e_success >= 0.99,
             "candidate execution success %.4f >= 0.99" % e_success),
     }
     all_pass = all(item["passed"] for item in gates.values())
-    return {"passed": all_pass, "gates": gates}
+    return {
+        "passed": all_pass,
+        "disposition": _candidate_disposition(gates),
+        "gates": gates,
+    }
+
+
+def _candidate_disposition(gates: Dict[str, Any]) -> str:
+    """Classify a candidate as promote-ready, a no-op, or rejected.
+
+    A candidate that only avoids regression without a material gain must be
+    kept out of promotion (plan Phase 6): it is marked ``NO_MATERIAL_IMPROVEMENT``
+    rather than Promote-ready.
+    """
+    material = bool(gates.get("Material Improvement", {}).get("passed"))
+    non_regress = all(
+        g.get("passed")
+        for name, g in gates.items()
+        if name != "Material Improvement" and g.get("passed") is not None
+    )
+    if material and non_regress:
+        return "PROMOTE_READY"
+    if not material and non_regress:
+        return "NO_MATERIAL_IMPROVEMENT"
+    return "REJECTED"
 
 
 # --------------------------------------------------------------------------- #
@@ -279,6 +336,13 @@ def freeze_candidate(
     parent_policy_id: str = "baseline-high",
 ) -> FrozenCandidateManifest:
     candidate_id = "eval-v2-%s" % artifact["name"]
+    # A no-op candidate (non-regression but no material gain) is not promote-
+    # ready (plan Phase 6): it must never be recorded as PASS.
+    disposition = gates.get("disposition")
+    if disposition == "NO_MATERIAL_IMPROVEMENT":
+        gate_result = "NO_MATERIAL_IMPROVEMENT"
+    else:
+        gate_result = "PASS" if gates.get("passed") else "FAIL"
     return FrozenCandidateManifest(
         candidate_id=candidate_id,
         parent_policy_id=parent_policy_id,
@@ -286,7 +350,8 @@ def freeze_candidate(
         runtime_policy_version="stable",
         validation_dataset_sha256=validation_sha256,
         created_from_split="validation",
-        gate_result="PASS" if gates.get("passed") else "FAIL",
+        gate_result=gate_result,
+        disposition=disposition,
         gates=gates,
         artifact=artifact,
     )
